@@ -6,14 +6,47 @@ image_resource:
   type: docker-image
   source: {repository: nsxedgegen/nsx-t-gen-worker}
 
-# params:
-#   VCENTER_HOST:
-#   VCENTER_USR:
-#   VCENTER_PWD:
+params:
+  VCENTER_HOST:
+  VCENTER_USR:
+  VCENTER_PWD:
+  VCENTER_DATACENTER:
+  VCENTER_DATASTORE:
+  VCENTER_CLUSTER:
+  NTPSERVERS:
+  PORTGROUP:
+  DNSSERVER:
+  DNSDOMAIN:
+  DEFAULTGATEWAY:
+  NETMASK:
+  NSX_T_MANAGER_FQDN:
+  NSX_T_MANAGER_VM_NAME:
+  NSX_T_MANAGER_IP:
+  NSX_T_MANAGER_ADMIN_PWD:
+  NSX_T_MANAGER_CLI_PWD:
+  NSX_T_CONTROLLER_HOST_PREFIX:
+  NSX_T_CONTROLLER_IPS:
+  NSX_T_CONTROLLER_CLUSTER_PWD:
+  NSX_T_EDGE_HOST_PREFIX:
+  NSX_T_EDGE_IPS:
+  NSX_T_EDGE_PORTGROUP_EXT:
+  NSX_T_EDGE_PORTGROUP_TRANSPORT:
+  NSX_T_TEP_POOL_NAME:
+  NSX_T_TEP_POOL_CIDR:
+  NSX_T_TEP_POOL_GATEWAY:
+  NSX_T_TEP_POOL_START:
+  NSX_T_TEP_POOL_END:
+  NSX_T_TRANSPORT_ZONE:
+  NSX_T_HOSTSWITCH:
+  NSX_T_TRANSPORT_VLAN:
+  NSX_T_T0ROUTER:
 
     
 inputs:
   - name: nsx-t-gen-pipeline
-  
+  - name: nsx-mgr-ova
+  - name: nsx-ctrl-ova
+  - name: nsx-edge-ova
+  - name: ovftool 
 run:
   path: nsx-t-gen-pipeline/tasks/install-nsx-t/task.sh
