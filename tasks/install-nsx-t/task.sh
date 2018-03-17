@@ -87,7 +87,7 @@ do
   cat >> controller_config.yml <<-EOF
 $controller_config
   nsxController0${count}:
-    hostname: $NSX_T_CONTROLLER_HOST_PREFIX0${count}.$DNSDOMAIN 
+    hostname: ${NSX_T_CONTROLLER_HOST_PREFIX}-0${count}.${DNSDOMAIN} 
     vmName: "${NSX_T_CONTROLLER_VM_NAME_PREFIX} 0${count}" 
     ipAddress: $controller_ip
     ovaFile: $NSX_T_CONTROLLER_OVA
@@ -106,7 +106,7 @@ do
   cat >> edge_config.yml <<-EOF
 $edge_config
   nsxEdge0${count}:
-    hostname: $NSX_T_EDGE_HOST_PREFIX0${count}.$DNSDOMAIN 
+    hostname: ${NSX_T_EDGE_HOST_PREFIX}-0${count}.${DNSDOMAIN}  
     vmName: "${NSX_T_EDGE_VM_NAME_PREFIX} 0${count}" 
     ipAddress: $edge_ip
     ovaFile: $NSX_T_EDGE_OVA
@@ -130,23 +130,27 @@ echo "[nsxcontrollers]" > ctrl_vms
 for controller_ip in $(echo $NSX_T_CONTROLLER_IPS | sed -e 's/,/ /g')
 do
   cat >> ctrl_vms <<-EOF
-$NSX_T_CONTROLLER_HOST_PREFIX0${count}  ansible_ssh_host=$controller_ip   ansible_ssh_user=root ansible_ssh_pass=$NSX_T_CONTROLLER_ROOT_PWD
+${NSX_T_CONTROLLER_HOST_PREFIX}0${count}  ansible_ssh_host=$controller_ip   ansible_ssh_user=root ansible_ssh_pass=$NSX_T_CONTROLLER_ROOT_PWD
 EOF
+  (( count++ ))
+done
 
 count=1
 echo "[nsxedges]" > edge_vms
 for edge_ip in $(echo $NSX_T_EDGE_IPS | sed -e 's/,/ /g')
 do
 cat >> edge_vms <<-EOF
-$NSX_T_EDGE_HOST_PREFIX0${count}  ansible_ssh_host=$edge_ip   ansible_ssh_user=root ansible_ssh_pass=$NSX_T_EDGE_ROOT_PWD
+${NSX_T_EDGE_HOST_PREFIX}0${count}  ansible_ssh_host=$edge_ip   ansible_ssh_user=root ansible_ssh_pass=$NSX_T_EDGE_ROOT_PWD
 EOF
+  (( count++ ))
+done
 
 count=1
 echo "[nsxtransportnodes]" > esxi_hosts
 for esxi_host_ip_passwd in $(echo $ESXI_HOST_IP_PWDS | sed -e 's/,/ /g')
 do
-  ESXI_INSTANCE_IP=$(echo esxi_host_ip_passwd | awk -F ':' '{print $1}' )  
-  ESXI_INSTANCE_PWD=$(echo esxi_host_ip_passwd | awk -F ':' '{print $2}' )
+  ESXI_INSTANCE_IP=$(echo $esxi_host_ip_passwd | awk -F ':' '{print $1}' )  
+  ESXI_INSTANCE_PWD=$(echo $esxi_host_ip_passwd | awk -F ':' '{print $2}' )
   if [ "$ESXI_INSTANCE_PWD" == "" ]; then
     ESXI_INSTANCE_PWD=$ESXI_HOST_PWD
   fi  
@@ -154,6 +158,7 @@ do
   cat >> esxi_hosts <<-EOF
 esxi-0${count}  ansible_ssh_host=$ESXI_INSTANCE_IP   ansible_ssh_user=root ansible_ssh_pass=$ESXI_INSTANCE_PWD
 EOF
+  (( count++ ))
 done
 
 
@@ -162,7 +167,7 @@ cat > hosts <<-EOF
 localhost       ansible_connection=local
 
 [jumphost]
-$JUMPBOX_IP    ansible_ssh_host=$JUMPBOX_IP   ansible_ssh_user=root ansible_ssh_pass=$JUMPBOX_ROOT_PWD
+$JUMPBOX_IP    ansible_ssh_host=$JUMPBOX_IP   ansible_ssh_user=$JUMPBOX_USER ansible_ssh_pass=$JUMPBOX_PWD
 
 [nsxmanagers]
 $NSX_T_MANAGER_IP     ansible_ssh_host=$NSX_T_MANAGER_IP    ansible_ssh_user=root ansible_ssh_pass=$NSX_T_MANAGER_ROOT_PWD
@@ -170,8 +175,16 @@ $NSX_T_MANAGER_IP     ansible_ssh_host=$NSX_T_MANAGER_IP    ansible_ssh_user=roo
 EOF
 
 cat ctrl_vms >> hosts
+echo "" >> hosts
 cat edge_vms >> hosts
+echo "" >> hosts
 cat esxi_hosts >> hosts
+echo "" >> hosts
+
+cat > ansible.cfg <<-EOF
+[defaults]
+host_key_checking = false
+EOF
 
 
 sleep 200
