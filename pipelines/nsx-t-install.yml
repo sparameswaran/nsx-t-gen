@@ -8,14 +8,11 @@ nsx_t_gen_params: &nsx-t-gen-params
   VCENTER_DATASTORE: {{vcenter_datastore}}
   VCENTER_CLUSTER: {{vcenter_cluster}}
   NTPSERVERS: {{ntpservers}}
-  PORTGROUP: {{portgroup}}
+  MGMT_PORTGROUP: {{mgmt_portgroup}}
   DNSSERVER: {{dnsserver}}
   DNSDOMAIN: {{dnsdomain}}
   DEFAULTGATEWAY: {{defaultgateway}}
   NETMASK: {{netmask}}
-  JUMPBOX_IP: {{jumpbox_ip}}
-  JUMPBOX_USER: {{jumpbox_user}}
-  JUMPBOX_PWD: {{jumpbox_pwd}}
   ESXI_HOST_PWD: {{esxi_host_pwd}}
   ESXI_HOST_IP_PWDS: {{esxi_host_ip_pwds}}
   NSX_T_MANAGER_FQDN: {{nsx_t_manager_fqdn}}

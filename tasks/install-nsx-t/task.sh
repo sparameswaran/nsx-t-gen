@@ -31,7 +31,7 @@ cat > answerfile.yml <<-EOF
 ovfToolPath: '/usr/bin'
 deployDataCenterName: $VCENTER_DATACENTER
 deployMgmtDatastoreName: $VCENTER_DATASTORE
-deployMgmtPortGroup: $PORTGROUP
+deployMgmtPortGroup: $MGMT_PORTGROUP
 deployCluster: $VCENTER_CLUSTER
 deployMgmtDnsServer: $DNSSERVER
 deployNtpServers: $NTPSERVERS
@@ -47,7 +47,7 @@ deployVcPassword: $VCENTER_PWD
 sshEnabled: True
 allowSSHRootAccess: True
 
-api_origin: 'jumphost'
+api_origin: 'localhost'
 
 ippool:
   name: $NSX_T_TEP_POOL_NAME
@@ -130,7 +130,7 @@ echo "[nsxcontrollers]" > ctrl_vms
 for controller_ip in $(echo $NSX_T_CONTROLLER_IPS | sed -e 's/,/ /g')
 do
   cat >> ctrl_vms <<-EOF
-${NSX_T_CONTROLLER_HOST_PREFIX}0${count}  ansible_ssh_host=$controller_ip   ansible_ssh_user=root ansible_ssh_pass=$NSX_T_CONTROLLER_ROOT_PWD
+nsx-controller0${count}  ansible_ssh_host=$controller_ip   ansible_ssh_user=root ansible_ssh_pass=$NSX_T_CONTROLLER_ROOT_PWD
 EOF
   (( count++ ))
 done
@@ -166,11 +166,8 @@ cat > hosts <<-EOF
 [localhost]
 localhost       ansible_connection=local
 
-[jumphost]
-$JUMPBOX_IP    ansible_ssh_host=$JUMPBOX_IP   ansible_ssh_user=$JUMPBOX_USER ansible_ssh_pass=$JUMPBOX_PWD
-
 [nsxmanagers]
-$NSX_T_MANAGER_IP     ansible_ssh_host=$NSX_T_MANAGER_IP    ansible_ssh_user=root ansible_ssh_pass=$NSX_T_MANAGER_ROOT_PWD
+nsx-manager     ansible_ssh_host=$NSX_T_MANAGER_IP    ansible_ssh_user=root ansible_ssh_pass=$NSX_T_MANAGER_ROOT_PWD
 
 EOF
 
