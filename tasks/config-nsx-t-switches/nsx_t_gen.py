@@ -1,11 +1,9 @@
 import os
 import json
-import requests
-from requests.auth import HTTPBasicAuth
+import yaml
 from pprint import pprint
 
 import client
-
 
 DEBUG=True
 
@@ -24,7 +22,7 @@ global_id_map = { }
 
 def init():
 	nsx_mgr_ip          = os.getenv('NSX_T_MANAGER_IP')
-	nsx_mgr_user        = os.getenv('NSX_T_MANAGER_ADMIN_USER')
+	nsx_mgr_user        = os.getenv('NSX_T_MANAGER_ADMIN_USER', 'admin')
 	nsx_mgr_pwd         = os.getenv('NSX_T_MANAGER_ADMIN_PWD')
 	transport_zone_name = os.getenv('NSX_T_MANAGER_TRANSPORT_ZONE')
 	nsx_mgr_context     = { 'admin_user' : nsx_mgr_user, 'url': 'https://' + nsx_mgr_ip, 'admin_passwd' : nsx_mgr_pwd }
@@ -329,7 +327,7 @@ def associate_logical_switch_port(t1_router_name, logical_switch_name, subnet):
   resp=client.post(api_endpoint, payload)
 
   logical_router_port_id=resp.json()['id']
-  print("Created Logical Switch Port from Logical Switch '{}' with name: '{}' "
+  print("Created Logical Switch Port from Logical Switch {} with name: {} "
   			+ "to T1Router: {}".format(logical_switch_name, switch_port_name, t1_router_name))
   
   global_id_map['LRP:' + name] = logical_router_port_id
@@ -381,40 +379,48 @@ def main():
 	load_edge_clusters()
 	load_transport_zones()
 	
-	t0_router_name = os.getenv('NSX_T_T0ROUTER')
-	t1_routers     = os.getenv('NSX_T_T1ROUTER_LOGICAL_SWITCHES')
-
+	t0_router_name    = os.getenv('NSX_T_T0ROUTER')
+	t1_router_content = os.getenv('NSX_T_T1ROUTER_LOGICAL_SWITCHES')
+  t1_routers        = yaml.load(t1_router_content)
+  
 	t0_router_id   = create_t0_logical_router(t0_router_name)
 
 	pas_tag_name    = os.getenv('NSX_T_PAS_TAG')	
-	tags = { 'ncp/cluster': pas_tag_name , 'ncp/shared_resource': 'true' }
-	update_tag(ROUTERS_ENDPOINT + '/' + t0_router_id, tags)
+	pas_tags = { 	
+						'ncp/cluster': pas_tag_name , 
+						'ncp/shared_resource': 'true' 
+					}
+	update_tag(ROUTERS_ENDPOINT + '/' + t0_router_id, pas_tags)
 
 	ha_switching_profile = os.getenv('NSX_T_HA_SWITCHING_PROFILE', 'HASwitchingProfile')
 	switching_profile_id=create_ha_switching_profile(ha_switching_profile)
-	switching_profile_tags = { 'ncp/cluster': pas_tag_name , 'ncp/shared_resource': 'true' , 'ncp/ha': 'true' }
+	switching_profile_tags = { 	
+															'ncp/cluster': pas_tag_name , 
+															'ncp/shared_resource': 'true' , 
+															'ncp/ha': 'true' 
+														}
 	update_tag(SWITCHING_PROFILE_ENDPOINT + '/' + switching_profile_id, switching_profile_tags)
 
-	ip_block_name   = os.getenv('NSX_T_CONTAINER_IP_BLOCK')
-	ip_block_cidr   = os.getenv('NSX_T_CONTAINER_IP_BLOCK_CIDR')
-	container_ip_block_id = create_container_ip_block(ip_block_name, ip_block_cidr)
-	update_tag(CONTAINER_IP_BLOCKS_ENDPOINT + '/' + container_ip_block_id, tags)
+	ip_blocks   = yaml.load(os.getenv('NSX_T_CONTAINER_IP_BLOCK'))
+	for ip_block in ip_blocks:
+		container_ip_block_id = create_container_ip_block(ip_block['name'], ip_block['cidr'])
+		update_tag(CONTAINER_IP_BLOCKS_ENDPOINT + '/' + container_ip_block_id, pas_tags)
 	
-	ip_pool_name    = os.getenv('NSX_T_EXTERNAL_IP_POOL')
-	ip_pool_cidr    = os.getenv('NSX_T_EXTERNAL_IP_POOL_CIDR')
-	ip_pool_gateway = os.getenv('NSX_T_EXTERNAL_IP_POOL_GATEWAY')
-	ip_pool_start   = os.getenv('NSX_T_EXTERNAL_IP_POOL_START')
-	ip_pool_end     = os.getenv('NSX_T_EXTERNAL_IP_POOL_END')
-	create_external_ip_pool(ip_pool_name, ip_pool_cidr, ip_pool_gateway, ip_pool_start, ip_pool_end)
+	ip_pools    = yaml.load(os.getenv('NSX_T_EXTERNAL_IP_POOL'))
+	for ip_pool in ip_pools:
+		create_external_ip_pool(ip_pool['name'], 
+														ip_pool['cidr'], 
+														ip_pool['gateway'], 
+														ip_pool['start'], 
+														ip_pool['end'])
 
 	for t1_router in t1_routers:
-		key = t1_router.keys()[0]
-		t1_router_name = key
+		t1_router_name = t1_router['name']
 		create_t1_logical_router_and_port(t0_router_name, t1_router_name)
-		logical_switches = t1_router[t1_router_name]
+		logical_switches = t1_router['switches']
 		for logical_switch_entry in logical_switches:
-			logical_switch_name = logical_switch_entry.split(':')[0]
-			logical_switch_subnet = logical_switch_entry.split(':')[1]
+			logical_switch_name = logical_switch_entry['name']
+			logical_switch_subnet = logical_switch_entry['subnet']
 			create_logical_switch(logical_switch_name)
 			associate_logical_switch_port(t1_router_name, logical_switch_name, logical_switch_subnet)
 

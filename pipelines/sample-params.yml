@@ -1,0 +1,75 @@
+vcenter_host: vcsa-01.corp.local.io
+vcenter_usr: administrator@vsphere.local
+vcenter_pwd: 39adladfasdfl!
+vcenter_datacenter: Datacenter
+vcenter_datastore: Datastore
+vcenter_cluster: Cluster
+ntpservers: 10.13.12.2
+mgmt_portgroup: 'VM Network'
+dnsserver: 10.13.12.2
+dnsdomain: corp.local.io
+defaultgateway: 10.13.12.1
+netmask: 255.255.255.0
+
+# Specify passwd of the esxi hosts that should be used for nsx-t
+esxi_host_pwd: hostPaswd!  # Root password for the esxi hosts
+# Specify ips (and passwds if they are different) for all the esxi hosts that should be used for nsx-t
+esxi_host_ip_pwds: 10.13.12.10:hostPaswd!! # ip:passwd[,] # Password can be ignored if same root passwd used for all hosts
+
+nsx_t_manager_fqdn: nsx-t-mgr.corp.local.io
+nsx_t_manager_vm_name: 'NSX-T Mgr'
+nsx_t_manager_ip: 10.13.12.50
+nsx_t_manager_admin_user: admin
+nsx_t_manager_admin_pwd: VMware1!
+nsx_t_manager_root_pwd: VMware1!
+nsx_t_controller_host_prefix: nsx-t-ctl # Generated controller would be nsx-t-ctrl-1.corp.local.io,...
+nsx_t_controller_vm_name_prefix: 'NSX-T Controller' # Generated edge host name would be "NSX-T Controller-1"
+nsx_t_controller_ips: 10.13.12.51,10.13.12.52,10.13.12.53 # Should be 1 or 3 ips to maintain quorum for Controller Cluster
+nsx_t_controller_root_pwd: VMware1!
+nsx_t_controller_cluster_pwd: VMware1!
+nsx_t_edge_host_prefix: nsx-t-edge # Generated edge would be nsx-t-edge-1.corp.local.io,...
+nsx_t_edge_vm_name_prefix: 'NSX-T Edge' # Generated edge host name would be "NSX-T Edge-1"
+nsx_t_edge_ips: 10.13.12.54,10.13.12.55
+nsx_t_edge_root_pwd: VMware1!
+nsx_t_edge_portgroup_ext: vlan3032 # For external routing
+nsx_t_edge_portgroup_transport: vlan3127 # For TEP
+nsx_t_tep_pool_name: tep-ip-pool
+nsx_t_tep_pool_cidr: 192.168.213.0/24
+nsx_t_tep_pool_gateway: 192.168.213.1
+nsx_t_tep_pool_start: 192.168.213.10
+nsx_t_tep_pool_end: 192.168.213.200
+nsx_t_transport_zone: tz1
+nsx_t_hostswitch: hostswitch1
+nsx_t_transport_vlan: 3127
+
+# Additional configs for T0Router (only one per run), T1Routers, Logical switches and tags...
+nsx_t_t0router: DefaultT0Router
+nsx_t_pas_ncp_cluster_tag: pcf2.0
+nsx_t_t0router_uplink: 10.193.162.10
+nsx_t_t1router_logical_switches: |
+  - name: T1Router-Mgmt
+    switches:
+    - name: InfraLogicalSwitch
+      subnet: 192.168.10.1/26 # Last octet should be 1 rather than 0
+  - name: T1Router-PAS
+    switches:
+    - name: PASDeployment
+      subnet: 192.168.20.1/22 # Last octet should be 1 rather than 0
+    - name: PASServices
+      subnet: 192.168.24.1/22 # Last octet should be 1 rather than 0
+    - name: PASDynamicServices
+      subnet: 192.168.28.1/22 # Last octet should be 1 rather than 0
+  - name: T1Router-PKS
+    switches:
+    - name: PKSServicesLogicalSwitch
+      subnet: 192.168.40.1/22 # Last octet should be 1 rather than 0
+nsx_t_ha_switching_profile:
+nsx_t_container_ip_block: |
+  - name: container-ip-block1
+    cidr: 10.100.0.0/16    
+nsx_t_external_ip_pool: |
+  - name: external-ip-pool1
+    cidr: 10.100.0.0/24
+    gateway: 10.100.0.1
+    start: 10.100.0.10 # Should not include gateway ip
+    end: 10.100.0.200  # Should not include gateway ip
