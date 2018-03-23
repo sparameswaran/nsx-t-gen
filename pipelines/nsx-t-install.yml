@@ -40,8 +40,8 @@ nsx_t_gen_params: &nsx-t-gen-params
   NSX_T_HOSTSWITCH: {{nsx_t_hostswitch}}
   NSX_T_TRANSPORT_VLAN: {{nsx_t_transport_vlan}}
   NSX_T_T0ROUTER: {{nsx_t_t0router}}
-  TEST_PAYLOAD: {{test_payload}}
-
+  NSX_T_T1ROUTER_LOGICAL_SWITCHES: {{nsx_t_t1router_logical_switches}}
+  
 groups:
 - name: install
   jobs:
