@@ -7,6 +7,9 @@ nsx_t_gen_params: &nsx-t-gen-params
   VCENTER_DATACENTER: {{vcenter_datacenter}}
   VCENTER_DATASTORE: {{vcenter_datastore}}
   VCENTER_CLUSTER: {{vcenter_cluster}}
+  VLAN_MGMT: {{vlan_mgmt}}
+  VLAN_VMOTION: {{vlan_vmotion}}
+  VLAN_VSAN: {{vlan_vsan}}
   NTPSERVERS: {{ntpservers}}
   MGMT_PORTGROUP: {{mgmt_portgroup}}
   DNSSERVER: {{dnsserver}}
@@ -37,15 +40,27 @@ nsx_t_gen_params: &nsx-t-gen-params
   NSX_T_TEP_POOL_GATEWAY: {{nsx_t_tep_pool_gateway}}
   NSX_T_TEP_POOL_START: {{nsx_t_tep_pool_start}}
   NSX_T_TEP_POOL_END: {{nsx_t_tep_pool_end}}
-  NSX_T_TRANSPORT_ZONE: {{nsx_t_transport_zone}}
+  NSX_T_TEP_POOL_NAMESERVER: {[nsx_t_tep_pool_nameserver]}
+  NSX_T_OVERLAY_TRANSPORT_ZONE: {{nsx_t_overlay_transport_zone}}
+  NSX_T_VLAN_TRANSPORT_ZONE: {{nsx_t_vlan_transport_zone}}
+  NSX_T_EDGE_UPLINK_PROFILE_NAME:
+  NSX_T_EDGE_UPLINK_PROFILE_MTU:
+  NSX_T_EDGE_UPLINK_PROFILE_VLAN:
+  NSX_T_EDGE_INTERFACE:
+  NSX_T_EDGE_CLUSTER:
+  NSX_T_ESXI_UPLINK_PROFILE_NAME:
+  NSX_T_ESXI_UPLINK_PROFILE_MTU:
+  NSX_T_ESXI_UPLINK_PROFILE_VLAN:
   NSX_T_HOSTSWITCH: {{nsx_t_hostswitch}}
   NSX_T_TRANSPORT_VLAN: {{nsx_t_transport_vlan}}
-  NSX_T_PAS_TAG: {{nsx_t_pas_tag}}
   NSX_T_T0ROUTER: {{nsx_t_t0router}}
+  NSX_T_T0ROUTER_HA_MODE: {{nsx_t_t0router_ha_mode}}
+  NSX_T_PAS_NCP_CLUSTER_TAG: {{nsx_t_pas_ncp_cluster_tag}}
   NSX_T_T1ROUTER_LOGICAL_SWITCHES: {{nsx_t_t1router_logical_switches}}
   NSX_T_HA_SWITCHING_PROFILE: {{nsx_t_ha_switching_profile}}
   NSX_T_CONTAINER_IP_BLOCK: {{nsx_t_container_ip_block}}
   NSX_T_EXTERNAL_IP_POOL: {{nsx_t_external_ip_pool}}
+  SUPPORT_NSX_VMOTION: {{support_nsx_vmotion}}
 
 groups:
 - name: install
@@ -69,6 +84,12 @@ resources:
   type: git
   source:
     uri: https://github.com/sparameswaran/nsx-t-gen.git
+    branch: master
+
+- name: nsxt-ansible
+  type: git
+  source:
+    uri: https://github.com/yasensim/nsxt-ansible
     branch: master
 
 # Download NSX-T 2.1 bits from
@@ -114,6 +135,7 @@ jobs:
   plan:
   - aggregate:
     - get: nsx-t-gen-pipeline
+    - get: nsxt-ansible
     - get: nsx-mgr-ova
     - get: nsx-ctrl-ova
     - get: nsx-edge-ova

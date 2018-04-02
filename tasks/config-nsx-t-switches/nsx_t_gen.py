@@ -210,9 +210,9 @@ def create_t1_logical_router_and_port(t0_router_name, t1_router_name):
   t0_router_id=create_t0_logical_router(t0_router_name)
   t1_router_id=create_t1_logical_router(t1_router_name)
   
-  name = "LogicalRouterLinkPortFrom{}To{}".format(t0_router_name, t1_router_name )
-  descp = "Port created on {} router for {}".format(t0_router_name, t1_router_name )
-  target_display_name = "LinkedPort_{}To{}".format(t0_router_name, t1_router_name )
+  name = "LogicalRouterLinkPortFrom%sTo%s" % (t0_router_name, t1_router_name )
+  descp = "Port created on %s router for %s" % (t0_router_name, t1_router_name )
+  target_display_name = "LinkedPort_%sTo%s" % (t0_router_name, t1_router_name )
 
   payload1={
       'resource_type': 'LogicalRouterLinkPortOnTIER0',
@@ -224,9 +224,9 @@ def create_t1_logical_router_and_port(t0_router_name, t1_router_name):
   resp = client.post(api_endpoint, payload1)
   target_id=resp.json()['id']
 
-  name = "LogicalRouterLinkPortFrom{}To{}".format(t1_router_name, t0_router_name )
-  descp = "Port created on {} router for {}".format(t1_router_name, t0_router_name )
-  target_display_name = "LinkedPort_{}To{}".format(t1_router_name, t0_router_name )
+  name = "LogicalRouterLinkPortFrom%sTo%s" % (t1_router_name, t0_router_name )
+  descp = "Port created on %s router for %s" % (t1_router_name, t0_router_name )
+  target_display_name = "LinkedPort_%sTo%s"% (t1_router_name, t0_router_name )
 
   payload2 = {
         'resource_type': 'LogicalRouterLinkPortOnTIER1',
