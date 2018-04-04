@@ -17,9 +17,9 @@ vlan_vmotion:
 vlan_vsan:
 
 # Specify passwd of the esxi hosts that should be used for nsx-t
-esxi_host_pwd: hostPaswd!  # Root password for the esxi hosts
+esxi_host_pwd: hostPasswd  # Root password for the esxi hosts
 # Specify ips (and passwds if they are different) for all the esxi hosts that should be used for nsx-t
-esxi_host_ip_pwds: 10.13.12.10:hostPaswd!! # ip:passwd[,] # Password can be ignored if same root passwd used for all hosts
+esxi_host_ip_pwds: 10.13.12.10:hostPasswd # ip:passwd[,] # Password can be ignored if same root passwd used for all hosts
 
 nsx_t_manager_fqdn: nsx-t-mgr.corp.local.io
 nsx_t_manager_vm_name: 'NSX-T Mgr'
@@ -43,7 +43,7 @@ nsx_t_tep_pool_cidr: 192.168.213.0/24
 nsx_t_tep_pool_gateway: 192.168.213.1
 nsx_t_tep_pool_start: 192.168.213.10
 nsx_t_tep_pool_end: 192.168.213.200
-nsx_t_tep_pool_nameserver:
+nsx_t_tep_pool_nameserver: 192.168.213.2
 
 nsx_t_hostswitch: hostswitch1
 nsx_t_transport_vlan: 3127
@@ -66,7 +66,7 @@ nsx_t_esxi_uplink_profile_name: "esxi-uplink-profile"
 nsx_t_esxi_uplink_profile_mtu: 1600
 nsx_t_esxi_uplink_profile_vlan: 20
 
-
+# T1 Logical Router with associated logical switches
 nsx_t_t1router_logical_switches: |
   - name: T1Router-Mgmt
     switches:
@@ -84,7 +84,7 @@ nsx_t_t1router_logical_switches: |
     switches:
     - name: PKSServicesLogicalSwitch
       subnet: 192.168.40.1/22 # Last octet should be 1 rather than 0
-nsx_t_ha_switching_profile:
+nsx_t_ha_switching_profile: HASwitchingProfile
 nsx_t_container_ip_block: |
   - name: container-ip-block1
     cidr: 10.100.0.0/16    

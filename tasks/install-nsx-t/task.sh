@@ -91,7 +91,7 @@ do
   cat >> edge_config.yml <<-EOF
 $edge_config
   ${NSX_T_EDGE_HOST_PREFIX}-0${count}:
-    hostname: ${NSX_T_EDGE_HOST_PREFIX}-0${count}.${DNSDOMAIN}  
+    hostname: ${NSX_T_EDGE_HOST_PREFIX}-0${count}  
     vmName: "${NSX_T_EDGE_VM_NAME_PREFIX} 0${count}" 
     ipAddress: $edge_ip
     ovaFile: $NSX_T_EDGE_OVA
