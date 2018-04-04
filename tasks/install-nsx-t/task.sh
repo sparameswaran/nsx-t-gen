@@ -29,25 +29,27 @@ echo "Done copying ova images into $OVA_ISO_PATH"
 
 cat > answerfile.yml <<-EOF
 ovfToolPath: '/usr/bin'
-deployDataCenterName: $VCENTER_DATACENTER
-deployMgmtDatastoreName: $VCENTER_DATASTORE
-deployMgmtPortGroup: $MGMT_PORTGROUP
-deployCluster: $VCENTER_CLUSTER
-deployMgmtDnsServer: $DNSSERVER
-deployNtpServers: $NTPSERVERS
-deployMgmtDnsDomain: $DNSDOMAIN
+deployDataCenterName: "$VCENTER_DATACENTER"
+deployMgmtDatastoreName: "$VCENTER_DATASTORE"
+deployMgmtPortGroup: "$MGMT_PORTGROUP"
+deployCluster: "$VCENTER_CLUSTER"
+deployMgmtDnsServer: "$DNSSERVER"
+deployNtpServers: "$NTPSERVERS"
+deployMgmtDnsDomain: "$DNSDOMAIN"
 deployMgmtDefaultGateway: $DEFAULTGATEWAY
 deployMgmtNetmask: $NETMASK
-nsxAdminPass: $NSX_T_MANAGER_ADMIN_PWD
-nsxCliPass: $NSX_T_MANAGER_ROOT_PWD
-nsxOvaPath: $OVA_ISO_PATH
+nsxAdminPass: "$NSX_T_MANAGER_ADMIN_PWD"
+nsxCliPass: "$NSX_T_MANAGER_ROOT_PWD"
+nsxOvaPath: "$OVA_ISO_PATH"
 deployVcIPAddress: $VCENTER_HOST
 deployVcUser: $VCENTER_USR
-deployVcPassword: $VCENTER_PWD
+deployVcPassword: "$VCENTER_PWD"
 sshEnabled: True
 allowSSHRootAccess: True
 
 api_origin: 'localhost'
+
+controllerClusterPass: $NSX_T_CONTROLLER_CLUSTER_PWD
 
 managers:
   nsxmanager:
@@ -60,8 +62,6 @@ EOF
 
 
 cat > controller_config.yml <<-EOF
-controllerClusterPass: $NSX_T_CONTROLLER_CLUSTER_PWD
-
 controllers:
 EOF
 
@@ -90,7 +90,7 @@ for edge_ip in $(echo $NSX_T_EDGE_IPS | sed -e 's/,/ /g')
 do
   cat >> edge_config.yml <<-EOF
 $edge_config
-  nsxEdge0${count}:
+  ${NSX_T_EDGE_HOST_PREFIX}-0${count}:
     hostname: ${NSX_T_EDGE_HOST_PREFIX}-0${count}.${DNSDOMAIN}  
     vmName: "${NSX_T_EDGE_VM_NAME_PREFIX} 0${count}" 
     ipAddress: $edge_ip
@@ -125,7 +125,7 @@ echo "[nsxedges]" > edge_vms
 for edge_ip in $(echo $NSX_T_EDGE_IPS | sed -e 's/,/ /g')
 do
 cat >> edge_vms <<-EOF
-${NSX_T_EDGE_HOST_PREFIX}0${count}  ansible_ssh_host=$edge_ip   ansible_ssh_user=root ansible_ssh_pass=$NSX_T_EDGE_ROOT_PWD
+${NSX_T_EDGE_HOST_PREFIX}-0${count}  ansible_ssh_host=$edge_ip   ansible_ssh_user=root ansible_ssh_pass=$NSX_T_EDGE_ROOT_PWD
 EOF
   (( count++ ))
 done
@@ -157,7 +157,7 @@ nsx-manager     ansible_ssh_host=$NSX_T_MANAGER_IP    ansible_ssh_user=root ansi
 [localhost:vars]
 
 tag_scope="ncp/cluster"
-tag_value=$NSX_T_PAS_NCP_CLUSTER_TAG
+tag=$NSX_T_PAS_NCP_CLUSTER_TAG
 overlay_tz_name=$NSX_T_OVERLAY_TRANSPORT_ZONE
 vlan_tz_name=$NSX_T_VLAN_TRANSPORT_ZONE
 hostswitch=$NSX_T_HOSTSWITCH
@@ -165,7 +165,7 @@ hostswitch=$NSX_T_HOSTSWITCH
 tep_pool_name=$NSX_T_TEP_POOL_NAME
 tep_pool_cidr=$NSX_T_TEP_POOL_CIDR
 tep_pool_range="${NSX_T_TEP_POOL_START}-${NSX_T_TEP_POOL_END}"
-tep_pool_nameserver=$NSX_T_TEP_POOL_NAMESERVER
+tep_pool_nameserver="$NSX_T_TEP_POOL_NAMESERVER"
 tep_pool_suffix=$DNSDOMAIN
 tep_pool_gw=$NSX_T_TEP_POOL_GATEWAY
 
@@ -178,14 +178,15 @@ esxi_uplink_profile_name=$NSX_T_ESXI_UPLINK_PROFILE_NAME
 esxi_uplink_profile_mtu=$NSX_T_ESXI_UPLINK_PROFILE_MTU
 esxi_uplink_profile_vlan=$NSX_T_ESXI_UPLINK_PROFILE_VLAN
 
-edge_cluster=$NSX_T_EDGE_CLUSTER
+edge_cluster="$NSX_T_EDGE_CLUSTER"
 
-t0_name=$NSX_T_T0ROUTER
-t0_ha_mode=$NSX_T_T0ROUTER_HA_MODE
+t0_name="$NSX_T_T0ROUTER"
+t0_ha_mode="$NSX_T_T0ROUTER_HA_MODE"
 
 vlan_ls_mgmt="$VLAN_MGMT"
 vlan_ls_vmotion="$VLAN_VMOTION"
 vlan_ls_vsan="$VLAN_VSAN"
+
 EOF
 
 cat ctrl_vms >> hosts
@@ -200,8 +201,10 @@ cat > ansible.cfg <<-EOF
 host_key_checking = false
 EOF
 
+cp hosts answerfile ansible.cfg nsxt-ansible/.
+cd nsxt-ansible
 
-sleep 200
+ansible-playbook -i hosts deployNsx.yml
 
 STATUS=$?
 popd  >/dev/null 2>&1
