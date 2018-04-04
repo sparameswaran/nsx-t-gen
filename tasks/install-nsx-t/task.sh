@@ -201,7 +201,7 @@ cat > ansible.cfg <<-EOF
 host_key_checking = false
 EOF
 
-cp hosts answerfile ansible.cfg nsxt-ansible/.
+cp hosts answerfile.yml ansible.cfg nsxt-ansible/.
 cd nsxt-ansible
 
 ansible-playbook -i hosts deployNsx.yml
