@@ -220,7 +220,19 @@ EOF
 cp hosts answerfile.yml ansible.cfg nsxt-ansible/.
 cd nsxt-ansible
 
+# Check if NSX MGR is up or not
+curl -fkv https://${NSX_T_MANAGER_IP}:443
+nsx_mgr_up_status=$?
+# Deploy the ovas if its not up
+if [ $nsx_mgr_up_status -ne 0 ]; then
+  ansible-playbook -i hosts deploy_ovas.yml
+fi
+
 ansible-playbook -i hosts deployNsx.yml
+
+if [ "$SUPPORT_NSX_VMOTION" == "true" ]; then
+  ansible-playbook -i hosts configure_nsx_vlans.yml
+fi
 
 STATUS=$?
 popd  >/dev/null 2>&1

@@ -11,7 +11,9 @@ dnsdomain: corp.local.io
 defaultgateway: 10.13.12.1
 netmask: 255.255.255.0
 
+# Should nsx-t have vmotion enabled?
 support_nsx_vmotion: false
+# If support nsx vmotion, then ensure values are filled for following params
 vlan_mgmt:
 vlan_vmotion:
 vlan_vsan:
