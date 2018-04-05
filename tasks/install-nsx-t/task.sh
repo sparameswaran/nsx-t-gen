@@ -222,16 +222,15 @@ cp hosts answerfile.yml ansible.cfg nsxt-ansible/.
 cd nsxt-ansible
 
 # Check if NSX MGR is up or not
-curl -fkv https://${NSX_T_MANAGER_IP}:443
-nsx_mgr_up_status=$?
+nsx_mgr_up_status=$(curl -s -o /dev/null -I -w "%{http_code}"  https://${NSX_T_MANAGER_IP}:443 || true)
 
 # Deploy the ovas if its not up
-if [ $nsx_mgr_up_status -ne 0 ]; then
+if [ $nsx_mgr_up_status -ne 200 ]; then
   echo "NSX Mgr not up yet, deploying the ovas followed by configuration of the NSX-T Mgr!!" 
   ansible-playbook -i hosts deployNsx.yml
 else
   echo "NSX Mgr up already, skipping deploying of the ovas!!"
-  echo "Starting configuration of the NSX-T Mgr"
+  echo "Starting basic configuration of the NSX-T Mgr"
   ansible-playbook -i hosts configureNsx.yml
 fi
 
