@@ -130,7 +130,7 @@ EOF
   (( count++ ))
 done
 
-echo $ESXI_HOSTS_CONFIG > /tmp/esxi_hosts_config.yml
+echo "$ESXI_HOSTS_CONFIG" > /tmp/esxi_hosts_config.yml
 echo "[nsxtransportnodes]" > esxi_hosts
 
 length=$(expr $(cat /tmp/esxi_hosts_config.yml  | shyaml get-values esxi_hosts | grep name: | wc -l) - 1 )
@@ -147,6 +147,18 @@ do
 $ESXI_INSTANCE_HOST  ansible_ssh_host=$ESXI_INSTANCE_IP   ansible_ssh_user=root ansible_ssh_pass=$ESXI_INSTANCE_PWD
 EOF
 done
+
+count=1
+esxi_host_uplink_vmnics='[ '
+for vmnic in $( echo $NSX_T_ESXI_VMNICS | sed -e 's/,/ /g')
+do
+  if [ $count -gt 1 ]; then
+    esxi_host_uplink_vmnics="${esxi_host_uplink_vmnics},"
+  fi
+  esxi_host_uplink_vmnics="${esxi_host_uplink_vmnics} uplink-${count}: ${vmnic}"
+  (( count++ ))
+done
+esxi_host_uplink_vmnics="${esxi_host_uplink_vmnics} ]"
 
 
 cat > hosts <<-EOF
@@ -179,6 +191,8 @@ edge_interface=$NSX_T_EDGE_INTERFACE
 esxi_uplink_profile_name=$NSX_T_ESXI_UPLINK_PROFILE_NAME
 esxi_uplink_profile_mtu=$NSX_T_ESXI_UPLINK_PROFILE_MTU
 esxi_uplink_profile_vlan=$NSX_T_ESXI_UPLINK_PROFILE_VLAN
+
+esxi_uplink_vmnics="${esxi_host_uplink_vmnics}"
 
 edge_cluster="$NSX_T_EDGE_CLUSTER"
 

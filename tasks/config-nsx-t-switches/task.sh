@@ -14,7 +14,7 @@ python nsx_t_gen.py
 
 STATUS=$?
 
-sleep 200
+sleep 20
 
 popd  >/dev/null 2>&1
 

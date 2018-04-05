@@ -7,15 +7,17 @@ import client
 
 DEBUG=True
 
-EDGE_CLUSTERS_ENDPOINT       = '/api/v1/edge-clusters'
-TRANSPORT_ZONES_ENDPOINT     = '/api/v1/transport-zones'
-ROUTERS_ENDPOINT             = '/api/v1/logical-routers'
-ROUTER_PORTS_ENDPOINT        = '/api/v1/logical-router-ports'
-SWITCHES_ENDPOINT            = '/api/v1/logical-switches'
-SWITCH_PORTS_ENDPOINT        = '/api/v1/logical-ports'
-SWITCHING_PROFILE_ENDPOINT   = '/api/v1/switching-profiles'
-CONTAINER_IP_BLOCKS_ENDPOINT = '/api/v1/pools/ip-blocks'
-EXTERNAL_IP_POOL_ENDPOINT    = '/api/v1/pools/ip-pools'
+API_VERSION                  = '/api/v1'
+
+EDGE_CLUSTERS_ENDPOINT       = '%s%s' % (API_VERSION, '/edge-clusters')
+TRANSPORT_ZONES_ENDPOINT     = '%s%s' % (API_VERSION, '/transport-zones')
+ROUTERS_ENDPOINT             = '%s%s' % (API_VERSION, '/logical-routers')
+ROUTER_PORTS_ENDPOINT        = '%s%s' % (API_VERSION, '/logical-router-ports')
+SWITCHES_ENDPOINT            = '%s%s' % (API_VERSION, '/logical-switches')
+SWITCH_PORTS_ENDPOINT        = '%s%s' % (API_VERSION, '/logical-ports')
+SWITCHING_PROFILE_ENDPOINT   = '%s%s' % (API_VERSION, '/switching-profiles')
+CONTAINER_IP_BLOCKS_ENDPOINT = '%s%s' % (API_VERSION, '/pools/ip-blocks')
+EXTERNAL_IP_POOL_ENDPOINT    = '%s%s' % (API_VERSION, '/pools/ip-pools')
 
 global_id_map = { }
 
@@ -381,7 +383,7 @@ def main():
 	
 	t0_router_name    = os.getenv('NSX_T_T0ROUTER')
 	t1_router_content = os.getenv('NSX_T_T1ROUTER_LOGICAL_SWITCHES')
-  t1_routers        = yaml.load(t1_router_content)
+  t1_routers        = yaml.load(t1_router_content)['t1_routers']
   
 	t0_router_id   = create_t0_logical_router(t0_router_name)
 
@@ -402,12 +404,12 @@ def main():
 	update_tag(SWITCHING_PROFILE_ENDPOINT + '/' + switching_profile_id, switching_profile_tags)
 
 	ip_blocks   = yaml.load(os.getenv('NSX_T_CONTAINER_IP_BLOCK'))
-	for ip_block in ip_blocks:
+	for ip_block in ip_blocks['container_ip_blocks']:
 		container_ip_block_id = create_container_ip_block(ip_block['name'], ip_block['cidr'])
 		update_tag(CONTAINER_IP_BLOCKS_ENDPOINT + '/' + container_ip_block_id, pas_tags)
 	
 	ip_pools    = yaml.load(os.getenv('NSX_T_EXTERNAL_IP_POOL'))
-	for ip_pool in ip_pools:
+	for ip_pool in ip_pools['external_ip_pools']:
 		create_external_ip_pool(ip_pool['name'], 
 														ip_pool['cidr'], 
 														ip_pool['gateway'], 

@@ -21,12 +21,13 @@ esxi_hosts_root_pwd: rootPasswd  # Root password for the esxi hosts
 
 # Specify FQDN, ip (and passwd if they are different) for each of the esxi hosts that should be used for nsx-t
 esxi_hosts_config: |
-- name: esxi-host1.corp.local.io
-  ip: 10.13.12.10
-  root_pwd: rootPasswd 
-#- name: esxi-host2.corp.local.io
-#  ip: 10.13.12.11
-#  root_pwd: rootPasswd 
+  esxi_hosts:
+  - name: esxi-host1.corp.local.io
+    ip: 10.13.12.10
+    root_pwd: rootPasswd 
+# - name: esxi-host2.corp.local.io
+#   ip: 10.13.12.11
+#   root_pwd: rootPasswd 
 
 nsx_t_manager_fqdn: nsx-t-mgr.corp.local.io
 nsx_t_manager_vm_name: 'NSX-T Mgr'
@@ -73,8 +74,13 @@ nsx_t_esxi_uplink_profile_name: "esxi-uplink-profile"
 nsx_t_esxi_uplink_profile_mtu: 1600
 nsx_t_esxi_uplink_profile_vlan: 20
 
+# Specify vmnic on esxi host to be uesd for nsx-t
+# can be multiple vmnics separated by comma
+nsx_t_esxi_vmnics: vmnic1 # vmnic1,vmnic2...
+
 # T1 Logical Router with associated logical switches
 nsx_t_t1router_logical_switches: |
+  t1_routers:
   - name: T1Router-Mgmt
     switches:
     - name: InfraLogicalSwitch
@@ -93,11 +99,13 @@ nsx_t_t1router_logical_switches: |
       subnet: 192.168.40.1/22 # Last octet should be 1 rather than 0
 nsx_t_ha_switching_profile: HASwitchingProfile
 nsx_t_container_ip_block: |
+  container_ip_blocks:
   - name: container-ip-block1
     cidr: 10.100.0.0/16    
 nsx_t_external_ip_pool: |
+  external_ip_pools:
   - name: external-ip-pool1
     cidr: 10.100.0.0/24
     gateway: 10.100.0.1
-    start: 10.100.0.10 # Should not include gateway ip
-    end: 10.100.0.200  # Should not include gateway ip
+    start: 10.100.0.10 # Should not include gateway
+    end: 10.100.0.200  # Should not include gateway
