@@ -13,6 +13,7 @@ if [ -e ovftool ]; then
   ./$ovftool_bundle --eulas-agreed
   cd ..
 fi
+echo "Done installing ovftool"
 
 NSX_T_MANAGER_OVA=$(ls nsx-mgr-ova)
 NSX_T_CONTROLLER_OVA=$(ls nsx-ctrl-ova)
@@ -133,7 +134,7 @@ done
 echo "$ESXI_HOSTS_CONFIG" > /tmp/esxi_hosts_config.yml
 echo "[nsxtransportnodes]" > esxi_hosts
 
-length=$(expr $(cat /tmp/esxi_hosts_config.yml  | shyaml get-values esxi_hosts | grep name: | wc -l) - 1 )
+length=$(expr $(cat /tmp/esxi_hosts_config.yml  | shyaml get-values esxi_hosts | grep name: | wc -l) - 1 || true )
 for index in $(seq 0 $length)
 do
   ESXI_INSTANCE_HOST=$(cat /tmp/esxi_hosts_config.yml  | shyaml get-value esxi_hosts.${index}.name)
@@ -223,13 +224,18 @@ cd nsxt-ansible
 # Check if NSX MGR is up or not
 curl -fkv https://${NSX_T_MANAGER_IP}:443
 nsx_mgr_up_status=$?
+
 # Deploy the ovas if its not up
 if [ $nsx_mgr_up_status -ne 0 ]; then
-  ansible-playbook -i hosts deploy_ovas.yml
+  echo "NSX Mgr not up yet, deploying the ovas followed by configuration of the NSX-T Mgr!!" 
+  ansible-playbook -i hosts deployNsx.yml
+else
+  echo "NSX Mgr up already, skipping deploying of the ovas!!"
+  echo "Starting configuration of the NSX-T Mgr"
+  ansible-playbook -i hosts configureNsx.yml
 fi
 
-ansible-playbook -i hosts deployNsx.yml
-
+echo "Starting configuration of the NSX-T Mgr to support vmotion"
 if [ "$SUPPORT_NSX_VMOTION" == "true" ]; then
   ansible-playbook -i hosts configure_nsx_vlans.yml
 fi
