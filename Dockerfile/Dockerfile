@@ -8,7 +8,7 @@ RUN pip install --upgrade pip && pip install pyVim pyvmomi six pyquery xmltodict
 
 RUN pip install --upgrade pip wheel setuptools
 RUN pip install --upgrade lxml enum cffi
-RUN pip install --upgrade cryptography pyopenssl enum34
+RUN pip install --upgrade cryptography enum34
 RUN pip uninstall -y enum
 
 # Add ansible support
@@ -17,6 +17,7 @@ RUN apt-get install -y software-properties-common
 RUN apt-add-repository -y ppa:ansible/ansible
 RUN apt-get update
 RUN apt-get install -y ansible
+
 
 # Add ovftool
 #COPY ./VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle .
@@ -33,3 +34,6 @@ RUN pip install nsx_python_sdk-*.whl
 RUN pip install vapi_runtime-*.whl
 RUN pip install vapi_common-*.whl
 RUN pip install vapi_common_client-*.whl
+
+# Overwrite the pyopenssl 0.15.1 with 17.5.0 as ansible breaks otherwise
+RUN pip install -U pyopenssl==17.5.0

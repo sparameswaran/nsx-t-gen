@@ -17,9 +17,16 @@ vlan_vmotion:
 vlan_vsan:
 
 # Specify passwd of the esxi hosts that should be used for nsx-t
-esxi_host_pwd: hostPasswd  # Root password for the esxi hosts
-# Specify ips (and passwds if they are different) for all the esxi hosts that should be used for nsx-t
-esxi_host_ip_pwds: 10.13.12.10:hostPasswd # ip:passwd[,] # Password can be ignored if same root passwd used for all hosts
+esxi_hosts_root_pwd: rootPasswd  # Root password for the esxi hosts
+
+# Specify FQDN, ip (and passwd if they are different) for each of the esxi hosts that should be used for nsx-t
+esxi_hosts_config: |
+- name: esxi-host1.corp.local.io
+  ip: 10.13.12.10
+  root_pwd: rootPasswd 
+#- name: esxi-host2.corp.local.io
+#  ip: 10.13.12.11
+#  root_pwd: rootPasswd 
 
 nsx_t_manager_fqdn: nsx-t-mgr.corp.local.io
 nsx_t_manager_vm_name: 'NSX-T Mgr'
