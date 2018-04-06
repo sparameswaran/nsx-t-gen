@@ -14,6 +14,7 @@ if [ -e ovftool ]; then
   cd ..
 fi
 echo "Done installing ovftool"
+echo ""
 
 NSX_T_MANAGER_OVA=$(ls nsx-mgr-ova)
 NSX_T_CONTROLLER_OVA=$(ls nsx-ctrl-ova)
@@ -27,6 +28,7 @@ cp nsx-mgr-ova/$NSX_T_MANAGER_OVA \
    $OVA_ISO_PATH
 
 echo "Done copying ova images into $OVA_ISO_PATH"
+echo ""
 
 cat > answerfile.yml <<-EOF
 ovfToolPath: '/usr/bin'
@@ -150,16 +152,36 @@ EOF
 done
 
 count=1
+# Create an extra_args.yml file for additional yaml style parameters outside of host and answerfile.yml
 esxi_host_uplink_vmnics='[ '
+echo "esxi_uplink_vmnics:" > extra_args.yml
 for vmnic in $( echo $NSX_T_ESXI_VMNICS | sed -e 's/,/ /g')
 do
   if [ $count -gt 1 ]; then
     esxi_host_uplink_vmnics="${esxi_host_uplink_vmnics},"
   fi
+  echo "  uplink-${count}: ${vmnic}" >> extra_args.yml
   esxi_host_uplink_vmnics="${esxi_host_uplink_vmnics} uplink-${count}: ${vmnic}"
   (( count++ ))
 done
 esxi_host_uplink_vmnics="${esxi_host_uplink_vmnics} ]"
+echo "" >> extra_args.yml
+
+echo "nsx_t_external_ip_pool:" >> extra_args.yml
+echo "$NSX_T_EXTERNAL_IP_POOL" >> extra_args.yml
+echo "" >> extra_args.yml
+
+echo "nsx_t_container_ip_block:" >> extra_args.yml
+echo "$NSX_T_CONTAINER_IP_BLOCK" >> extra_args.yml
+echo "" >> extra_args.yml
+
+echo "nsx_t_ha_switching_profile:" >> extra_args.yml
+echo "$NSX_T_HA_SWITCHING_PROFILE" >> extra_args.yml
+echo "" >> extra_args.yml
+
+echo "nsx_t_t1router_logical_switches:" >> extra_args.yml
+echo "$NSX_T_T1ROUTER_LOGICAL_SWITCHES" >> extra_args.yml
+echo "" >> extra_args.yml
 
 
 cat > hosts <<-EOF
@@ -213,6 +235,10 @@ echo "" >> hosts
 cat esxi_hosts >> hosts
 echo "" >> hosts
 
+# Add additional params to answerfile
+echo "" >> answerfile.yml
+cat extra_args.yml >> answerfile.yml
+
 cat > ansible.cfg <<-EOF
 [defaults]
 host_key_checking = false
@@ -221,23 +247,27 @@ EOF
 cp hosts answerfile.yml ansible.cfg nsxt-ansible/.
 cd nsxt-ansible
 
+echo ""
+
 # Check if NSX MGR is up or not
 nsx_mgr_up_status=$(curl -s -o /dev/null -I -w "%{http_code}"  https://${NSX_T_MANAGER_IP}:443 || true)
 
 # Deploy the ovas if its not up
 if [ $nsx_mgr_up_status -ne 200 ]; then
   echo "NSX Mgr not up yet, deploying the ovas followed by configuration of the NSX-T Mgr!!" 
-  ansible-playbook -i hosts deployNsx.yml
+  ansible-playbook -vvv -i hosts deployNsx.yml
 else
   echo "NSX Mgr up already, skipping deploying of the ovas!!"
   echo "Starting basic configuration of the NSX-T Mgr"
-  ansible-playbook -i hosts configureNsx.yml
+  ansible-playbook -vvv -i hosts configureNsx.yml
 fi
+echo ""
 
-echo "Starting configuration of the NSX-T Mgr to support vmotion"
 if [ "$SUPPORT_NSX_VMOTION" == "true" ]; then
+  echo "Starting configuration of the NSX-T Mgr to support vmotion"
   ansible-playbook -i hosts configure_nsx_vlans.yml
 fi
+echo ""
 
 STATUS=$?
 popd  >/dev/null 2>&1
