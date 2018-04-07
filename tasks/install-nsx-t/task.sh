@@ -154,34 +154,38 @@ done
 count=1
 # Create an extra_args.yml file for additional yaml style parameters outside of host and answerfile.yml
 esxi_host_uplink_vmnics='[ '
-echo "esxi_uplink_vmnics:" > extra_args.yml
+echo "esxi_uplink_vmnics:" > extra_yaml_args.yml
 for vmnic in $( echo $NSX_T_ESXI_VMNICS | sed -e 's/,/ /g')
 do
   if [ $count -gt 1 ]; then
     esxi_host_uplink_vmnics="${esxi_host_uplink_vmnics},"
   fi
-  echo "  uplink-${count}: ${vmnic}" >> extra_args.yml
+  echo "  uplink-${count}: ${vmnic}" >> extra_yaml_args.yml
   esxi_host_uplink_vmnics="${esxi_host_uplink_vmnics} uplink-${count}: ${vmnic}"
   (( count++ ))
 done
 esxi_host_uplink_vmnics="${esxi_host_uplink_vmnics} ]"
-echo "" >> extra_args.yml
+echo "" >> extra_yaml_args.yml
 
-echo "nsx_t_external_ip_pool:" >> extra_args.yml
-echo "$NSX_T_EXTERNAL_IP_POOL" >> extra_args.yml
-echo "" >> extra_args.yml
+# Has root element
+echo "$NSX_T_EXTERNAL_IP_POOL_SPEC" >> extra_yaml_args.yml
+echo "" >> extra_yaml_args.yml
 
-echo "nsx_t_container_ip_block:" >> extra_args.yml
-echo "$NSX_T_CONTAINER_IP_BLOCK" >> extra_args.yml
-echo "" >> extra_args.yml
+# Has root element
+echo "$NSX_T_CONTAINER_IP_BLOCK_SPEC" >> extra_yaml_args.yml
+echo "" >> extra_yaml_args.yml
 
-echo "nsx_t_ha_switching_profile:" >> extra_args.yml
-echo "$NSX_T_HA_SWITCHING_PROFILE" >> extra_args.yml
-echo "" >> extra_args.yml
+# Single line entry - just value
+echo "ha_switching_profile: $NSX_T_HA_SWITCHING_PROFILE" >> extra_yaml_args.yml
+echo "" >> extra_yaml_args.yml
 
-echo "nsx_t_t1router_logical_switches:" >> extra_args.yml
-echo "$NSX_T_T1ROUTER_LOGICAL_SWITCHES" >> extra_args.yml
-echo "" >> extra_args.yml
+# Has root element
+echo "$NSX_T_T0ROUTER_SPEC" >> extra_yaml_args.yml
+echo "" >> extra_yaml_args.yml
+
+# Has root element
+echo "$NSX_T_T1ROUTER_LOGICAL_SWITCHES_SPEC" >> extra_yaml_args.yml
+echo "" >> extra_yaml_args.yml
 
 
 cat > hosts <<-EOF
@@ -197,7 +201,8 @@ tag_scope="ncp/cluster"
 tag=$NSX_T_PAS_NCP_CLUSTER_TAG
 overlay_tz_name=$NSX_T_OVERLAY_TRANSPORT_ZONE
 vlan_tz_name=$NSX_T_VLAN_TRANSPORT_ZONE
-hostswitch=$NSX_T_HOSTSWITCH
+vlan_hostswitch=$NSX_T_VLAN_HOSTSWITCH
+overlay_hostswitch=$NSX_T_OVERLAY_HOSTSWITCH
 
 tep_pool_name=$NSX_T_TEP_POOL_NAME
 tep_pool_cidr=$NSX_T_TEP_POOL_CIDR
@@ -206,21 +211,21 @@ tep_pool_nameserver="$NSX_T_TEP_POOL_NAMESERVER"
 tep_pool_suffix=$DNSDOMAIN
 tep_pool_gw=$NSX_T_TEP_POOL_GATEWAY
 
-edge_uplink_profile_name=$NSX_T_EDGE_UPLINK_PROFILE_NAME
-edge_uplink_profile_mtu=$NSX_T_EDGE_UPLINK_PROFILE_MTU
-edge_uplink_profile_vlan=$NSX_T_EDGE_UPLINK_PROFILE_VLAN
-edge_interface=$NSX_T_EDGE_INTERFACE
+edge_single_uplink_profile_name=$NSX_T_SINGLE_UPLINK_PROFILE_NAME
+edge_single_uplink_profile_mtu=$NSX_T_SINGLE_UPLINK_PROFILE_MTU
+edge_single_uplink_profile_vlan=$NSX_T_SINGLE_UPLINK_PROFILE_VLAN
 
-esxi_uplink_profile_name=$NSX_T_ESXI_UPLINK_PROFILE_NAME
-esxi_uplink_profile_mtu=$NSX_T_ESXI_UPLINK_PROFILE_MTU
-esxi_uplink_profile_vlan=$NSX_T_ESXI_UPLINK_PROFILE_VLAN
+edge_uplink_interface=$NSX_T_EDGE_UPLINK_INTERFACE
+esxi_uplink_vmnics_arr="${esxi_host_uplink_vmnics}"
 
-esxi_uplink_vmnics="${esxi_host_uplink_vmnics}"
+esxi_overlay_profile_name=$NSX_T_ESXI_OVERLAY_PROFILE_NAME
+esxi_overlay_profile_mtu=$NSX_T_ESXI_OVERLAY_PROFILE_MTU
+esxi_overlay_profile_vlan=$NSX_T_ESXI_OVERLAY_PROFILE_VLAN
 
 edge_cluster="$NSX_T_EDGE_CLUSTER"
 
 t0_name="$NSX_T_T0ROUTER"
-t0_ha_mode="$NSX_T_T0ROUTER_HA_MODE"
+t0_ha_mode="ACTIVE_STANDBY"
 
 vlan_ls_mgmt="$VLAN_MGMT"
 vlan_ls_vmotion="$VLAN_VMOTION"
@@ -235,16 +240,12 @@ echo "" >> hosts
 cat esxi_hosts >> hosts
 echo "" >> hosts
 
-# Add additional params to answerfile
-echo "" >> answerfile.yml
-cat extra_args.yml >> answerfile.yml
-
 cat > ansible.cfg <<-EOF
 [defaults]
 host_key_checking = false
 EOF
 
-cp hosts answerfile.yml ansible.cfg nsxt-ansible/.
+cp hosts answerfile.yml ansible.cfg extra_yaml_args.yml nsxt-ansible/.
 cd nsxt-ansible
 
 echo ""
@@ -255,17 +256,17 @@ nsx_mgr_up_status=$(curl -s -o /dev/null -I -w "%{http_code}"  https://${NSX_T_M
 # Deploy the ovas if its not up
 if [ $nsx_mgr_up_status -ne 200 ]; then
   echo "NSX Mgr not up yet, deploying the ovas followed by configuration of the NSX-T Mgr!!" 
-  ansible-playbook -vvv -i hosts deployNsx.yml
+  ansible-playbook -vvv -i hosts deployNsx.yml -e @extra_yaml_args.yml
 else
   echo "NSX Mgr up already, skipping deploying of the ovas!!"
   echo "Starting basic configuration of the NSX-T Mgr"
-  ansible-playbook -vvv -i hosts configureNsx.yml
+  ansible-playbook -vvv -i hosts configureNsx.yml -e @extra_yaml_args.yml
 fi
 echo ""
 
 if [ "$SUPPORT_NSX_VMOTION" == "true" ]; then
   echo "Starting configuration of the NSX-T Mgr to support vmotion"
-  ansible-playbook -i hosts configure_nsx_vlans.yml
+  ansible-playbook -i hosts configure_nsx_vlans.yml -e @extra_yaml_args.yml
 fi
 echo ""
 

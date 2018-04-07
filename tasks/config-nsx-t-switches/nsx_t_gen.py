@@ -156,12 +156,26 @@ def check_logical_router(router_name):
 
   return logical_router_id
 
-def create_t0_logical_router(router_name):
+def check_logical_router_port(router_id):
+  api_endpoint = ROUTER_PORTS_ENDPOINT
+  
+  resp = client.get(api_endpoint)
+
+  logical_router_port_id = None
+  for result in resp.json()['results']:
+  	global_id_map['ROUTER_PORT:' + result['display_name']] = result['id']
+  	if result['logical_router_id'] == router_id:
+  		logical_router_port_id = result['id']
+
+  return logical_router_port_id
+
+def create_t0_logical_router(t0_router):
   api_endpoint = ROUTERS_ENDPOINT
   
   router_type='TIER0'
   edge_cluster_id=get_edge_cluster_id()
 
+  router_name = t0_router['name']
   t0_router_id=check_logical_router(router_name)
   if t0_router_id is not None:
     return t0_router_id  
@@ -172,13 +186,51 @@ def create_t0_logical_router(router_name):
       'display_name': router_name,
       'edge_cluster_id': edge_cluster_id,      
       'router_type': router_type,
-      'high_availability_mode': 'ACTIVE_STANDBY',
+      'high_availability_mode': t0_router['ha_mode'],
     }
   resp = client.post(api_endpoint, payload )
 
   router_id=resp.json()['id']
   print("Created Logical Router '{}' of type '{}'".format(router_name, router_type))
   global_id_map['TIER0ROUTER:' + router_name] = router_id
+  return router_id
+
+def create_t0_logical_router_and_port(t0_router):
+
+	api_endpoint = ROUTER_PORTS_ENDPOINT
+  
+  router_name = t0_router['name']
+  subnet = t0_router['subnet']
+  
+  router_id=create_t0_logical_router(router_name)  
+  logical_router_port_id=check_logical_router_port(t0_router_id)
+  if logical_router_port_id is not None:
+    return t0_router_id
+
+  name = "LogicalRouterUplinkPortFor%s" % (router_name )
+  descp = "Uplink Port created for %s router" % (router_name)
+  target_display_name = "LogicalRouterUplinkFor%s" % (router_name)
+
+  network=subnet.split('/')[0]
+  cidr=subnet.split('/')[1]
+
+  payload1={
+      'resource_type': 'LogicalRouterUpLinkPort',
+      'description': descp,
+      'display_name': name,
+      'logical_router_id': router_id,
+      'edge_cluster_member_index' : [ t0_router['edge_index'] ],
+      'subnets' : [ {
+          'ip_addresses' : [ network ],
+          'prefix_length' : cidr
+        } ]    
+    }
+      
+  resp = client.post(api_endpoint, payload1)
+  target_id=resp.json()['id']
+
+  print("Created Logical Router Uplink Port for T0Router: '{}'".format(router_name))
+  logical_router_port_id=resp.json()['id']
   return router_id
 
 def create_t1_logical_router(router_name):
@@ -206,10 +258,10 @@ def create_t1_logical_router(router_name):
   return router_id
 
 
-def create_t1_logical_router_and_port(t0_router_name, t1_router_name):
+def create_t1_logical_router_and_port(t0_router_name, t1_router_name, t0_router_subnet):
   api_endpoint = ROUTER_PORTS_ENDPOINT
   
-  t0_router_id=create_t0_logical_router(t0_router_name)
+  t0_router_id=create_t0_logical_router_and_port(t0_router_name, t0_router_subnet)
   t1_router_id=create_t1_logical_router(t1_router_name)
   
   name = "LogicalRouterLinkPortFrom%sTo%s" % (t0_router_name, t1_router_name )
@@ -382,12 +434,14 @@ def main():
 	load_transport_zones()
 	
 	t0_router_name    = os.getenv('NSX_T_T0ROUTER')
-	t1_router_content = os.getenv('NSX_T_T1ROUTER_LOGICAL_SWITCHES')
-  t1_routers        = yaml.load(t1_router_content)['t1_routers']
-  
-	t0_router_id   = create_t0_logical_router(t0_router_name)
+	t0_router_subnet  = os.getenv('NSX_T_T0ROUTER_SUBNET')
+	t0_router         = yaml.load(t1_router_content)['t0_router']
+	t0_router_id      = create_t0_logical_router_and_port(t0_router)
 
-	pas_tag_name    = os.getenv('NSX_T_PAS_TAG')	
+	t1_router_content = os.getenv('NSX_T_T1ROUTER_LOGICAL_SWITCHES')
+	t1_routers        = yaml.load(t1_router_content)['t1_routers']
+
+	pas_tag_name   = os.getenv('NSX_T_PAS_TAG')	
 	pas_tags = { 	
 						'ncp/cluster': pas_tag_name , 
 						'ncp/shared_resource': 'true' 
@@ -418,7 +472,7 @@ def main():
 
 	for t1_router in t1_routers:
 		t1_router_name = t1_router['name']
-		create_t1_logical_router_and_port(t0_router_name, t1_router_name)
+		create_t1_logical_router_and_port(t0_router_name, t1_router_name, t0_router_subnet)
 		logical_switches = t1_router['switches']
 		for logical_switch_entry in logical_switches:
 			logical_switch_name = logical_switch_entry['name']
