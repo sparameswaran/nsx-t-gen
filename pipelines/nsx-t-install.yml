@@ -46,7 +46,6 @@ nsx_t_gen_params: &nsx-t-gen-params
   NSX_T_EDGE_SINGLE_UPLINK_PROFILE_NAME: ((nsx_t_edge_uplink_profile_name))
   NSX_T_EDGE_SINGLE_UPLINK_PROFILE_MTU: ((nsx_t_edge_uplink_profile_mtu))
   NSX_T_EDGE_SINGLE_UPLINK_PROFILE_VLAN: ((nsx_t_edge_uplink_profile_vlan))
-  NSX_T_EDGE_UPLINK_INTERFACE: ((nsx_t_edge_uplink_interface))
   NSX_T_EDGE_CLUSTER: ((nsx_t_edge_cluster))
   NSX_T_ESXI_OVERLAY_PROFILE_NAME: ((nsx_t_esxi_overlay_profile_name))
   NSX_T_ESXI_OVERLAY_PROFILE_MTU: ((nsx_t_esxi_overlay_profile_mtu))

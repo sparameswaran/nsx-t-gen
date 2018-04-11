@@ -160,12 +160,21 @@ do
   if [ $count -gt 1 ]; then
     esxi_host_uplink_vmnics="${esxi_host_uplink_vmnics},"
   fi
-  echo "  uplink-${count}: ${vmnic}" >> extra_yaml_args.yml
+  echo "  - uplink-${count}: ${vmnic}" >> extra_yaml_args.yml
   esxi_host_uplink_vmnics="${esxi_host_uplink_vmnics} uplink-${count}: ${vmnic}"
   (( count++ ))
 done
 esxi_host_uplink_vmnics="${esxi_host_uplink_vmnics} ]"
 echo "" >> extra_yaml_args.yml
+
+
+# Going with single profile uplink ; so use uplink-1 for both vmnics for edge
+echo "edge_uplink_vmnics:" > extra_yaml_args.yml
+echo "  - uplink-1: fp-eth1 # network3 used for overlay/tep" >> extra_yaml_args.yml
+echo "  - uplink-1: fp-eth0 # network2 used for vlan uplink" >> extra_yaml_args.yml
+echo "# network1 and network4 are for mgmt and not used for uplink"
+echo "" >> extra_yaml_args.yml
+
 
 # Has root element
 echo "$NSX_T_EXTERNAL_IP_POOL_SPEC" >> extra_yaml_args.yml
@@ -215,8 +224,8 @@ edge_single_uplink_profile_name=$NSX_T_SINGLE_UPLINK_PROFILE_NAME
 edge_single_uplink_profile_mtu=$NSX_T_SINGLE_UPLINK_PROFILE_MTU
 edge_single_uplink_profile_vlan=$NSX_T_SINGLE_UPLINK_PROFILE_VLAN
 
-edge_uplink_interface=$NSX_T_EDGE_UPLINK_INTERFACE
 esxi_uplink_vmnics_arr="${esxi_host_uplink_vmnics}"
+edge_uplink_vmnics_arr="${edge_host_uplink_vmnics}"
 
 esxi_overlay_profile_name=$NSX_T_ESXI_OVERLAY_PROFILE_NAME
 esxi_overlay_profile_mtu=$NSX_T_ESXI_OVERLAY_PROFILE_MTU

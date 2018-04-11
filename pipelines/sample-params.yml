@@ -70,7 +70,6 @@ nsx_t_edge_cluster: 'Edge Cluster'
 nsx_t_edge_uplink_profile_name: "edge-uplink-profile"
 nsx_t_edge_uplink_profile_mtu: 1600
 nsx_t_edge_uplink_profile_vlan: 20
-nsx_t_edge_interface: "fp-eth1"
 
 nsx_t_esxi_uplink_profile_name: "esxi-uplink-profile"
 nsx_t_esxi_uplink_profile_mtu: 1600
