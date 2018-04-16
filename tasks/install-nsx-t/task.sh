@@ -151,10 +151,13 @@ $ESXI_INSTANCE_HOST  ansible_ssh_host=$ESXI_INSTANCE_IP   ansible_ssh_user=root 
 EOF
 done
 
+# Start the extra yaml args
+echo "" > extra_yaml_args.yml
+
 count=1
 # Create an extra_args.yml file for additional yaml style parameters outside of host and answerfile.yml
 esxi_host_uplink_vmnics='[ '
-echo "esxi_uplink_vmnics:" > extra_yaml_args.yml
+echo "esxi_uplink_vmnics:" >> extra_yaml_args.yml
 for vmnic in $( echo $NSX_T_ESXI_VMNICS | sed -e 's/,/ /g')
 do
   if [ $count -gt 1 ]; then
@@ -169,7 +172,7 @@ echo "" >> extra_yaml_args.yml
 
 
 # Going with single profile uplink ; so use uplink-1 for both vmnics for edge
-echo "edge_uplink_vmnics:" > extra_yaml_args.yml
+echo "edge_uplink_vmnics:" >> extra_yaml_args.yml
 echo "  - uplink-1: fp-eth1 # network3 used for overlay/tep" >> extra_yaml_args.yml
 echo "  - uplink-1: fp-eth0 # network2 used for vlan uplink" >> extra_yaml_args.yml
 echo "# network1 and network4 are for mgmt and not used for uplink"
@@ -254,10 +257,6 @@ cat > ansible.cfg <<-EOF
 host_key_checking = false
 EOF
 
-cp hosts answerfile.yml ansible.cfg extra_yaml_args.yml nsxt-ansible/.
-cd nsxt-ansible
-
-echo ""
 
 # Check if NSX MGR is up or not
 nsx_mgr_up_status=$(curl -s -o /dev/null -I -w "%{http_code}"  https://${NSX_T_MANAGER_IP}:443 || true)
@@ -265,18 +264,32 @@ nsx_mgr_up_status=$(curl -s -o /dev/null -I -w "%{http_code}"  https://${NSX_T_M
 # Deploy the ovas if its not up
 if [ $nsx_mgr_up_status -ne 200 ]; then
   echo "NSX Mgr not up yet, deploying the ovas followed by configuration of the NSX-T Mgr!!" 
-  ansible-playbook -vvv -i hosts deployNsx.yml -e @extra_yaml_args.yml
+  echo 'deploy_ova: True' >> answerfile.yml
+  
 else
   echo "NSX Mgr up already, skipping deploying of the ovas!!"
-  echo "Starting basic configuration of the NSX-T Mgr"
-  ansible-playbook -vvv -i hosts configureNsx.yml -e @extra_yaml_args.yml
+  echo 'deploy_ova: False' >> answerfile.yml
 fi
+
+if [ -z "$SUPPORT_NSX_VMOTION -o "$SUPPORT_NSX_VMOTION" == "false" ]; then
+  echo "Skipping vmks configuration for NSX-T Mgr!!" 
+  echo 'configure_vmks: False' >> answerfile.yml
+  
+else
+  echo "Allowing vmks configuration for NSX-T Mgr!!" 
+  echo 'configure_vmks: True' >> answerfile.yml
+fi
+
 echo ""
 
-if [ "$SUPPORT_NSX_VMOTION" == "true" ]; then
-  echo "Starting configuration of the NSX-T Mgr to support vmotion"
-  ansible-playbook -i hosts configure_nsx_vlans.yml -e @extra_yaml_args.yml
-fi
+cp hosts answerfile.yml ansible.cfg extra_yaml_args.yml nsxt-ansible/.
+cd nsxt-ansible
+
+echo ""
+
+echo "Starting install and configuration of the NSX-T Mgr!!"
+echo ""
+ansible-playbook -vvv -i hosts deployNsx.yml -e @extra_yaml_args.yml
 echo ""
 
 STATUS=$?

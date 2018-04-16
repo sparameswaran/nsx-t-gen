@@ -60,12 +60,6 @@ nsx_t_transport_vlan: 3127
 nsx_t_vlan_transport_zone: ESXI-MGMT-TZ 
 nsx_t_overlay_transport_zone: overlay-tz
 
-# Additional configs for T0Router (only one per run), T1Routers, Logical switches and tags...
-nsx_t_t0router: DefaultT0Router
-nsx_t_t0router_ha_mode: 'ACTIVE_STANDBY'
-nsx_t_pas_ncp_cluster_tag: pcf2.0
-nsx_t_t0router_uplink: 10.13.12.10
-
 nsx_t_edge_cluster: 'Edge Cluster'
 nsx_t_edge_uplink_profile_name: "edge-uplink-profile"
 nsx_t_edge_uplink_profile_mtu: 1600
@@ -79,30 +73,46 @@ nsx_t_esxi_uplink_profile_vlan: 20
 # can be multiple vmnics separated by comma
 nsx_t_esxi_vmnics: vmnic1 # vmnic1,vmnic2...
 
+# Additional configs for T0Router (only one per run), T1Routers, Logical switches and tags...
+nsx_t_t0router_spec: |
+  t0_router:
+    name: DefaultT0Router
+    edge_index: nsx-t-edge-01
+    ha_mode: 'ACTIVE_STANDBY'
+    subnet: 10.13.12.10/24
+
 # T1 Logical Router with associated logical switches
 nsx_t_t1router_logical_switches: |
   t1_routers:
   - name: T1Router-Mgmt
     switches:
     - name: InfraLogicalSwitch
-      subnet: 192.168.10.1/26 # Last octet should be 1 rather than 0
+      subnet_ip: 192.168.10.1 # Last octet should be 1 rather than 0
+      subnet_mask: 26
   - name: T1Router-PAS
     switches:
     - name: PASDeployment
-      subnet: 192.168.20.1/22 # Last octet should be 1 rather than 0
+      subnet_ip: 192.168.20.1 # Last octet should be 1 rather than 0
+      subnet_mask: 22
     - name: PASServices
-      subnet: 192.168.24.1/22 # Last octet should be 1 rather than 0
+      subnet_ip: 192.168.24.1 # Last octet should be 1 rather than 0
+      subnet_mask: 22
     - name: PASDynamicServices
-      subnet: 192.168.28.1/22 # Last octet should be 1 rather than 0
+      subnet_ip: 192.168.28.1 # Last octet should be 1 rather than 0
+      subnet_mask: 22
   - name: T1Router-PKS
     switches:
     - name: PKSServicesLogicalSwitch
-      subnet: 192.168.40.1/22 # Last octet should be 1 rather than 0
+      subnet_ip: 192.168.40.1 # Last octet should be 1 rather than 0
+      subnet_mask: 22
+
 nsx_t_ha_switching_profile: HASwitchingProfile
+
 nsx_t_container_ip_block: |
   container_ip_blocks:
   - name: container-ip-block1
     cidr: 10.100.0.0/16    
+
 nsx_t_external_ip_pool: |
   external_ip_pools:
   - name: external-ip-pool1
