@@ -64,6 +64,8 @@ nsx_t_transport_vlan: 3032
 nsx_t_vlan_transport_zone: ESXi-MGMT-TZ
 nsx_t_overlay_transport_zone: overlay-tz
 
+nsx_t_pas_ncp_cluster_tag: pcf2.0
+
 nsx_t_edge_cluster: 'Edge Cluster'
 
 # For outbound uplink connection used by Edge
@@ -80,6 +82,9 @@ nsx_t_overlay_profile_vlan: 3127
 # can be multiple vmnics separated by comma
 nsx_t_esxi_vmnics: vmnic1 # vmnic1,vmnic2...
 
+
+# Configs for single T0Router (only one per run), T1Routers, Logical switches and tags...
+nsx_t_t0router: DefaultT0Router
 # Additional configs for T0Router (only one per run), T1Routers, Logical switches and tags...
 nsx_t_t0router_spec: |
   t0_router:
@@ -93,7 +98,7 @@ nsx_t_t0router_spec: |
       admin_distance: 1
 
 # T1 Logical Router with associated logical switches
-nsx_t_t1router_logical_switches: |
+nsx_t_t1router_logical_switches_spec: |
   t1_routers:
   - name: T1Router-Mgmt
     switches:
@@ -119,12 +124,12 @@ nsx_t_t1router_logical_switches: |
 
 nsx_t_ha_switching_profile: HASwitchingProfile
 
-nsx_t_container_ip_block: |
+nsx_t_container_ip_block_spec: |
   container_ip_blocks:
   - name: container-ip-block1
     cidr: 10.100.0.0/16    
 
-nsx_t_external_ip_pool: |
+nsx_t_external_ip_pool_spec: |
   external_ip_pools:
   - name: external-ip-pool1
     cidr: 10.100.0.0/24
