@@ -62,6 +62,7 @@ nsx_t_gen_params: &nsx-t-gen-params
   NSX_T_CONTAINER_IP_BLOCK_SPEC: ((nsx_t_container_ip_block_spec))
   NSX_T_EXTERNAL_IP_POOL_SPEC: ((nsx_t_external_ip_pool_spec))
   SUPPORT_NSX_VMOTION: ((support_nsx_vmotion))
+  ENABLE_ANSIBLE_DEBUG: ((enable_ansible_debug))
 
 groups:
 - name: install

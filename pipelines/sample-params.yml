@@ -131,3 +131,5 @@ nsx_t_external_ip_pool: |
     gateway: 10.100.0.1
     start: 10.100.0.10 # Should not include gateway
     end: 10.100.0.200  # Should not include gateway
+
+enable_ansible_debug: false # set value to true for verbose output from ansible

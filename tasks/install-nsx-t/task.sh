@@ -175,7 +175,7 @@ echo "" >> extra_yaml_args.yml
 echo "edge_uplink_vmnics:" >> extra_yaml_args.yml
 echo "  - uplink-1: fp-eth1 # network3 used for overlay/tep" >> extra_yaml_args.yml
 echo "  - uplink-1: fp-eth0 # network2 used for vlan uplink" >> extra_yaml_args.yml
-echo "# network1 and network4 are for mgmt and not used for uplink"
+echo "# network1 and network4 are for mgmt and not used for uplink" >> extra_yaml_args.yml
 echo "" >> extra_yaml_args.yml
 
 
@@ -287,9 +287,14 @@ cd nsxt-ansible
 
 echo ""
 
+DEBUG=""
+if [ "$ENABLE_ANSIBLE_DEBUG" == "true" ]; then
+  DEBUG="-vvv"
+fi
+
 echo "Starting install and configuration of the NSX-T Mgr!!"
 echo ""
-ansible-playbook -vvv -i hosts deployNsx.yml -e @extra_yaml_args.yml
+ansible-playbook $DEBUG -i hosts deployNsx.yml -e @extra_yaml_args.yml
 echo ""
 
 STATUS=$?
