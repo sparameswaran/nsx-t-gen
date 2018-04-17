@@ -230,9 +230,9 @@ edge_single_uplink_profile_vlan=$NSX_T_SINGLE_UPLINK_PROFILE_VLAN
 esxi_uplink_vmnics_arr="${esxi_host_uplink_vmnics}"
 edge_uplink_vmnics_arr="${edge_host_uplink_vmnics}"
 
-esxi_overlay_profile_name=$NSX_T_ESXI_OVERLAY_PROFILE_NAME
-esxi_overlay_profile_mtu=$NSX_T_ESXI_OVERLAY_PROFILE_MTU
-esxi_overlay_profile_vlan=$NSX_T_ESXI_OVERLAY_PROFILE_VLAN
+esxi_overlay_profile_name=$NSX_T_OVERLAY_PROFILE_NAME
+esxi_overlay_profile_mtu=$NSX_T_OVERLAY_PROFILE_MTU
+esxi_overlay_profile_vlan=$NSX_T_OVERLAY_PROFILE_VLAN
 
 edge_cluster="$NSX_T_EDGE_CLUSTER"
 
