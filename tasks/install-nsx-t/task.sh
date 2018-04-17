@@ -271,7 +271,7 @@ else
   echo 'deploy_ova: False' >> answerfile.yml
 fi
 
-if [ -z "$SUPPORT_NSX_VMOTION -o "$SUPPORT_NSX_VMOTION" == "false" ]; then
+if [ -z "$SUPPORT_NSX_VMOTION" -o "$SUPPORT_NSX_VMOTION" == "false" ]; then
   echo "Skipping vmks configuration for NSX-T Mgr!!" 
   echo 'configure_vmks: False' >> answerfile.yml
   
