@@ -119,7 +119,7 @@ resources:
   source:
     #username: username
     #password: password
-    url: http://10.85.24.5:9080/nsx-edge-2.1.0.0.0.7380184.ova #nsx-edge-2.1.0.0.0.7395502.ova  
+    url: http://10.85.24.5:9080/nsx-edge-2.1.0.0.0.7395502.ova #nsx-edge-2.1.0.0.0.7395502.ova  
     filename: nsx-edge-2.1.0.0.0.7395502.ova  
 
 # Download from https://my.vmware.com/group/vmware/details?productId=614&downloadGroup=OVFTOOL420#
