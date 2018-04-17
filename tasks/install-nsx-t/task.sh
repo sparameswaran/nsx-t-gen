@@ -107,10 +107,7 @@ done
 cat controller_config.yml >> answerfile.yml
 echo "" >> answerfile.yml
 cat edge_config.yml >> answerfile.yml 
-
-#echo "Final ansible answer config"
-#cat answerfile.yml
-
+echo "" >> answerfile.yml
 
 
 count=1
@@ -259,7 +256,7 @@ EOF
 
 
 # Check if NSX MGR is up or not
-nsx_mgr_up_status=$(curl -s -o /dev/null -I -w "%{http_code}"  https://${NSX_T_MANAGER_IP}:443 || true)
+nsx_mgr_up_status=$(curl -s -o /dev/null -I -w "%{http_code}" -k  https://${NSX_T_MANAGER_IP}:443/login.jsp || true)
 
 # Deploy the ovas if its not up
 if [ $nsx_mgr_up_status -ne 200 ]; then
