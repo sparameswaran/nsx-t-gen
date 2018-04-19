@@ -103,7 +103,7 @@ resources:
   source:
     #username: username
     #password: password
-    url: ((nsx_ova_webserver))/((nsx_mgr_ova))   #nsx-unified-appliance-2.1.0.0.0.7395503.ova  
+    url: ((nsx_image_webserver))/((nsx_mgr_ova))
     filename: ((nsx_mgr_ova))  
 
 - name: nsx-ctrl-ova
@@ -111,16 +111,16 @@ resources:
   source:
     #username: username
     #password: password
-    url: ((nsx_ova_webserver))/((nsx_mgr_ova))   #nsx-unified-appliance-2.1.0.0.0.7395503.ova  
-    filename: ((nsx_mgr_ova)) 
+    url: ((nsx_image_webserver))/((nsx_controller_ova))  
+    filename: ((nsx_controller_ova)) 
 
 - name: nsx-edge-ova
   type: file-url
   source:
     #username: username
     #password: password
-    url: ((nsx_ova_webserver))/((nsx_mgr_ova))   #nsx-unified-appliance-2.1.0.0.0.7395503.ova  
-    filename: ((nsx_mgr_ova)) 
+    url: ((nsx_image_webserver))/((nsx_edge_ova)) 
+    filename: ((nsx_edge_ova)) 
 
 # Download from https://my.vmware.com/group/vmware/details?productId=614&downloadGroup=OVFTOOL420#
 - name: ovftool
@@ -128,7 +128,7 @@ resources:
   source:
     #username: username
     #password: password
-    url: ((nsx_ova_webserver))/((nsx_mgr_ova))   #nsx-unified-appliance-2.1.0.0.0.7395503.ova  
+    url: ((nsx_image_webserver))/((ovftool_image))
     filename: ((ovftool_image))   
 
 jobs:

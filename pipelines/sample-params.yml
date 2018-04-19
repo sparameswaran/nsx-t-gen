@@ -11,9 +11,11 @@ dnsdomain: corp.local.io
 defaultgateway: 10.13.12.1
 netmask: 255.255.255.0
 
-# Webserver to serve the ova images and ovftool
+# Download NSX-T 2.1 bits from
+# https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-210&productId=673
+# Host a Webserver to serve the ova images and ovftool
 # Please edit the endpoint and the file names
-nsx_ova_webserver: http://10.85.24.5:9080/
+nsx_image_webserver: http://10.85.24.5:9080/
 nsx_mgr_ova: nsx-unified-appliance-2.1.0.0.0.7395503.ova  
 nsx_controller_ova: nsx-controller-2.1.0.0.0.7395493.ova  
 nsx_edge_ova: nsx-edge-2.1.0.0.0.7395502.ova  
