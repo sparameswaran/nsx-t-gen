@@ -55,6 +55,19 @@ nsx_t_tep_pool_start: 192.168.213.10
 nsx_t_tep_pool_end: 192.168.213.200
 nsx_t_tep_pool_nameserver: 192.168.213.2
 
+nsx_t_sizing_spec: |
+  nsx_t_sizing:
+    mgr:
+      cpu: 2
+      memory: 8192 # in MB, needs to be multiples of 1024
+    controller:
+      cpu: 2
+      memory: 8192 # in MB, needs to be multiples of 1024
+    # edge:
+    #   cpu: 2
+    #   memory: 8192
+
+
 nsx_t_overlay_hostswitch: overlay-hostswitch
 nsx_t_vlan_hostswitch: vlan-hostswitch
 
