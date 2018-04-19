@@ -103,24 +103,24 @@ resources:
   source:
     #username: username
     #password: password
-    url: http://10.85.24.5:9080/nsx-unified-appliance-2.1.0.0.0.7380167.ova   #nsx-unified-appliance-2.1.0.0.0.7395503.ova  
-    filename: nsx-unified-appliance-2.1.0.0.0.7395503.ova  
+    url: ((nsx_ova_webserver))/((nsx_mgr_ova))   #nsx-unified-appliance-2.1.0.0.0.7395503.ova  
+    filename: ((nsx_mgr_ova))  
 
 - name: nsx-ctrl-ova
   type: file-url
   source:
     #username: username
     #password: password
-    url: http://10.85.24.5:9080/nsx-controller-2.1.0.0.0.7380161.ova #nsx-controller-2.1.0.0.0.7395493.ova  
-    filename: nsx-controller-2.1.0.0.0.7395493.ova  
+    url: ((nsx_ova_webserver))/((nsx_mgr_ova))   #nsx-unified-appliance-2.1.0.0.0.7395503.ova  
+    filename: ((nsx_mgr_ova)) 
 
 - name: nsx-edge-ova
   type: file-url
   source:
     #username: username
     #password: password
-    url: http://10.85.24.5:9080/nsx-edge-2.1.0.0.0.7395502.ova #nsx-edge-2.1.0.0.0.7395502.ova  
-    filename: nsx-edge-2.1.0.0.0.7395502.ova  
+    url: ((nsx_ova_webserver))/((nsx_mgr_ova))   #nsx-unified-appliance-2.1.0.0.0.7395503.ova  
+    filename: ((nsx_mgr_ova)) 
 
 # Download from https://my.vmware.com/group/vmware/details?productId=614&downloadGroup=OVFTOOL420#
 - name: ovftool
@@ -128,9 +128,8 @@ resources:
   source:
     #username: username
     #password: password
-    url: http://10.85.24.5:9080/VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle  
-    filename: VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle  
-  
+    url: ((nsx_ova_webserver))/((nsx_mgr_ova))   #nsx-unified-appliance-2.1.0.0.0.7395503.ova  
+    filename: ((ovftool_image))   
 
 jobs:
 
