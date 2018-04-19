@@ -63,9 +63,9 @@ nsx_t_sizing_spec: |
     controller:
       cpu: 2
       memory: 8192 # in MB, needs to be multiples of 1024
-    # edge:
-    #   cpu: 2
-    #   memory: 8192
+    edge:
+      cpu: 2
+      memory: 8192
 
 
 nsx_t_overlay_hostswitch: overlay-hostswitch
