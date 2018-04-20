@@ -1,8 +1,5 @@
 #!/bin/bash
 
-export ROOT_DIR=`pwd`
-export OVA_ISO_PATH='/root/ISOs/CHGA'
-	
 function install_ovftool {
 
 	# Install provided ovftool
@@ -21,10 +18,6 @@ function install_ovftool {
 
 function copy_ovas_to_OVA_ISO_PATH {
 
-	NSX_T_MANAGER_OVA=$(ls $ROOT_DIR/nsx-mgr-ova)
-	NSX_T_CONTROLLER_OVA=$(ls $ROOT_DIR/nsx-ctrl-ova)
-	NSX_T_EDGE_OVA=$(ls $ROOT_DIR/nsx-edge-ova)
-
 	mkdir -p $OVA_ISO_PATH
 	cp $ROOT_DIR/nsx-mgr-ova/$NSX_T_MANAGER_OVA \
 	   $ROOT_DIR/nsx-ctrl-ova/$NSX_T_CONTROLLER_OVA \
@@ -36,10 +29,6 @@ function copy_ovas_to_OVA_ISO_PATH {
 }
 
 function create_customize_ova_params {
-
-	NSX_T_MANAGER_OVA=$(ls $ROOT_DIR/nsx-mgr-ova)
-	NSX_T_CONTROLLER_OVA=$(ls $ROOT_DIR/nsx-ctrl-ova)
-	NSX_T_EDGE_OVA=$(ls $ROOT_DIR/nsx-edge-ova)
 
 	cat > customize_ova_vars.yml <<-EOF
 ovftool_path: '/usr/bin'
