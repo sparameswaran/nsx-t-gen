@@ -64,10 +64,20 @@ nsx_t_gen_params: &nsx-t-gen-params
   SUPPORT_NSX_VMOTION: ((support_nsx_vmotion))
   ENABLE_ANSIBLE_DEBUG: ((enable_ansible_debug))
   NSX_T_SIZING_SPEC: ((nsx_t_sizing_spec))
+
 groups:
-- name: install
+
+- name: full-install
   jobs:
   - install-nsx-t
+  - config-nsx-t-switches
+
+- name: base-install
+  jobs:
+  - install-nsx-t
+
+- name: configure
+  jobs:
   - config-nsx-t-switches
 
 - name: cleanup
@@ -151,8 +161,9 @@ jobs:
   plan:
   - aggregate:
     - get: nsx-t-gen-pipeline
+    - get: nsxt-ansible
 
-  - task: install-nsx-t
+  - task: configure-nsx-t
     file: nsx-t-gen-pipeline/tasks/config-nsx-t-switches/task.yml
     params: *nsx-t-gen-params
 

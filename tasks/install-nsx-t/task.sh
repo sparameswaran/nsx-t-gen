@@ -55,31 +55,29 @@ if [ "$NSX_MGR_OVA_DEPLOYED" != "true" ]; then
 	create_customize_ova_params
 
 	ansible-playbook $DEBUG -i localhost customize_ovas.yml -e @customize_ova_vars.yml
-    ansible-playbook $DEBUG -i hosts deploy_ovas.yml -e @extra_yaml_args.yml
+    ansible-playbook $DEBUG -i hosts deployNsx.yml -e @extra_yaml_args.yml
+    STATUS=$?
 fi
 
-NO_OF_CONTROLLERS=$(curl -k -u "admin:$NSX_T_MANAGER_ADMIN_PWD" \
-                    https://${NSX_T_MANAGER_IP}/api/v1/cluster/nodes \
-                    | jq '.results[].controller_role.type' | wc -l )
-if [ "$NO_OF_CONTROLLERS" -lt 2 ]; then
-  ansible-playbook $DEBUG -i hosts configure_controllers.yml -e @extra_yaml_args.yml
-  echo ""
-fi
+# NO_OF_CONTROLLERS=$(curl -k -u "admin:$NSX_T_MANAGER_ADMIN_PWD" \
+#                     https://${NSX_T_MANAGER_IP}/api/v1/cluster/nodes \
+#                     | jq '.results[].controller_role.type' | wc -l )
+# if [ "$NO_OF_CONTROLLERS" -lt 2 ]; then
+#   ansible-playbook $DEBUG -i hosts configure_controllers.yml -e @extra_yaml_args.yml
+#   echo ""
+# fi
 
-ansible-playbook $DEBUG -i hosts deployNsx.yml -e @extra_yaml_args.yml
-STATUS=$?
 
 echo ""
 
 
-if [ -z "$SUPPORT_NSX_VMOTION" -o "$SUPPORT_NSX_VMOTION" == "false" ]; then
-  echo "Skipping vmks configuration for NSX-T Mgr!!" 
-  echo 'configure_vmks: False' >> answerfile.yml
-  
-else
-  echo "Allowing vmks configuration for NSX-T Mgr!!" 
-  echo 'configure_vmks: True' >> answerfile.yml
-fi
+# if [ -z "$SUPPORT_NSX_VMOTION" -o "$SUPPORT_NSX_VMOTION" == "false" ]; then
+#   echo "Skipping vmks configuration for NSX-T Mgr!!" 
+# else
+#   echo "Allowing vmks configuration for NSX-T Mgr!!" 
+#   ansible-playbook $DEBUG -i hosts configure_nsx_vmks.yml -e @extra_yaml_args.yml
 
-echo ""
+# fi
+
+# echo ""
 
