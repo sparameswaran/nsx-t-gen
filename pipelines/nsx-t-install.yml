@@ -70,15 +70,15 @@ groups:
 - name: full-install
   jobs:
   - install-nsx-t
-  - config-nsx-t-switches
+  - add-nsx-t-routers
 
 - name: base-install
   jobs:
   - install-nsx-t
 
-- name: configure
+- name: add-routers
   jobs:
-  - config-nsx-t-switches
+  - add-nsx-t-routers
 
 - name: cleanup
   jobs:
@@ -157,14 +157,14 @@ jobs:
     file: nsx-t-gen-pipeline/tasks/install-nsx-t/task.yml
     params: *nsx-t-gen-params
 
-- name: config-nsx-t-switches
+- name: add-nsx-t-routers
   plan:
   - aggregate:
     - get: nsx-t-gen-pipeline
     - get: nsxt-ansible
 
-  - task: configure-nsx-t
-    file: nsx-t-gen-pipeline/tasks/config-nsx-t-switches/task.yml
+  - task: add-nsx-t-routers
+    file: nsx-t-gen-pipeline/tasks/add-nsx-t-routers/task.yml
     params: *nsx-t-gen-params
 
 - name: uninstall-nsx-t
