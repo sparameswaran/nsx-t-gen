@@ -16,6 +16,9 @@ Not handled by pipeline (as of 4/24/18):
 * NAT setup
 * Route distribution
 
+## Alert
+This is purely a trial work-in-progress and not officially supported by anyone. Please use caution while using it.
+
 ## Offline envs
 This is only applicable if the docker image `nsxedgegen/nsx-t-gen-worker:latest` is unavailable or env is restricted to offline. 
 
