@@ -124,9 +124,9 @@ nsx_t_t0router_spec: |
     name: DefaultT0Router
     edge_index: nsx-t-edge-01
     ha_mode: 'ACTIVE_STANDBY'
-    ip1: 10.193.162.101/24
-    ip2: 10.193.162.102/24
-    vip: 10.193.162.103/24
+    ip1: 10.13.12.101/27
+    ip2: 10.13.12.102/27
+    vip: 10.13.12.103/27
     vlan_uplink: 3032
     static_route:
       next_hop: 10.13.12.1

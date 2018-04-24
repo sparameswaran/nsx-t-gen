@@ -30,7 +30,7 @@ function create_edge_hosts {
   for edge_ip in $(echo $NSX_T_EDGE_IPS | sed -e 's/,/ /g')
   do
     cat >> edge_vms <<-EOF
-edge${count}  \
+${NSX_T_EDGE_HOST_PREFIX}-0${count}  \
   ansible_ssh_host=$edge_ip \
   ansible_ssh_user=root \
   ansible_ssh_pass=$NSX_T_EDGE_ROOT_PWD \
