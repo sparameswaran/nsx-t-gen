@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 function create_base_answerfile {
 	cat > answerfile.yml <<-EOF
 ovfToolPath: '/usr/bin'
@@ -16,7 +15,7 @@ deployMgmtNetmask: $NETMASK
 nsxAdminPass: "$NSX_T_MANAGER_ADMIN_PWD"
 nsxCliPass: "$NSX_T_MANAGER_ROOT_PWD"
 nsxOvaPath: "$OVA_ISO_PATH"
-deployVcIPAddress: $VCENTER_HOST
+deployVcIPAddress: "$VCENTER_HOST"
 deployVcUser: $VCENTER_USR
 deployVcPassword: "$VCENTER_PWD"
 compute_manager: "$VCENTER_MANAGER"
@@ -66,7 +65,7 @@ EOF
 $controller_config
   nsxController0${count}:
     hostname: ${NSX_T_CONTROLLER_HOST_PREFIX}-0${count}.${DNSDOMAIN} 
-    vmName: "${NSX_T_CONTROLLER_VM_NAME_PREFIX} 0${count}" 
+    vmName: "${NSX_T_CONTROLLER_VM_NAME_PREFIX}-0${count}" 
     ipAddress: $controller_ip
     ovaFile: $NSX_T_CONTROLLER_OVA
 EOF

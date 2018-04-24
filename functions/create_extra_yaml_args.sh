@@ -31,7 +31,8 @@ function create_extra_yaml_args {
 	echo "esxi_uplink_vmnics:" >> extra_yaml_args.yml
 	for vmnic in $( echo $NSX_T_ESXI_VMNICS | sed -e 's/,/ /g')
 	do
-	  echo "  - uplink-${count}: ${vmnic}" >> extra_yaml_args.yml
+	  #echo "  - uplink-${count}: ${vmnic}" >> extra_yaml_args.yml
+	  echo "  uplink-${count}: ${vmnic}" >> extra_yaml_args.yml
 	  (( count++ ))
 	done
 	echo "" >> extra_yaml_args.yml

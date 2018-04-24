@@ -7,7 +7,7 @@ function create_controller_hosts {
   for controller_ip in $(echo $NSX_T_CONTROLLER_IPS | sed -e 's/,/ /g')
   do
     cat >> ctrl_vms <<-EOF
-nsx-controller${count} \
+nsx-controller0${count} \
   ansible_ssh_host=$controller_ip \
   ansible_ssh_user=root \
   ansible_ssh_pass=$NSX_T_CONTROLLER_ROOT_PWD \
@@ -17,7 +17,7 @@ nsx-controller${count} \
   portgroup="$MGMT_PORTGROUP" \
   gw=$DEFAULTGATEWAY \
   mask=$NETMASK \
-  hostname=nsx-controller${count} 
+  hostname="${NSX_T_CONTROLLER_HOST_PREFIX}-0${count}" 
 EOF
     (( count++ ))
   done
@@ -30,7 +30,7 @@ function create_edge_hosts {
   for edge_ip in $(echo $NSX_T_EDGE_IPS | sed -e 's/,/ /g')
   do
     cat >> edge_vms <<-EOF
-${NSX_T_EDGE_HOST_PREFIX}-0${count}  \
+edge${count}  \
   ansible_ssh_host=$edge_ip \
   ansible_ssh_user=root \
   ansible_ssh_pass=$NSX_T_EDGE_ROOT_PWD \
@@ -40,16 +40,13 @@ ${NSX_T_EDGE_HOST_PREFIX}-0${count}  \
   portgroup="$MGMT_PORTGROUP" \
   gw=$DEFAULTGATEWAY \
   mask=$NETMASK \
-  hostname=${NSX_T_EDGE_HOST_PREFIX}-0${count} \
-  portgroupExt=$NSX_T_EDGE_PORTGROUP_EXT \
-  portgroupTransport=$NSX_T_EDGE_PORTGROUP_TRANSPORT 
+  hostname="${NSX_T_EDGE_HOST_PREFIX}-0${count}" \
+  portgroupExt="$NSX_T_EDGE_PORTGROUP_EXT" \
+  portgroupTransport="$NSX_T_EDGE_PORTGROUP_TRANSPORT" 
 EOF
     (( count++ ))
   done
 }
-
-    portgroupExt: $NSX_T_EDGE_PORTGROUP_EXT
-    portgroupTransport: $NSX_T_EDGE_PORTGROUP_TRANSPORT
 
 
 function create_esxi_hosts {
@@ -89,7 +86,7 @@ nsx-manager  \
   portgroup="$MGMT_PORTGROUP" \
   gw=$DEFAULTGATEWAY \
   mask=$NETMASK \
-  hostname=$NSX_T_MANAGER_VM_NAME
+  hostname="$NSX_T_MANAGER_VM_NAME"
 
 [localhost:vars]
 
@@ -101,11 +98,11 @@ managerOva=$NSX_T_MANAGER_OVA
 controllerOva=$NSX_T_CONTROLLER_OVA
 edgeOva=$NSX_T_EDGE_OVA
 
-deployVcIPAddress: "$VCENTER_HOST"
-deployVcUser: $VCENTER_USR
-deployVcPassword: "$VCENTER_PWD"
-compute_manager: "$VCENTER_MANAGER"
-cm_cluster: "$VCENTER_CLUSTER"
+deployVcIPAddress="$VCENTER_HOST"
+deployVcUser=$VCENTER_USR
+deployVcPassword="$VCENTER_PWD"
+compute_manager="$VCENTER_MANAGER"
+cm_cluster="$VCENTER_CLUSTER"
 
 nsxAdminPass="$NSX_T_MANAGER_ADMIN_PWD"
 nsxCliPass="$NSX_T_MANAGER_ROOT_PWD"
