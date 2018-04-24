@@ -143,9 +143,6 @@ esxi_overlay_profile_vlan=$NSX_T_OVERLAY_PROFILE_VLAN
 
 edge_cluster="$NSX_T_EDGE_CLUSTER"
 
-t0_name="$NSX_T_T0ROUTER_NAME"
-t0_ha_mode="$NSX_T_T0ROUTER_HA_MODE"
-
 vlan_ls_mgmt="$VLAN_MGMT"
 vlan_ls_vmotion="$VLAN_VMOTION"
 vlan_ls_vsan="$VLAN_VSAN"

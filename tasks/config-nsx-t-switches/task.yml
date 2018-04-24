@@ -18,6 +18,8 @@ params:
   NSX_T_EXTERNAL_IP_POOL:
   NSX_T_PAS_TAG: 
   NSX_T_HA_SWITCHING_PROFILE:
+  NSX_T_CONTAINER_IP_BLOCK_NAME:
+  NSX_T_CONTAINER_IP_BLOCK_CIDR:
     
 inputs:
   - name: nsx-t-gen-pipeline

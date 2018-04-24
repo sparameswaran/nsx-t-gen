@@ -433,9 +433,8 @@ def main():
 	load_edge_clusters()
 	load_transport_zones()
 	
-	t0_router_name    = os.getenv('NSX_T_T0ROUTER')
-	t0_router_subnet  = os.getenv('NSX_T_T0ROUTER_SUBNET')
-	t0_router         = yaml.load(t1_router_content)['t0_router']
+	t0_router_content  = os.getenv('NSX_T_T0ROUTER')
+	t0_router         = yaml.load(t0_router_content)['t0_router']
 	t0_router_id      = create_t0_logical_router_and_port(t0_router)
 
 	t1_router_content = os.getenv('NSX_T_T1ROUTER_LOGICAL_SWITCHES')
@@ -457,10 +456,10 @@ def main():
 														}
 	update_tag(SWITCHING_PROFILE_ENDPOINT + '/' + switching_profile_id, switching_profile_tags)
 
-	ip_blocks   = yaml.load(os.getenv('NSX_T_CONTAINER_IP_BLOCK'))
-	for ip_block in ip_blocks['container_ip_blocks']:
-		container_ip_block_id = create_container_ip_block(ip_block['name'], ip_block['cidr'])
-		update_tag(CONTAINER_IP_BLOCKS_ENDPOINT + '/' + container_ip_block_id, pas_tags)
+	ip_block_name   = os.getenv('NSX_T_CONTAINER_IP_BLOCK_NAME')
+	ip_block_cidr   = os.getenv('NSX_T_CONTAINER_IP_BLOCK_CIDR')
+	container_ip_block_id = create_container_ip_block(ip_block_name, ip_block_cidr)
+	update_tag(CONTAINER_IP_BLOCKS_ENDPOINT + '/' + container_ip_block_id, pas_tags)
 	
 	ip_pools    = yaml.load(os.getenv('NSX_T_EXTERNAL_IP_POOL'))
 	for ip_pool in ip_pools['external_ip_pools']:
