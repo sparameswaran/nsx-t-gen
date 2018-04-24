@@ -55,21 +55,47 @@ if [ "$NSX_MGR_OVA_DEPLOYED" != "true" ]; then
 	create_customize_ova_params
 
 	ansible-playbook $DEBUG -i localhost customize_ovas.yml -e @customize_ova_vars.yml
-    ansible-playbook $DEBUG -i hosts deployNsx.yml -e @extra_yaml_args.yml
+    ansible-playbook $DEBUG -i hosts deploy_ovas.yml -e @extra_yaml_args.yml
     STATUS=$?
 fi
 
-# NO_OF_CONTROLLERS=$(curl -k -u "admin:$NSX_T_MANAGER_ADMIN_PWD" \
-#                     https://${NSX_T_MANAGER_IP}/api/v1/cluster/nodes \
-#                     | jq '.results[].controller_role.type' | wc -l )
-# if [ "$NO_OF_CONTROLLERS" -lt 2 ]; then
-#   ansible-playbook $DEBUG -i hosts configure_controllers.yml -e @extra_yaml_args.yml
-#   echo ""
-# fi
+if [ $STATUS != 0 ]; then
+	echo "Deployment of ovas failed, vms failed to come up!!"
+	echo "Check error logs"
+	echo ""
+	exit $STATUS
+else
+	echo "Deployment of ovas succcessfull!, continuing with configuration of controllers!!"
+	echo ""
+fi
 
+# Configure the controllers
+NO_OF_CONTROLLERS=$(curl -k -u "admin:$NSX_T_MANAGER_ADMIN_PWD" \
+                    https://${NSX_T_MANAGER_IP}/api/v1/cluster/nodes \
+                    | jq '.results[].controller_role.type' | wc -l )
+if [ "$NO_OF_CONTROLLERS" -lt 2 ]; then
+	# There should 1 mgr + 1 contorller (or atmost 3 controllers). 
+	# So min count of 2 if already configured
+	ansible-playbook $DEBUG -i hosts configure_controllers.yml -e @extra_yaml_args.yml
+	STATUS=$?
+else
+	echo "Controllers already configured!!"
+	echo ""
+fi
 
-echo ""
+if [ $STATUS != 0 ]; then
+	echo "Configuration of controllers failed!!"
+	echo "Check error logs"
+	echo ""
+	exit $STATUS
+else
+	echo "Configuration of controllers successfull!!"
+	echo ""
+fi
 
+echo "Finished with Install!!"
+
+exit 0
 
 # if [ -z "$SUPPORT_NSX_VMOTION" -o "$SUPPORT_NSX_VMOTION" == "false" ]; then
 #   echo "Skipping vmks configuration for NSX-T Mgr!!" 

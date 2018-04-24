@@ -8,12 +8,6 @@ export TASKS_DIR=$(dirname $BASH_SOURCE)
 export PIPELINE_DIR=$(cd $TASKS_DIR/../../ && pwd)
 export FUNCTIONS_DIR=$(cd $PIPELINE_DIR/functions && pwd)
 
-export OVA_ISO_PATH='/root/ISOs/CHGA'
-export NSX_T_MANAGER_OVA=$(ls $ROOT_DIR/nsx-mgr-ova)
-export NSX_T_CONTROLLER_OVA=$(ls $ROOT_DIR/nsx-ctrl-ova)
-export NSX_T_EDGE_OVA=$(ls $ROOT_DIR/nsx-edge-ova)
-
-source $FUNCTIONS_DIR/copy_ovas.sh
 source $FUNCTIONS_DIR/create_ansible_cfg.sh
 source $FUNCTIONS_DIR/create_answerfile.sh
 source $FUNCTIONS_DIR/create_hosts.sh
