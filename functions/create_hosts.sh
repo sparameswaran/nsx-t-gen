@@ -7,7 +7,17 @@ function create_controller_hosts {
   for controller_ip in $(echo $NSX_T_CONTROLLER_IPS | sed -e 's/,/ /g')
   do
     cat >> ctrl_vms <<-EOF
-nsx-controller0${count}  ansible_ssh_host=$controller_ip   ansible_ssh_user=root ansible_ssh_pass=$NSX_T_CONTROLLER_ROOT_PWD
+nsx-controller${count} \
+  ansible_ssh_host=$controller_ip \
+  ansible_ssh_user=root \
+  ansible_ssh_pass=$NSX_T_CONTROLLER_ROOT_PWD \
+  dc="$VCENTER_DATACENTER" \
+  cluster="$VCENTER_CLUSTER" \
+  datastore="$VCENTER_DATASTORE" \
+  portgroup="$MGMT_PORTGROUP" \
+  gw=$DEFAULTGATEWAY \
+  mask=$NETMASK \
+  hostname=nsx-controller${count} 
 EOF
     (( count++ ))
   done
@@ -20,11 +30,27 @@ function create_edge_hosts {
   for edge_ip in $(echo $NSX_T_EDGE_IPS | sed -e 's/,/ /g')
   do
     cat >> edge_vms <<-EOF
-${NSX_T_EDGE_HOST_PREFIX}-0${count}  ansible_ssh_host=$edge_ip   ansible_ssh_user=root ansible_ssh_pass=$NSX_T_EDGE_ROOT_PWD
+${NSX_T_EDGE_HOST_PREFIX}-0${count}  \
+  ansible_ssh_host=$edge_ip \
+  ansible_ssh_user=root \
+  ansible_ssh_pass=$NSX_T_EDGE_ROOT_PWD \
+  dc="$VCENTER_DATACENTER" \
+  cluster="$VCENTER_CLUSTER" \
+  datastore="$VCENTER_DATASTORE" \
+  portgroup="$MGMT_PORTGROUP" \
+  gw=$DEFAULTGATEWAY \
+  mask=$NETMASK \
+  hostname=${NSX_T_EDGE_HOST_PREFIX}-0${count} \
+  portgroupExt=$NSX_T_EDGE_PORTGROUP_EXT \
+  portgroupTransport=$NSX_T_EDGE_PORTGROUP_TRANSPORT 
 EOF
     (( count++ ))
   done
 }
+
+    portgroupExt: $NSX_T_EDGE_PORTGROUP_EXT
+    portgroupTransport: $NSX_T_EDGE_PORTGROUP_TRANSPORT
+
 
 function create_esxi_hosts {
   echo "$ESXI_HOSTS_CONFIG" > /tmp/esxi_hosts_config.yml
@@ -53,9 +79,40 @@ cat > hosts <<-EOF
 localhost       ansible_connection=local
 
 [nsxmanagers]
-nsx-manager     ansible_ssh_host=$NSX_T_MANAGER_IP    ansible_ssh_user=root ansible_ssh_pass=$NSX_T_MANAGER_ROOT_PWD
+nsx-manager  \
+  ansible_ssh_host=$NSX_T_MANAGER_IP \
+  ansible_ssh_user=root \
+  ansible_ssh_pass=$NSX_T_MANAGER_ROOT_PWD \
+  dc="$VCENTER_DATACENTER" \
+  cluster="$VCENTER_CLUSTER" \
+  datastore="$VCENTER_DATASTORE" \
+  portgroup="$MGMT_PORTGROUP" \
+  gw=$DEFAULTGATEWAY \
+  mask=$NETMASK \
+  hostname=$NSX_T_MANAGER_VM_NAME
 
 [localhost:vars]
+
+ovfToolPath='/usr/bin'
+nsxOvaPath="$OVA_ISO_PATH"
+sshEnabled='True'
+allowSSHRootAccess='True'
+managerOva=$NSX_T_MANAGER_OVA
+controllerOva=$NSX_T_CONTROLLER_OVA
+edgeOva=$NSX_T_EDGE_OVA
+
+deployVcIPAddress: "$VCENTER_HOST"
+deployVcUser: $VCENTER_USR
+deployVcPassword: "$VCENTER_PWD"
+compute_manager: "$VCENTER_MANAGER"
+cm_cluster: "$VCENTER_CLUSTER"
+
+nsxAdminPass="$NSX_T_MANAGER_ADMIN_PWD"
+nsxCliPass="$NSX_T_MANAGER_ROOT_PWD"
+
+dns_server="$DNSSERVER"
+dns_domain="$DNSDOMAIN"
+ntp_server="$NTPSERVERS"
 
 tag_scope="ncp/cluster"
 tag=$NSX_T_PAS_NCP_CLUSTER_TAG
@@ -71,9 +128,14 @@ tep_pool_nameserver="$NSX_T_TEP_POOL_NAMESERVER"
 tep_pool_suffix=$DNSDOMAIN
 tep_pool_gw=$NSX_T_TEP_POOL_GATEWAY
 
+ip_block_name=$NSX_T_CONTAINER_IP_BLOCK_NAME
+ip_block_cidr=$NSX_T_CONTAINER_IP_BLOCK_CIDR
+
 edge_single_uplink_profile_name=$NSX_T_SINGLE_UPLINK_PROFILE_NAME
 edge_single_uplink_profile_mtu=$NSX_T_SINGLE_UPLINK_PROFILE_MTU
 edge_single_uplink_profile_vlan=$NSX_T_SINGLE_UPLINK_PROFILE_VLAN
+edge_interface=$NSX_T_EDGE_OVERLAY_INTERFACE
+edge_uplink_interface=$NSX_T_EDGE_UPLINK_INTERFACE
 
 esxi_uplink_vmnics_arr="${esxi_host_uplink_vmnics}"
 edge_uplink_vmnics_arr="${edge_host_uplink_vmnics}"
@@ -84,7 +146,7 @@ esxi_overlay_profile_vlan=$NSX_T_OVERLAY_PROFILE_VLAN
 
 edge_cluster="$NSX_T_EDGE_CLUSTER"
 
-t0_name="$NSX_T_T0ROUTER"
+t0_name="$NSX_T_T0ROUTER_NAME"
 t0_ha_mode="ACTIVE_STANDBY"
 
 vlan_ls_mgmt="$VLAN_MGMT"
@@ -93,7 +155,10 @@ vlan_ls_vsan="$VLAN_VSAN"
 
 EOF
 
-  create_esxi_hosts
+  if  [ ! -z "$ESXI_HOSTS_CONFIG" ]; then
+    create_esxi_hosts
+  fi
+
   create_edge_hosts
   create_controller_hosts
 

@@ -4,6 +4,7 @@ vcenter_pwd: 39adladfasdfl!
 vcenter_datacenter: Datacenter
 vcenter_datastore: Datastore
 vcenter_cluster: Cluster
+vcenter_manager: vcenter-1
 ntpservers: 10.13.12.2
 mgmt_portgroup: 'VM Network'
 dnsserver: 10.13.12.2
@@ -58,6 +59,15 @@ nsx_t_edge_ips: 10.13.12.54,10.13.12.55
 nsx_t_edge_root_pwd: VMware1!
 nsx_t_edge_portgroup_ext: vlan3032 # For external routing
 nsx_t_edge_portgroup_transport: vlan3127 # For TEP/overlay
+
+# Edge network interfaces
+# Network1 and Network4 are for mgmt and not used for uplink
+# Network2 is for external uplink
+# Network3 is for overlay
+# Change only if necessary
+nsx_t_edge_overlay_interface: fp-eth1 # Wired to Network3
+nsx_t_edge_uplink_interface: fp-eth0  # Wired to Network2
+
 nsx_t_tep_pool_name: tep-ip-pool
 nsx_t_tep_pool_cidr: 192.168.213.0/24
 nsx_t_tep_pool_gateway: 192.168.213.1
@@ -114,7 +124,10 @@ nsx_t_t0router_spec: |
     name: DefaultT0Router
     edge_index: nsx-t-edge-01
     ha_mode: 'ACTIVE_STANDBY'
-    subnet: 10.13.12.10/24
+    ip1: 10.193.162.101/24
+    ip2: 10.193.162.102/24
+    vip: 10.193.162.103/24
+    vlan_uplink: 3032
     static_route:
       next_hop: 10.13.12.1
       network: 0.0.0.0/0
@@ -147,10 +160,14 @@ nsx_t_t1router_logical_switches_spec: |
 
 nsx_t_ha_switching_profile: HASwitchingProfile
 
-nsx_t_container_ip_block_spec: |
-  container_ip_blocks:
-  - name: container-ip-block1
-    cidr: 10.100.0.0/16    
+nsx_t_container_ip_block_name: container-ip-block
+nsx_t_container_ip_block_cidr: 10.4.0.0/16
+
+# nsx_t_container_ip_block_spec: |
+#   container_ip_blocks:
+#   - name: container-ip-block
+#     cidr: 10.100.0.0/16    
+ 
 
 nsx_t_external_ip_pool_spec: |
   external_ip_pools:

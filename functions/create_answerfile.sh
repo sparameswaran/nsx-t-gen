@@ -19,6 +19,8 @@ nsxOvaPath: "$OVA_ISO_PATH"
 deployVcIPAddress: $VCENTER_HOST
 deployVcUser: $VCENTER_USR
 deployVcPassword: "$VCENTER_PWD"
+compute_manager: "$VCENTER_MANAGER"
+cm_cluster: "$VCENTER_CLUSTER"
 sshEnabled: True
 allowSSHRootAccess: True
 
