@@ -69,8 +69,7 @@ groups:
 
 - name: full-install
   jobs:
-  - install-nsx-t
-  - add-nsx-t-routers
+  - full-install-nsx-t
 
 - name: base-install
   jobs:
@@ -162,6 +161,24 @@ jobs:
   - aggregate:
     - get: nsx-t-gen-pipeline
     - get: nsxt-ansible
+
+  - task: add-nsx-t-routers
+    file: nsx-t-gen-pipeline/tasks/add-nsx-t-routers/task.yml
+    params: *nsx-t-gen-params
+
+- name: full-install-nsx-t
+  plan:
+  - aggregate:
+    - get: nsx-t-gen-pipeline
+    - get: nsxt-ansible
+    - get: nsx-mgr-ova
+    - get: nsx-ctrl-ova
+    - get: nsx-edge-ova
+    - get: ovftool
+
+  - task: install-nsx-t
+    file: nsx-t-gen-pipeline/tasks/install-nsx-t/task.yml
+    params: *nsx-t-gen-params
 
   - task: add-nsx-t-routers
     file: nsx-t-gen-pipeline/tasks/add-nsx-t-routers/task.yml

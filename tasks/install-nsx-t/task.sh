@@ -25,7 +25,9 @@ if [ "$ENABLE_ANSIBLE_DEBUG" == "true" ]; then
 fi
 
 # Check if NSX MGR is up or not
-nsx_mgr_up_status=$(curl -s -o /dev/null -I -w "%{http_code}" -k  https://${NSX_T_MANAGER_IP}:443/login.jsp || true)
+nsx_mgr_up_status=$(curl -s -o /dev/null -I -w "%{http_code}" -k \
+	                 https://${NSX_T_MANAGER_IP}:443/login.jsp \
+	                 2>/dev/null || true)
 
 # Deploy the ovas if its not up
 if [ $nsx_mgr_up_status -ne 200 ]; then
@@ -59,7 +61,7 @@ if [ "$NSX_MGR_OVA_DEPLOYED" != "true" ]; then
     STATUS=$?
 fi
 
-if [ $STATUS != 0 ]; then
+if [[ $STATUS != 0 ]]; then
 	echo "Deployment of ovas failed, vms failed to come up!!"
 	echo "Check error logs"
 	echo ""
@@ -72,7 +74,7 @@ fi
 # Configure the controllers
 NO_OF_CONTROLLERS=$(curl -k -u "admin:$NSX_T_MANAGER_ADMIN_PWD" \
                     https://${NSX_T_MANAGER_IP}/api/v1/cluster/nodes \
-                    | jq '.results[].controller_role.type' | wc -l )
+                     2>/dev/null | jq '.results[].controller_role.type' | wc -l )
 if [ "$NO_OF_CONTROLLERS" -lt 2 ]; then
 	# There should 1 mgr + 1 contorller (or atmost 3 controllers). 
 	# So min count of 2 if already configured
@@ -83,7 +85,7 @@ else
 	echo ""
 fi
 
-if [ $STATUS != 0 ]; then
+if [[ $STATUS != 0 ]]; then
 	echo "Configuration of controllers failed!!"
 	echo "Check error logs"
 	echo ""
