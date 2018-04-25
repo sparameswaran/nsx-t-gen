@@ -38,5 +38,9 @@ nsx_controller_filename: "$NSX_T_CONTROLLER_OVA"
 nsx_gw_filename: "$NSX_T_EDGE_OVA"
 EOF
 
+	if [ "$NSX_T_TURN_OFF_RESERVATION" == "true" ]; then
+		echo "nsx_t_turn_off_reservation: $NSX_T_TURN_OFF_RESERVATION" >> customize_ova_vars.yml
+	fi
+
 	echo "$NSX_T_SIZING_SPEC" >> customize_ova_vars.yml
 }

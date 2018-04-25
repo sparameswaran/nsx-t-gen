@@ -75,6 +75,22 @@ nsx_t_tep_pool_start: 192.168.213.10
 nsx_t_tep_pool_end: 192.168.213.200
 nsx_t_tep_pool_nameserver: 192.168.213.2
 
+# Memory reservation is turned ON by default with the OVAs.
+# This would mean a deployment of an edge or a mgr would reserve full memory
+# leading to memory constraints
+# Set to true - would turn OFF reservation for POCs, smaller setups. 
+# Set to false - would turn ON reservation, recommended for production setups.
+nsx_t_turn_off_reservation: true
+
+# Default Sizing:
+# Edge Small:  2 vCPU, 4GB RAM # Too small
+# Edge Medium: 4 vCPU, 8GB RAM
+# Edge Large:  8 vCPU, 16GB RAM
+# Ctrl: 4 vCPU, 16GB RAM - changed to 2 vCPU and 8GB
+# Mgr Small:  2 vCPU, 8GB RAM
+# Mgr Medium: 4 vCPU, 16GB RAM
+# Mgr Large:  8 vCPU, 32GB RAM
+
 nsx_t_sizing_spec: |
   nsx_t_sizing:
     mgr:
@@ -85,7 +101,7 @@ nsx_t_sizing_spec: |
       memory: 8192 # in MB, needs to be multiples of 1024
     edge:
       cpu: 2
-      memory: 8192
+      memory: 8192 # in MB, needs to be multiples of 1024
 
 
 nsx_t_overlay_hostswitch: overlay-hostswitch
