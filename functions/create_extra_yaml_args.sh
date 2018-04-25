@@ -10,11 +10,11 @@ function create_extra_yaml_args {
 	echo "" >> extra_yaml_args.yml
 
 	# Has root element
-	# echo "$NSX_T_CONTAINER_IP_BLOCK_SPEC" >> extra_yaml_args.yml
-	# echo "" >> extra_yaml_args.yml
+	echo "$NSX_T_CONTAINER_IP_BLOCK_SPEC" >> extra_yaml_args.yml
+	echo "" >> extra_yaml_args.yml
 
-	# Single line entry - just value
-	echo "ha_switching_profile: $NSX_T_HA_SWITCHING_PROFILE" >> extra_yaml_args.yml
+	# Has root element
+	echo "$NSX_T_HA_SWITCHING_PROFILE_SPEC" >> extra_yaml_args.yml
 	echo "" >> extra_yaml_args.yml
 
 	# Has root element

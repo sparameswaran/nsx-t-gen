@@ -125,9 +125,6 @@ tep_pool_nameserver="$NSX_T_TEP_POOL_NAMESERVER"
 tep_pool_suffix=$DNSDOMAIN
 tep_pool_gw=$NSX_T_TEP_POOL_GATEWAY
 
-ip_block_name=$NSX_T_CONTAINER_IP_BLOCK_NAME
-ip_block_cidr=$NSX_T_CONTAINER_IP_BLOCK_CIDR
-
 edge_single_uplink_profile_name=$NSX_T_SINGLE_UPLINK_PROFILE_NAME
 edge_single_uplink_profile_mtu=$NSX_T_SINGLE_UPLINK_PROFILE_MTU
 edge_single_uplink_profile_vlan=$NSX_T_SINGLE_UPLINK_PROFILE_VLAN

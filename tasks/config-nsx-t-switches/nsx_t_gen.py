@@ -456,11 +456,13 @@ def main():
 														}
 	update_tag(SWITCHING_PROFILE_ENDPOINT + '/' + switching_profile_id, switching_profile_tags)
 
-	ip_block_name   = os.getenv('NSX_T_CONTAINER_IP_BLOCK_NAME')
-	ip_block_cidr   = os.getenv('NSX_T_CONTAINER_IP_BLOCK_CIDR')
-	container_ip_block_id = create_container_ip_block(ip_block_name, ip_block_cidr)
-	update_tag(CONTAINER_IP_BLOCKS_ENDPOINT + '/' + container_ip_block_id, pas_tags)
-	
+	ip_blocks = yaml.load(os.getenv('NSX_T_CONTAINER_IP_BLOCK'))
+	for ip_block in ip_blocks['container_ip_blocks']:
+		ip_block_name   = ip_block('name')
+		ip_block_cidr   = ip_block('cidr')		
+		container_ip_block_id = create_container_ip_block(ip_block_name, ip_block_cidr)
+		update_tag(CONTAINER_IP_BLOCKS_ENDPOINT + '/' + container_ip_block_id, pas_tags)
+		
 	ip_pools    = yaml.load(os.getenv('NSX_T_EXTERNAL_IP_POOL'))
 	for ip_pool in ip_pools['external_ip_pools']:
 		create_external_ip_pool(ip_pool['name'], 

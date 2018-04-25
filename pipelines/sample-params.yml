@@ -116,6 +116,8 @@ nsx_t_overlay_profile_vlan: 3127
 nsx_t_esxi_vmnics: vmnic1 # vmnic1,vmnic2...
 
 # Configs for T0Router (only one per run), T1Routers, Logical switches and tags...
+# Make sure the ncp/cluster tag matches the one defined at the top level.
+# Similarly, make sure the vlan_uplink matches the one defined for external transport vlan
 nsx_t_t0router_spec: |
   t0_router:
     name: DefaultT0Router
@@ -124,20 +126,34 @@ nsx_t_t0router_spec: |
     ip1: 10.13.12.101/27
     ip2: 10.13.12.102/27
     vip: 10.13.12.103/27
-    vlan_uplink: 3032
+    vlan_uplink: 3032 # Should match rest of external transport vlan id
     static_route:
       next_hop: 10.13.12.1
       network: 0.0.0.0/0
       admin_distance: 1
+    tags:
+      ncp/cluster: 'pcf2.0' # Should match the top level ncp/cluster tag value
+      testtag: 'testpcf2.0'
 
 # T1 Logical Router with associated logical switches
+# Add additional or comment off unnecessary t1 routers and switches as needed
+# Can have 3 different setups:
+# 1: One shared mgmt T1 Router and infra logical switch for both PKS & PAS
+# 2: One mgmt T1 Router and infra logical switch for either PKS or PAS.. 
+#    Comment off the T1 router not required
+# 3: Separate mgmt T1 Router and infra logical switch for each PKS and PAS.. 
+#    Add additional T1Router-Mgmt2 as needed with its infra logical switch
+# Name the routers and logical switches and cidrs differently to avoid conflict
 nsx_t_t1router_logical_switches_spec: |
   t1_routers:
+  # Add additional T1 Routers for Mgmt if there is need to have separate 
+  # infra switches for PKS and PAS separately
   - name: T1Router-Mgmt
     switches:
     - name: InfraLogicalSwitch
       subnet_ip: 192.168.10.1 # Last octet should be 1 rather than 0
       subnet_mask: 26
+  # Comment off the following T1 Router if there is no PAS
   - name: T1Router-PAS
     switches:
     - name: PASDeployment
@@ -149,29 +165,51 @@ nsx_t_t1router_logical_switches_spec: |
     - name: PASDynamicServices
       subnet_ip: 192.168.28.1 # Last octet should be 1 rather than 0
       subnet_mask: 22
+  # Comment off the following T1 Router if there is no PKS
   - name: T1Router-PKS
     switches:
     - name: PKSServicesLogicalSwitch
       subnet_ip: 192.168.40.1 # Last octet should be 1 rather than 0
       subnet_mask: 22
 
-nsx_t_ha_switching_profile: HASwitchingProfile
+# Make sure the ncp/cluster tag matches the one defined on the T0 Router
+# Additional the ncp/ha tag should be set for HA Spoof guard profile
+nsx_t_ha_switching_profile_spec: |
+  ha_switching_profiles:
+  - name: HASwitchingProfile
+    tags:
+      ncp/cluster: 'pcf2.0'  # Should match the top level ncp/cluster tag value
+      ncp/ha: 'true'         # Required for HA
+      testtag: 'testpcf2.0'
 
-nsx_t_container_ip_block_name: container-ip-block
-nsx_t_container_ip_block_cidr: 10.4.0.0/16
 
-# nsx_t_container_ip_block_spec: |
-#   container_ip_blocks:
-#   - name: container-ip-block
-#     cidr: 10.100.0.0/16    
+# Make sure the ncp/cluster tag matches the one defined on the T0 Router
+# Add additional container ip blocks as needed
+nsx_t_container_ip_block_spec: |
+  container_ip_blocks:
+  - name: container-ip-block
+    cidr: 10.4.0.0/16    
+    tags:
+      ncp/cluster: 'pcf2.0' # Should match the top level ncp/cluster tag value
+      testtag: 'testpcf2.0'
  
 
+# Make sure the ncp/cluster tag matches the one defined on the T0 Router
+# Additional the ncp/external tag should be set for external facing ip pool
+# Add additional exernal ip pools as needed
 nsx_t_external_ip_pool_spec: |
   external_ip_pools:
-  - name: external-ip-pool1
+  - name: external-ip-pool
     cidr: 10.100.0.0/24
     gateway: 10.100.0.1
     start: 10.100.0.10 # Should not include gateway
     end: 10.100.0.200  # Should not include gateway
+    nameserver: 10.100.0.2
+    dns_domain: corp.local.io
+    tags:
+      ncp/cluster: 'pcf2.0' # Should match the top level ncp/cluster tag value
+      ncp/external: 'true'  # Required for external facing ips
+      testtag: 'testpcf2.0'
+
 
 enable_ansible_debug: false # set value to true for verbose output from ansible
