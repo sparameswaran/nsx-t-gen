@@ -111,6 +111,10 @@ dns_server="$DNSSERVER"
 dns_domain="$DNSDOMAIN"
 ntp_server="$NTPSERVERS"
 
+# Sizing of vms for deployment
+nsx_t_mgr_deploy_size="$NSX_T_MGR_DEPLOY_SIZE"
+nsx_t_edge_deploy_size="$NSX_T_EDGE_DEPLOY_SIZE"
+
 tag_scope="ncp/cluster"
 tag=$NSX_T_PAS_NCP_CLUSTER_TAG
 overlay_tz_name=$NSX_T_OVERLAY_TRANSPORT_ZONE

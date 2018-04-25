@@ -46,19 +46,19 @@ nsx_t_manager_fqdn: nsx-t-mgr.corp.local.io
 nsx_t_manager_vm_name: 'NSX-T Mgr'
 nsx_t_manager_ip: 10.13.12.50
 nsx_t_manager_admin_user: admin
-nsx_t_manager_admin_pwd: VMware1!
-nsx_t_manager_root_pwd: VMware1!
-nsx_t_controller_host_prefix: nsx-t-ctl # Generated controller would be nsx-t-ctrl-1.corp.local.io,...
+nsx_t_manager_admin_pwd: VMware1!         # Min 8 chars, upper, lower, number, special digit
+nsx_t_manager_root_pwd: VMware1!          # Min 8 chars, upper, lower, number, special digit
+nsx_t_controller_host_prefix: nsx-t-ctl   # Generated controller would be nsx-t-ctrl-1.corp.local.io,...
 nsx_t_controller_vm_name_prefix: 'NSX-T Controller' # Generated edge host name would be "NSX-T Controller-1"
 nsx_t_controller_ips: 10.13.12.51,10.13.12.52,10.13.12.53 # Should be 1 or 3 ips to maintain quorum for Controller Cluster
-nsx_t_controller_root_pwd: VMware1!
-nsx_t_controller_cluster_pwd: VMware1!
-nsx_t_edge_host_prefix: nsx-t-edge # Generated edge would be nsx-t-edge-1.corp.local.io,...
-nsx_t_edge_vm_name_prefix: 'NSX-T Edge' # Generated edge host name would be "NSX-T Edge-1"
-nsx_t_edge_ips: 10.13.12.54,10.13.12.55
+nsx_t_controller_root_pwd: VMware1!       # Min 8 chars, upper, lower, number, special digit
+nsx_t_controller_cluster_pwd: VMware1!    # Min 8 chars, upper, lower, number, special digit
+nsx_t_edge_host_prefix: nsx-t-edge        # Generated edge would be nsx-t-edge-1.corp.local.io,...
+nsx_t_edge_vm_name_prefix: 'NSX-T Edge'   # Generated edge host name would be "NSX-T Edge-1"
+nsx_t_edge_ips: 10.13.12.54,10.13.12.55   # comma separated ips
 nsx_t_edge_root_pwd: VMware1!
-nsx_t_edge_portgroup_ext: vlan3032 # For external routing
-nsx_t_edge_portgroup_transport: vlan3127 # For TEP/overlay
+nsx_t_edge_portgroup_ext: vlan3032        # For external routing
+nsx_t_edge_portgroup_transport: vlan3127  # For TEP/overlay
 
 # Edge network interfaces
 # Network1 and Network4 are for mgmt and not used for uplink
@@ -75,28 +75,37 @@ nsx_t_tep_pool_start: 192.168.213.10
 nsx_t_tep_pool_end: 192.168.213.200
 nsx_t_tep_pool_nameserver: 192.168.213.2
 
-# Memory reservation is turned ON by default with the OVAs.
+# Memory reservation is turned ON by default with the NSX-T OVAs.
 # This would mean a deployment of an edge or a mgr would reserve full memory
 # leading to memory constraints
-# Set to true - would turn OFF reservation for POCs, smaller setups. 
-# Set to false - would turn ON reservation, recommended for production setups.
-nsx_t_turn_off_reservation: true
+# Set following flag to true  - would keep reservation ON, recommended for production setups.
+# Set following flag to false - would turn reservation OFF, recommended for POCs, smaller setups. 
+nsx_t_keep_reservation: false # for POCs, small setups
 
-# Default Sizing:
-# Edge Small:  2 vCPU, 4GB RAM # Too small
-# Edge Medium: 4 vCPU, 8GB RAM
-# Edge Large:  8 vCPU, 16GB RAM
-# Ctrl: 4 vCPU, 16GB RAM - changed to 2 vCPU and 8GB
-# Mgr Small:  2 vCPU, 8GB RAM
-# Mgr Medium: 4 vCPU, 16GB RAM
-# Mgr Large:  8 vCPU, 32GB RAM
+# Default Sizing of NSX-T VMs
+# Manager Sizing
+# Small  : 2 vCPU,  8GB RAM
+# Medium : 4 vCPU, 16GB RAM - default with OVA
+# Large  : 8 vCPU, 32GB RAM
+# Controller Sizing
+# default: 4 vCPU, 16GB RAM - would be resized to 2 vCPU and 8GB
+# Edge Instance Sizing
+# Small  : 2 vCPU,  4GB RAM - Too small - dont use
+# Medium : 4 vCPU,  8GB RAM - default with OVA
+# Large  : 8 vCPU, 16GB RAM
 
+# Change default size for deployment
+nsx_t_mgr_deploy_size: small   # recommended for POCs, smaller setup
+nsx_t_edge_deploy_size: medium # recommended for POCs, smaller setup
+
+# More control over memory and vcpu to use
 nsx_t_sizing_spec: |
   nsx_t_sizing:
     mgr:
       cpu: 2
       memory: 8192 # in MB, needs to be multiples of 1024
     controller:
+      # Controller would be resized from 4vCPU/16GB to 2vCPU/8GB
       cpu: 2
       memory: 8192 # in MB, needs to be multiples of 1024
     edge:
