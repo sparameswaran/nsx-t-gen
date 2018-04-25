@@ -49,7 +49,7 @@ cd nsxt-ansible
 
 echo ""
 
-
+STATUS=0
 # Deploy the ovas if its not up
 if [ "$NSX_MGR_OVA_DEPLOYED" != "true" ]; then
 	install_ovftool
@@ -59,16 +59,16 @@ if [ "$NSX_MGR_OVA_DEPLOYED" != "true" ]; then
 	ansible-playbook $DEBUG -i localhost customize_ovas.yml -e @customize_ova_vars.yml
     ansible-playbook $DEBUG -i hosts deploy_ovas.yml -e @extra_yaml_args.yml
     STATUS=$?
-fi
 
-if [[ $STATUS != 0 ]]; then
-	echo "Deployment of ovas failed, vms failed to come up!!"
-	echo "Check error logs"
-	echo ""
-	exit $STATUS
-else
-	echo "Deployment of ovas succcessfull!, continuing with configuration of controllers!!"
-	echo ""
+	if [[ $STATUS != 0 ]]; then
+		echo "Deployment of ovas failed, vms failed to come up!!"
+		echo "Check error logs"
+		echo ""
+		exit $STATUS
+	else
+		echo "Deployment of ovas succcessfull!, continuing with configuration of controllers!!"
+		echo ""
+	fi
 fi
 
 # Configure the controllers
@@ -95,7 +95,7 @@ else
 	echo ""
 fi
 
-echo "Finished with Install!!"
+echo "Successfully finished with Install!!"
 
 exit 0
 
