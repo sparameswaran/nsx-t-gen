@@ -244,7 +244,7 @@ nsx_t_external_ip_pool_spec: |
     start: 10.100.0.10 # Should not include gateway
     end: 10.100.0.200  # Should not include gateway
     tags:
-      ncp/cluster: 'pas1'   # Should match the top level ncp/cluster tag value
+      ncp/cluster: 'pas1'   # Should match the top level ncp/cluster tag value for PAS
       ncp/external: 'true'  # Required for external facing ips
       testtag: 'testpas1'      
   - name: external-ip-pool-for-pks
@@ -254,7 +254,6 @@ nsx_t_external_ip_pool_spec: |
     end: 10.200.0.200  # Should not include gateway
     tags:
       # Needs to have atleast one tag entry
-      ncp/cluster: 'pas1'   # Should match the top level ncp/cluster tag value
       ncp/external: 'true'  # Required for external facing ips
       ncp/shared: 'true'    # Required for PKS
 
