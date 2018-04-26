@@ -53,14 +53,4 @@ STATUS=$?
 
 echo ""
 
-
-if [ -z "$SUPPORT_NSX_VMOTION" -o "$SUPPORT_NSX_VMOTION" == "false" ]; then
-  echo "Skipping vmks configuration for NSX-T Mgr!!" 
-else
-  echo "Allowing vmks configuration for NSX-T Mgr!!" 
-  ansible-playbook $DEBUG -i hosts configure_nsx_vmks.yml -e @extra_yaml_args.yml
-
-fi
-
-echo ""
-
+exit $STATUS

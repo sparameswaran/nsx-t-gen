@@ -104,35 +104,24 @@ else
 	echo ""
 fi
 
-STATUS=0
+# STATUS=0
 # Deploy the ovas if its not up
-if [ "$SUPPORT_NSX_VMOTION" == "true" ]; then
+# if [ "$SUPPORT_NSX_VMOTION" == "true" ]; then
 
-	ansible-playbook $DEBUG -i hosts configure_nsx_vmks.yml -e @extra_yaml_args.yml
-    STATUS=$?
+# 	ansible-playbook $DEBUG -i hosts configure_nsx_vmks.yml -e @extra_yaml_args.yml
+#     STATUS=$?
 
-	if [[ $STATUS != 0 ]]; then
-		echo "Configuration of vmks support failed!!"
-		echo "Check error logs"
-		echo ""
-		exit $STATUS
-	else
-		echo "Configuration of vmks succcessfull!"
-		echo ""
-	fi
-fi
+# 	if [[ $STATUS != 0 ]]; then
+# 		echo "Configuration of vmks support failed!!"
+# 		echo "Check error logs"
+# 		echo ""
+# 		exit $STATUS
+# 	else
+# 		echo "Configuration of vmks succcessfull!"
+# 		echo ""
+# 	fi
+# fi
 
 echo "Successfully finished with Install!!"
 
 exit 0
-
-# if [ -z "$SUPPORT_NSX_VMOTION" -o "$SUPPORT_NSX_VMOTION" == "false" ]; then
-#   echo "Skipping vmks configuration for NSX-T Mgr!!" 
-# else
-#   echo "Allowing vmks configuration for NSX-T Mgr!!" 
-#   ansible-playbook $DEBUG -i hosts configure_nsx_vmks.yml -e @extra_yaml_args.yml
-
-# fi
-
-# echo ""
-

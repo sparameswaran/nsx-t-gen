@@ -22,13 +22,6 @@ nsx_controller_ova: nsx-controller-2.1.0.0.0.7395493.ova
 nsx_edge_ova: nsx-edge-2.1.0.0.0.7395502.ova  
 ovftool_image: VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle
 
-# Should nsx-t have vmotion enabled?
-support_nsx_vmotion: false
-# If support nsx vmotion, then ensure values are filled for following params
-vlan_mgmt:
-vlan_vmotion:
-vlan_vsan:
-
 # Specify passwd of the esxi hosts that should be used for nsx-t
 esxi_hosts_root_pwd: rootPasswd  # Root password for the esxi hosts
 

@@ -470,7 +470,7 @@ def create_ha_switching_profile():
                                 'ncp/ha': 'true' 
                               }
     update_tag(SWITCHING_PROFILE_ENDPOINT + '/' + switching_profile_id, switching_profile_tags)
-  print('Done creating HASwitchingProfiles')
+  print('Done creating HASwitchingProfiles\n')
 
 def build_routers():
   init()
@@ -515,7 +515,7 @@ def set_t0_route_redistribution():
           '_revision': cur_redistribution_resp['_revision']
         }
       resp = client.put(api_endpoint, payload )
-  print('Done enabling route redisribution for T0Routers')
+  print('Done enabling route redisribution for T0Routers\n')
 
 def print_t0_route_nat_rules():
   for key in global_id_map:
@@ -530,7 +530,7 @@ def add_t0_route_nat_rules():
   nat_rules_defn = yaml.load(os.getenv('NSX_T_NAT_RULES_SPEC'))['nat_rules']
 
   for nat_rule in nat_rules_defn:
-    print 'Nat rule: {}'.format(nat_rule)
+    #print 'Nat rule: {}'.format(nat_rule)
     t0_router_id = global_id_map['ROUTER:TIER0:' + nat_rule['t0_router']]
     if t0_router_id is None:
       print('Error!! No T0Router found with name: {}'.format(nat_rule['t0_router']))
@@ -565,7 +565,7 @@ def add_t0_route_nat_rules():
     print('Adding Nat rule: {}'.format(rule_payload))
     resp = client.post(api_endpoint, rule_payload )
     #print('Response on adding nat rule: {}'.format(resp.json()))
-  print('Done adding nat rules for T0Routers')
+  print('Done adding nat rules for T0Routers\n')
 
 def main():
   

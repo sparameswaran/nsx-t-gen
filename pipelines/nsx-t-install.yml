@@ -8,9 +8,6 @@ nsx_t_gen_params: &nsx-t-gen-params
   VCENTER_DATASTORE: ((vcenter_datastore))
   VCENTER_CLUSTER: ((vcenter_cluster))
   VCENTER_MANAGER: ((vcenter_manager))
-  VLAN_MGMT: ((vlan_mgmt))
-  VLAN_VMOTION: ((vlan_vmotion))
-  VLAN_VSAN: ((vlan_vsan))
   NTPSERVERS: ((ntpservers))
   MGMT_PORTGROUP: ((mgmt_portgroup))
   DNSSERVER: ((dnsserver))
@@ -67,7 +64,6 @@ nsx_t_gen_params: &nsx-t-gen-params
   NSX_T_CONTAINER_IP_BLOCK_SPEC: ((nsx_t_container_ip_block_spec))
   NSX_T_EXTERNAL_IP_POOL_SPEC: ((nsx_t_external_ip_pool_spec))
   NSX_T_NAT_RULES_SPEC: ((nsx_t_nat_rules_spec))
-  SUPPORT_NSX_VMOTION: ((support_nsx_vmotion))
   ENABLE_ANSIBLE_DEBUG: ((enable_ansible_debug))
   
 

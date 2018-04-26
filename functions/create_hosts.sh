@@ -144,10 +144,6 @@ esxi_overlay_profile_vlan=$NSX_T_OVERLAY_PROFILE_VLAN
 
 edge_cluster="$NSX_T_EDGE_CLUSTER"
 
-vlan_ls_mgmt="$VLAN_MGMT"
-vlan_ls_vmotion="$VLAN_VMOTION"
-vlan_ls_vsan="$VLAN_VSAN"
-
 EOF
 
   if  [ ! -z "$ESXI_HOSTS_CONFIG" ]; then
