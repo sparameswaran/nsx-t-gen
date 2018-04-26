@@ -68,7 +68,7 @@ nsx_t_gen_params: &nsx-t-gen-params
   NSX_T_EXTERNAL_IP_POOL_SPEC: ((nsx_t_external_ip_pool_spec))
   SUPPORT_NSX_VMOTION: ((support_nsx_vmotion))
   ENABLE_ANSIBLE_DEBUG: ((enable_ansible_debug))
-  NSX_T_SIZING_SPEC: ((nsx_t_sizing_spec))
+  
 
 groups:
 
@@ -83,6 +83,10 @@ groups:
 - name: add-routers
   jobs:
   - add-nsx-t-routers
+
+- name: config-nsx-t-extras
+  jobs:
+  - config-nsx-t-extras
 
 # - name: cleanup
 #   jobs:
@@ -171,6 +175,16 @@ jobs:
     file: nsx-t-gen-pipeline/tasks/add-nsx-t-routers/task.yml
     params: *nsx-t-gen-params
 
+- name: config-nsx-t-extras
+  plan:
+  - aggregate:
+    - get: nsx-t-gen-pipeline
+    - get: nsxt-ansible
+
+  - task: config-nsx-t-extras
+    file: nsx-t-gen-pipeline/tasks/config-nsx-t-extras/task.yml
+    params: *nsx-t-gen-params
+
 - name: full-install-nsx-t
   plan:
   - aggregate:
@@ -187,6 +201,10 @@ jobs:
 
   - task: add-nsx-t-routers
     file: nsx-t-gen-pipeline/tasks/add-nsx-t-routers/task.yml
+    params: *nsx-t-gen-params
+
+  - task: config-nsx-t-extras
+    file: nsx-t-gen-pipeline/tasks/config-nsx-t-extras/task.yml
     params: *nsx-t-gen-params
 
 # - name: uninstall-nsx-t

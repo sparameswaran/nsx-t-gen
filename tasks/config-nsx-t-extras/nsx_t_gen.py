@@ -23,92 +23,92 @@ global_id_map = { }
 
 
 def init():
-	nsx_mgr_ip          = os.getenv('NSX_T_MANAGER_IP')
-	nsx_mgr_user        = os.getenv('NSX_T_MANAGER_ADMIN_USER', 'admin')
-	nsx_mgr_pwd         = os.getenv('NSX_T_MANAGER_ADMIN_PWD')
-	transport_zone_name = os.getenv('NSX_T_MANAGER_TRANSPORT_ZONE')
-	nsx_mgr_context     = { 'admin_user' : nsx_mgr_user, 'url': 'https://' + nsx_mgr_ip, 'admin_passwd' : nsx_mgr_pwd }
+  nsx_mgr_ip          = os.getenv('NSX_T_MANAGER_IP')
+  nsx_mgr_user        = os.getenv('NSX_T_MANAGER_ADMIN_USER', 'admin')
+  nsx_mgr_pwd         = os.getenv('NSX_T_MANAGER_ROOT_PWD')
+  transport_zone_name = os.getenv('NSX_T_OVERLAY_TRANSPORT_ZONE')
+  nsx_mgr_context     = { 
+                          'admin_user' : nsx_mgr_user, 
+                          'url': 'https://' + nsx_mgr_ip, 
+                          'admin_passwd' : nsx_mgr_pwd 
+                        }
+  global_id_map['DEFAULT_TRANSPORT_ZONE_NAME'] = transport_zone_name
 
-	client.set_context(nsx_mgr_context)
+  client.set_context(nsx_mgr_context)
 
 def print_global_ip_map():
-	print '-----------------------------------------------'
-	for key in global_id_map:
-		print(" {} : {}".format(key, global_id_map[key]))
-	print '-----------------------------------------------'
+  print '-----------------------------------------------'
+  for key in global_id_map:
+    print(" {} : {}".format(key, global_id_map[key]))
+  print '-----------------------------------------------'
 
 def load_edge_clusters():
 
   api_endpoint = EDGE_CLUSTERS_ENDPOINT
   resp=client.get(api_endpoint)
   for result in resp.json()['results']:
-	  edge_cluster_name = result['display_name']
-	  edge_cluster_id = result['id']
-	  global_id_map['EDGE_CLUSTER:'+edge_cluster_name] = edge_cluster_id
-	  if global_id_map.get('DEFAULT_EDGE_CLUSTER_NAME') is None:
-	  	global_id_map['DEFAULT_EDGE_CLUSTER_NAME'] = edge_cluster_name
+    edge_cluster_name = result['display_name']
+    edge_cluster_id = result['id']
+    global_id_map['EDGE_CLUSTER:'+edge_cluster_name] = edge_cluster_id
+    if global_id_map.get('DEFAULT_EDGE_CLUSTER_NAME') is None:
+      global_id_map['DEFAULT_EDGE_CLUSTER_NAME'] = edge_cluster_name
 
 def get_edge_cluster():
 
-	edge_cluster_name = global_id_map.get('DEFAULT_EDGE_CLUSTER_NAME')
-	if edge_cluster_name is None:
-		load_edge_clusters()
+  edge_cluster_name = global_id_map.get('DEFAULT_EDGE_CLUSTER_NAME')
+  if edge_cluster_name is None:
+    load_edge_clusters()
 
-	return global_id_map['DEFAULT_EDGE_CLUSTER_NAME']
+  return global_id_map['DEFAULT_EDGE_CLUSTER_NAME']
 
 def get_edge_cluster_id():
 
-	default_edge_cluster_name = get_edge_cluster()
-	return global_id_map['EDGE_CLUSTER:' + default_edge_cluster_name]
+  default_edge_cluster_name = get_edge_cluster()
+  return global_id_map['EDGE_CLUSTER:' + default_edge_cluster_name]
 
 # def get_edge_cluster_id(edge_cluster_name):
 
-# 	if edge_cluster_name is not None and edge_cluster_name != '':
-# 		return global_id_map['EDGE_CLUSTER:' + edge_cluster_name]
+#   if edge_cluster_name is not None and edge_cluster_name != '':
+#     return global_id_map['EDGE_CLUSTER:' + edge_cluster_name]
 
-# 	default_edge_cluster_name = get_edge_cluster()
-# 	return global_id_map['EDGE_CLUSTER:' + default_edge_cluster_name]
+#   default_edge_cluster_name = get_edge_cluster()
+#   return global_id_map['EDGE_CLUSTER:' + default_edge_cluster_name]
 
 def load_transport_zones():
-  api_endpoint = TRANSPORT_ZONES_ENDPOINT
+  api_endpoint = TRANSPORT_ZONES_ENDPOINT  
+
   resp=client.get(api_endpoint)
   for result in resp.json()['results']:
-	  transport_zone_name = result['display_name']
-	  transport_zone_id = result['id']
-	  global_id_map['TZ:'+transport_zone_name] = transport_zone_id
-
-	  if global_id_map.get('DEFAULT_TRANSPORT_ZONE_NAME') is None:
-	  	global_id_map['DEFAULT_TRANSPORT_ZONE_NAME'] = transport_zone_name
+    transport_zone_name = result['display_name']
+    transport_zone_id = result['id']
+    global_id_map['TZ:'+transport_zone_name] = transport_zone_id
 
 def get_transport_zone():
 
-	transport_zone_name = global_id_map.get('DEFAULT_TRANSPORT_ZONE_NAME')
-	if transport_zone_name is None:
-		load_transport_zones()
-			
-	return global_id_map['DEFAULT_TRANSPORT_ZONE_NAME']
+  load_transport_zones()      
+  return global_id_map['DEFAULT_TRANSPORT_ZONE_NAME']
 
 def get_transport_zone_id(transport_zone):
-	default_transport_zone = get_transport_zone()
+  default_transport_zone = get_transport_zone()
 
-	transport_zone_id = global_id_map.get('TZ:' + default_transport_zone)
-	if transport_zone_id is None:
-		return global_id_map['TZ:' + default_transport_zone]
-	
-	return transport_zone_id
+  transport_zone_id = global_id_map.get('TZ:' + default_transport_zone)
+  if transport_zone_id is None:
+    return global_id_map['TZ:' + default_transport_zone]
+  
+  return transport_zone_id
 
 def update_tag(api_endpoint, tag_map):
 
-	tags = []
-	resp = client.get(api_endpoint)
-	updated_payload = resp.json()
+  tags = []
+  resp = client.get(api_endpoint)
+  updated_payload = resp.json()
 
-	for key in tag_map:
-		entry = { 'scope': key, 'tag': tag_map[key] }
-		tags.append(entry)
-	updated_payload['tags'] = tags
-	
-	resp = client.put(api_endpoint, updated_payload)	
+  for key in tag_map:
+    entry = { 'scope': key, 'tag': tag_map[key] }
+    tags.append(entry)
+  updated_payload['tags'] = tags
+  
+  resp = client.put(api_endpoint, updated_payload)  
 
 def check_switching_profile(switching_profile_name):
   api_endpoint = SWITCHING_PROFILE_ENDPOINT
@@ -117,12 +117,11 @@ def check_switching_profile(switching_profile_name):
 
   switching_profile_id = None
   for result in resp.json()['results']:
-  	global_id_map['SP:' + result['display_name']] = result['id']
-  	if result['display_name'] == switching_profile_name:
-  		switching_profile_id = result['id']
+    global_id_map['SP:' + result['display_name']] = result['id']
+    if result['display_name'] == switching_profile_name:
+      switching_profile_id = result['id']
 
   return switching_profile_id
-
 
 def create_ha_switching_profile(switching_profile_name):
   api_endpoint = SWITCHING_PROFILE_ENDPOINT  
@@ -143,6 +142,15 @@ def create_ha_switching_profile(switching_profile_name):
   global_id_map['SP:' + switching_profile_name] = switching_profile_id
   return switching_profile_id
 
+def load_logical_routers():
+  api_endpoint = ROUTERS_ENDPOINT
+  resp=client.get(api_endpoint)
+  for result in resp.json()['results']:
+    router_name = result['display_name']
+    router_id = result['id']
+    router_type = result['router_type']
+    global_id_map['ROUTER:'+router_type+':'+router_name] = router_id
+
 def check_logical_router(router_name):
   api_endpoint = ROUTERS_ENDPOINT
   
@@ -150,9 +158,9 @@ def check_logical_router(router_name):
 
   logical_router_id = None
   for result in resp.json()['results']:
-  	global_id_map[result['router_type'] + 'ROUTER:' + result['display_name']] = result['id']
-  	if result['display_name'] == router_name:
-  		logical_router_id = result['id']
+    global_id_map[result['router_type'] + 'ROUTER:' + result['display_name']] = result['id']
+    if result['display_name'] == router_name:
+      logical_router_id = result['id']
 
   return logical_router_id
 
@@ -163,9 +171,9 @@ def check_logical_router_port(router_id):
 
   logical_router_port_id = None
   for result in resp.json()['results']:
-  	global_id_map['ROUTER_PORT:' + result['display_name']] = result['id']
-  	if result['logical_router_id'] == router_id:
-  		logical_router_port_id = result['id']
+    global_id_map['ROUTER_PORT:' + result['display_name']] = result['id']
+    if result['logical_router_id'] == router_id:
+      logical_router_port_id = result['id']
 
   return logical_router_port_id
 
@@ -197,8 +205,7 @@ def create_t0_logical_router(t0_router):
 
 def create_t0_logical_router_and_port(t0_router):
 
-	api_endpoint = ROUTER_PORTS_ENDPOINT
-  
+  api_endpoint = ROUTER_PORTS_ENDPOINT
   router_name = t0_router['name']
   subnet = t0_router['subnet']
   
@@ -299,7 +306,6 @@ def create_t1_logical_router_and_port(t0_router_name, t1_router_name, t0_router_
   logical_router_port_id=resp.json()['id']
   return logical_router_port_id
 
-
 def check_logical_switch(logical_switch):
   api_endpoint = SWITCHES_ENDPOINT
   
@@ -307,12 +313,11 @@ def check_logical_switch(logical_switch):
 
   logical_switch_id = None
   for result in resp.json()['results']:
-  	global_id_map['LS:' + result['display_name']] = result['id']
-  	if result['display_name'] == logical_switch:
-  		logical_switch_id = result['id']
+    global_id_map['LS:' + result['display_name']] = result['id']
+    if result['display_name'] == logical_switch:
+      logical_switch_id = result['id']
 
   return logical_switch_id
-
 
 def create_logical_switch(logical_switch_name):
   api_endpoint = SWITCHES_ENDPOINT
@@ -331,7 +336,6 @@ def create_logical_switch(logical_switch_name):
   
   global_id_map['LS:' + logical_switch_name] = logical_switch_id
   return logical_switch_id
-
 
 def create_logical_switch_port(logical_switch_name, logical_switch_id):
   api_endpoint = SWITCH_PORTS_ENDPOINT
@@ -382,7 +386,7 @@ def associate_logical_switch_port(t1_router_name, logical_switch_name, subnet):
 
   logical_router_port_id=resp.json()['id']
   print("Created Logical Switch Port from Logical Switch {} with name: {} "
-  			+ "to T1Router: {}".format(logical_switch_name, switch_port_name, t1_router_name))
+        + "to T1Router: {}".format(logical_switch_name, switch_port_name, t1_router_name))
   
   global_id_map['LRP:' + name] = logical_router_port_id
   return logical_router_port_id
@@ -410,76 +414,171 @@ def create_external_ip_pool(ip_pool_name, cidr, gateway, start_ip, end_ip):
       'resource_type': 'IpPool',
       'display_name': ip_pool_name,      
       'subnets' : [ {  
-      	'allocation_ranges' : [ { 
-      		'start' : start_ip,
-        	'end' : end_ip
-	      } ],
-	      'cidr' : cidr,
-	      'gateway_ip' : gateway,
-	      'dns_nameservers' : [ ]
+        'allocation_ranges' : [ { 
+          'start' : start_ip,
+          'end' : end_ip
+        } ],
+        'cidr' : cidr,
+        'gateway_ip' : gateway,
+        'dns_nameservers' : [ ]
        } ],
     }
   resp = client.post(api_endpoint, payload )
 
   ip_pool_id=resp.json()['id']
   print("Created External IP Pool '{}' with cidr: {}, gateway: {}, start: {},"
-  	+ " end: {}".format(ip_pool_name, cidr, gateway, start_ip, end_ip))
+    + " end: {}".format(ip_pool_name, cidr, gateway, start_ip, end_ip))
   global_id_map['IPPOOL:' + ip_pool_name] = ip_pool_id
   return ip_pool_id
 
+def create_pas_tags():
+  pas_tag_name   = os.getenv('NSX_T_PAS_NCP_CLUSTER_TAG') 
+  pas_tags = {  
+            'ncp/cluster': pas_tag_name , 
+            'ncp/shared_resource': 'true' 
+          }
+  return pas_tags
+
+def create_container_ip_blocks():
+  ip_blocks = yaml.load(os.getenv('NSX_T_CONTAINER_IP_BLOCK_SPEC'))
+  for ip_block in ip_blocks['container_ip_blocks']:
+    ip_block_name   = ip_block('name')
+    ip_block_cidr   = ip_block('cidr')    
+    container_ip_block_id = create_container_ip_block(ip_block_name, ip_block_cidr)
+    update_tag(CONTAINER_IP_BLOCKS_ENDPOINT + '/' + container_ip_block_id, create_pas_tags())
+    
+def create_external_ip_pools():
+  ip_pools    = yaml.load(os.getenv('NSX_T_EXTERNAL_IP_POOL_SPEC'))
+  for ip_pool in ip_pools['external_ip_pools']:
+    create_external_ip_pool(ip_pool['name'], 
+                            ip_pool['cidr'], 
+                            ip_pool['gateway'], 
+                            ip_pool['start'], 
+                            ip_pool['end']) 
+
+def create_ha_switching_profile():
+  pas_tag_name   = os.getenv('NSX_T_PAS_NCP_CLUSTER_TAG')
+  ha_switching_profile = os.getenv('NSX_T_HA_SWITCHING_PROFILE_SPEC', 'HASwitchingProfile')
+  switching_profile_id = create_ha_switching_profile(ha_switching_profile)
+  switching_profile_tags = {  
+                              'ncp/cluster': pas_tag_name , 
+                              'ncp/shared_resource': 'true' , 
+                              'ncp/ha': 'true' 
+                            }
+  update_tag(SWITCHING_PROFILE_ENDPOINT + '/' + switching_profile_id, switching_profile_tags)
+  print('Done creating HASwitchingProfile')
+
+def build_routers():
+  init()
+  load_edge_clusters()
+  load_transport_zones()
+  
+  t0_router_content  = os.getenv('NSX_T_T0ROUTER_SPEC')
+  t0_router         = yaml.load(t0_router_content)['t0_router']
+  t0_router_id      = create_t0_logical_router_and_port(t0_router)
+
+  t1_router_content = os.getenv('NSX_T_T1ROUTER_LOGICAL_SWITCHES_SPEC')
+  t1_routers        = yaml.load(t1_router_content)['t1_routers']
+
+  pas_tags = create_pas_tags()
+  update_tag(ROUTERS_ENDPOINT + '/' + t0_router_id, pas_tags)
+
+  create_ha_switching_profile()
+  create_container_ip_blocks()
+  create_external_ip_pools()
+
+  for t1_router in t1_routers:
+    t1_router_name = t1_router['name']
+    create_t1_logical_router_and_port(t0_router_name, t1_router_name, t0_router_subnet)
+    logical_switches = t1_router['switches']
+    for logical_switch_entry in logical_switches:
+      logical_switch_name = logical_switch_entry['name']
+      logical_switch_subnet = logical_switch_entry['subnet']
+      create_logical_switch(logical_switch_name)
+      associate_logical_switch_port(t1_router_name, logical_switch_name, logical_switch_subnet)
+
+def set_t0_route_redistribution():
+  for key in global_id_map:
+    if key.startswith('ROUTER:TIER0'):
+      t0_router_id = global_id_map[key]
+      api_endpoint = '%s/%s/%s' % (ROUTERS_ENDPOINT, t0_router_id, 'routing/redistribution')
+  
+      cur_redistribution_resp = client.get(api_endpoint ).json()
+      payload={
+          'resource_type': 'RedistributionConfig',
+          'logical_router_id': t0_router_id,
+          'bgp_enabled': True,
+          '_revision': cur_redistribution_resp['_revision']
+        }
+      resp = client.put(api_endpoint, payload )
+  print('Done enabling route redisribution for T0Routers')
+
+def print_t0_route_nat_rules():
+  for key in global_id_map:
+    if key.startswith('ROUTER:TIER0:'):
+      t0_router_id = global_id_map[key]
+      api_endpoint = '%s/%s/%s' % (ROUTERS_ENDPOINT, t0_router_id, 'nat/rules')
+      resp = client.get(api_endpoint).json()
+      print('NAT Rules for T0 Router: {}\n{}'.format(t0_router_id, resp))
+
+def add_t0_route_nat_rules():
+
+  nat_rules_defn = yaml.load(os.getenv('NSX_T_NAT_RULES_SPEC'))['nat_rules']
+
+  for nat_rule in nat_rules_defn:
+    print 'Nat rule: {}'.format(nat_rule)
+    t0_router_id = global_id_map['ROUTER:TIER0:' + nat_rule['t0_router']]
+    if t0_router_id is None:
+      print('Error!! No T0Router found with name: {}'.format(nat_rule['t0_router']))
+      exit -1
+
+    api_endpoint = '%s/%s/%s' % (ROUTERS_ENDPOINT, t0_router_id, 'nat/rules')
+  
+    rule_payload = {
+        'resource_type': 'NatRule',
+        'enabled' : True,
+        'rule_priority': nat_rule['rule_priority'],
+        'translated_network' : nat_rule['translated_network']
+    }
+
+    if nat_rule['nat_type'] == 'dnat':
+      rule_payload['action'] = 'DNAT'
+      rule_payload['match_destination_network'] = nat_rule['destination_network']
+    else:
+      rule_payload['action'] = 'SNAT'
+      rule_payload['match_source_network'] = nat_rule['source_network']
+
+    # match_service = {}
+    # if nat_rule.get('source_ports') is not None:
+    #   new_ports = nat_rule.get('source_ports').split(',')
+    #   #ports = [ for port in nat_rule.get('source_ports').split(',') '"' + port + '"' ]
+    #   match_service['source_ports'] = new_ports
+    
+    # if nat_rule.get('destination_ports') is not None:
+    #   new_ports = nat_rule.get('destination_ports').split(',')
+    #   match_service['destination_ports'] = new_ports
+    
+    # rule_payload['match_service'] = match_service
+
+    resp = client.post(api_endpoint, rule_payload )
+    #print('Response on adding nat rule: {}'.format(resp.json()))
+  print('Done adding nat rules for T0Routers')
 
 def main():
-	init()
-	load_edge_clusters()
-	load_transport_zones()
-	
-	t0_router_content  = os.getenv('NSX_T_T0ROUTER')
-	t0_router         = yaml.load(t0_router_content)['t0_router']
-	t0_router_id      = create_t0_logical_router_and_port(t0_router)
+  
+  init()
+  load_edge_clusters()
+  load_transport_zones()
+  load_logical_routers()
+  #print_global_ip_map()
 
-	t1_router_content = os.getenv('NSX_T_T1ROUTER_LOGICAL_SWITCHES')
-	t1_routers        = yaml.load(t1_router_content)['t1_routers']
+  create_ha_switching_profile()
+  set_t0_route_redistribution()
+  #print_t0_route_nat_rules()
+  add_t0_route_nat_rules()
 
-	pas_tag_name   = os.getenv('NSX_T_PAS_TAG')	
-	pas_tags = { 	
-						'ncp/cluster': pas_tag_name , 
-						'ncp/shared_resource': 'true' 
-					}
-	update_tag(ROUTERS_ENDPOINT + '/' + t0_router_id, pas_tags)
-
-	ha_switching_profile = os.getenv('NSX_T_HA_SWITCHING_PROFILE', 'HASwitchingProfile')
-	switching_profile_id=create_ha_switching_profile(ha_switching_profile)
-	switching_profile_tags = { 	
-															'ncp/cluster': pas_tag_name , 
-															'ncp/shared_resource': 'true' , 
-															'ncp/ha': 'true' 
-														}
-	update_tag(SWITCHING_PROFILE_ENDPOINT + '/' + switching_profile_id, switching_profile_tags)
-
-	ip_blocks = yaml.load(os.getenv('NSX_T_CONTAINER_IP_BLOCK'))
-	for ip_block in ip_blocks['container_ip_blocks']:
-		ip_block_name   = ip_block('name')
-		ip_block_cidr   = ip_block('cidr')		
-		container_ip_block_id = create_container_ip_block(ip_block_name, ip_block_cidr)
-		update_tag(CONTAINER_IP_BLOCKS_ENDPOINT + '/' + container_ip_block_id, pas_tags)
-		
-	ip_pools    = yaml.load(os.getenv('NSX_T_EXTERNAL_IP_POOL'))
-	for ip_pool in ip_pools['external_ip_pools']:
-		create_external_ip_pool(ip_pool['name'], 
-														ip_pool['cidr'], 
-														ip_pool['gateway'], 
-														ip_pool['start'], 
-														ip_pool['end'])
-
-	for t1_router in t1_routers:
-		t1_router_name = t1_router['name']
-		create_t1_logical_router_and_port(t0_router_name, t1_router_name, t0_router_subnet)
-		logical_switches = t1_router['switches']
-		for logical_switch_entry in logical_switches:
-			logical_switch_name = logical_switch_entry['name']
-			logical_switch_subnet = logical_switch_entry['subnet']
-			create_logical_switch(logical_switch_name)
-			associate_logical_switch_port(t1_router_name, logical_switch_name, logical_switch_subnet)
+  # No support for switching profile in the ansible script yet
+  # So create directly
 
 if __name__ == '__main__':
-	main()
+  main()

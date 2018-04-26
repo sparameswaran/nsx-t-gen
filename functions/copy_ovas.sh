@@ -42,5 +42,5 @@ EOF
 		echo "nsx_t_keep_reservation: $NSX_T_KEEP_RESERVATION" >> customize_ova_vars.yml
 	fi
 
-	echo "$NSX_T_SIZING_SPEC" >> customize_ova_vars.yml
+	#echo "$NSX_T_SIZING_SPEC" >> customize_ova_vars.yml
 }
