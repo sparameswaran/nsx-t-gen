@@ -78,9 +78,9 @@ nsx_t_tep_pool_nameserver: 192.168.213.2
 # Memory reservation is turned ON by default with the NSX-T OVAs.
 # This would mean a deployment of an edge or a mgr would reserve full memory
 # leading to memory constraints
-# Set following flag to true  - would keep reservation ON, recommended for production setups.
-# Set following flag to false - would turn reservation OFF, recommended for POCs, smaller setups. 
-nsx_t_keep_reservation: false # for POCs, small setups
+# if nsx_t_keep_reservation to true  - would keep reservation ON, recommended for production setups.
+# if nsx_t_keep_reservation to false - would turn reservation OFF, recommended for POCs, smaller setups. 
+nsx_t_keep_reservation: true # for Prod setup
 
 # Default Sizing of NSX-T VMs
 # Manager Sizing
@@ -138,13 +138,12 @@ nsx_t_overlay_profile_name: "host-overlay-profile"
 nsx_t_overlay_profile_mtu: 1600 # Min 1600
 nsx_t_overlay_profile_vlan: 0
 
-# Specify vmnic on esxi host to be used for nsx-t
+# Specify a free vmnic on esxi host to be used for nsx-t
 # can be multiple vmnics separated by comma
 nsx_t_esxi_vmnics: vmnic1 # vmnic1,vmnic2...
 
 # Configs for T0Router (only one per run), T1Routers, Logical switches and tags...
 # Make sure the ncp/cluster tag matches the one defined at the top level.
-# Similarly, make sure the vlan_uplink matches the one defined for external transport vlan
 nsx_t_t0router_spec: |
   t0_router:
     name: DefaultT0Router

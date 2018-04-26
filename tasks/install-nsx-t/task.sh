@@ -44,14 +44,14 @@ create_ansible_cfg
 create_extra_yaml_args
 create_customize_ova_params
 
-if [ -z "$SUPPORT_NSX_VMOTION" -o "$SUPPORT_NSX_VMOTION" == "false" ]; then
-  echo "Skipping vmks configuration for NSX-T Mgr!!" 
-  echo 'configure_vmks: False' >> answerfile.yml
+# if [ -z "$SUPPORT_NSX_VMOTION" -o "$SUPPORT_NSX_VMOTION" == "false" ]; then
+#   echo "Skipping vmks configuration for NSX-T Mgr!!" 
+#   echo 'configure_vmks: False' >> answerfile.yml
   
-else
-  echo "Allowing vmks configuration for NSX-T Mgr!!" 
-  echo 'configure_vmks: True' >> answerfile.yml
-fi
+# else
+#   echo "Allowing vmks configuration for NSX-T Mgr!!" 
+#   echo 'configure_vmks: True' >> answerfile.yml
+# fi
 
 cp hosts answerfile.yml ansible.cfg extra_yaml_args.yml customize_ova_vars.yml nsxt-ansible/.
 cd nsxt-ansible

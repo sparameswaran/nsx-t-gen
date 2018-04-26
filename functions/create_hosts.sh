@@ -163,7 +163,5 @@ EOF
   echo "" >> hosts
   cat esxi_hosts >> hosts
   echo "" >> hosts
-
-  echo "hosts"
 }
 
