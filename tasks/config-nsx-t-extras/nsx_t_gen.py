@@ -431,36 +431,46 @@ def create_container_ip_blocks():
 def create_external_ip_pools():
   ip_pools    = yaml.load(os.getenv('NSX_T_EXTERNAL_IP_POOL_SPEC'))
   for ip_pool in ip_pools['external_ip_pools']:
-    create_external_ip_pool(ip_pool['name'], 
+    ip_pool_id - create_external_ip_pool(ip_pool['name'], 
                             ip_pool['cidr'], 
                             ip_pool['gateway'], 
                             ip_pool['start'], 
                             ip_pool['end']) 
 
+    external_ip_pool_profile_tags = {  
+                                'ncp/cluster': pas_tag_name , 
+                                'ncp/external': 'true'
+                              }
+    update_tag(EXTERNAL_IP_POOL_ENDPOINT + '/' + ip_pool_id, external_ip_pool_profile_tags)
+
+
 def create_ha_switching_profile():
   pas_tag_name   = os.getenv('NSX_T_PAS_NCP_CLUSTER_TAG')
-  ha_switching_profile = os.getenv('NSX_T_HA_SWITCHING_PROFILE_SPEC', 'HASwitchingProfile')
+  ha_switching_profiles = yaml.load(os.getenv('NSX_T_HA_SWITCHING_PROFILE_SPEC'))['ha_switching_profiles']
   
-  api_endpoint = SWITCHING_PROFILE_ENDPOINT  
-  switching_profile_id=check_switching_profile(switching_profile_name)
-  if switching_profile_id is None:
-    payload={
-        'resource_type': 'SpoofGuardSwitchingProfile',
-        'description': 'Spoofguard switching profile for ncp-cluster-ha, created by nsx-t-gen!!',
-        'display_name': switching_profile_name, 
-        'white_list_providers': ['LSWITCH_BINDINGS']
-      }
-    resp = client.post(api_endpoint, payload )
-    switching_profile_id=resp.json()['id']
+  api_endpoint = SWITCHING_PROFILE_ENDPOINT
 
-  global_id_map['SP:' + switching_profile_name] = switching_profile_id
-  switching_profile_tags = {  
-                              'ncp/cluster': pas_tag_name , 
-                              'ncp/shared_resource': 'true' , 
-                              'ncp/ha': 'true' 
-                            }
-  update_tag(SWITCHING_PROFILE_ENDPOINT + '/' + switching_profile_id, switching_profile_tags)
-  print('Done creating HASwitchingProfile')
+  for ha_switching_profile in ha_switching_profiles:
+    switching_profile_name = ha_switching_profile['name']  
+    switching_profile_id   = check_switching_profile(ha_switching_profile['name'])
+    if switching_profile_id is None:
+      payload={
+          'resource_type': 'SpoofGuardSwitchingProfile',
+          'description': 'Spoofguard switching profile for ncp-cluster-ha, created by nsx-t-gen!!',
+          'display_name': switching_profile_name, 
+          'white_list_providers': ['LSWITCH_BINDINGS']
+        }
+      resp = client.post(api_endpoint, payload )
+      switching_profile_id=resp.json()['id']
+
+    global_id_map['SP:' + switching_profile_name] = switching_profile_id
+    switching_profile_tags = {  
+                                'ncp/cluster': pas_tag_name , 
+                                'ncp/shared_resource': 'true' , 
+                                'ncp/ha': 'true' 
+                              }
+    update_tag(SWITCHING_PROFILE_ENDPOINT + '/' + switching_profile_id, switching_profile_tags)
+  print('Done creating HASwitchingProfiles')
 
 def build_routers():
   init()
@@ -552,7 +562,7 @@ def add_t0_route_nat_rules():
     #   match_service['destination_ports'] = new_ports
     
     # rule_payload['match_service'] = match_service
-
+    print('Adding Nat rule: {}'.format(rule_payload))
     resp = client.post(api_endpoint, rule_payload )
     #print('Response on adding nat rule: {}'.format(resp.json()))
   print('Done adding nat rules for T0Routers')
