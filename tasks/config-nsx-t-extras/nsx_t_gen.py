@@ -123,25 +123,6 @@ def check_switching_profile(switching_profile_name):
 
   return switching_profile_id
 
-def create_ha_switching_profile(switching_profile_name):
-  api_endpoint = SWITCHING_PROFILE_ENDPOINT  
-  
-  switching_profile_id=check_switching_profile(switching_profile_name)
-  if switching_profile_id is not None:
-    return switching_profile_id  
-
-  payload={
-      'resource_type': 'SpoofGuardSwitchingProfile',
-      'description': 'Spoofguard switching profile for ncp-cluster-ha, created by nsx-t-gen!!',
-      'display_name': switching_profile_name, 
-      'white_list_providers': ['LSWITCH_BINDINGS']
-    }
-  resp = client.post(api_endpoint, payload )
-  switching_profile_id=resp.json()['id']
-
-  global_id_map['SP:' + switching_profile_name] = switching_profile_id
-  return switching_profile_id
-
 def load_logical_routers():
   api_endpoint = ROUTERS_ENDPOINT
   resp=client.get(api_endpoint)
@@ -459,7 +440,20 @@ def create_external_ip_pools():
 def create_ha_switching_profile():
   pas_tag_name   = os.getenv('NSX_T_PAS_NCP_CLUSTER_TAG')
   ha_switching_profile = os.getenv('NSX_T_HA_SWITCHING_PROFILE_SPEC', 'HASwitchingProfile')
-  switching_profile_id = create_ha_switching_profile(ha_switching_profile)
+  
+  api_endpoint = SWITCHING_PROFILE_ENDPOINT  
+  switching_profile_id=check_switching_profile(switching_profile_name)
+  if switching_profile_id is None:
+    payload={
+        'resource_type': 'SpoofGuardSwitchingProfile',
+        'description': 'Spoofguard switching profile for ncp-cluster-ha, created by nsx-t-gen!!',
+        'display_name': switching_profile_name, 
+        'white_list_providers': ['LSWITCH_BINDINGS']
+      }
+    resp = client.post(api_endpoint, payload )
+    switching_profile_id=resp.json()['id']
+
+  global_id_map['SP:' + switching_profile_name] = switching_profile_id
   switching_profile_tags = {  
                               'ncp/cluster': pas_tag_name , 
                               'ncp/shared_resource': 'true' , 
@@ -533,7 +527,6 @@ def add_t0_route_nat_rules():
       exit -1
 
     api_endpoint = '%s/%s/%s' % (ROUTERS_ENDPOINT, t0_router_id, 'nat/rules')
-  
     rule_payload = {
         'resource_type': 'NatRule',
         'enabled' : True,
