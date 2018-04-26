@@ -178,31 +178,36 @@ nsx_t_t1router_logical_switches_spec: |
       subnet_ip: 192.168.10.1 # Last octet should be 1 rather than 0
       subnet_mask: 26
 
+  - name: T1-Router-PAS-ERT
+    switches:
+    - name: PAS-ERT
+      subnet_ip: 192.168.24.1 # Last octet should be 1 rather than 0
+      subnet_mask: 26
+
   - name: T1-Router-PAS-Services
     switches:
     - name: PAS-Services
-      subnet_ip: 192.168.24.1 # Last octet should be 1 rather than 0
+      subnet_ip: 192.168.28.1 # Last octet should be 1 rather than 0
       subnet_mask: 26
 
   - name: T1-Router-PAS-DynamicServices
     switches:
     - name: PAS-DynamicServices
-      subnet_ip: 192.168.28.1 # Last octet should be 1 rather than 0
+      subnet_ip: 192.168.30.1 # Last octet should be 1 rather than 0
       subnet_mask: 22
 
-  # Comment off the following T1 Router if there is no PKS
-  - name: T1Router-PKS-Clusters
-    switches:
-    - name: PKS-PKS-Clusters
-      subnet_ip: 192.168.40.1 # Last octet should be 1 rather than 0
-      subnet_mask: 22
-
+  # Comment off the following T1 Routers if there is no PKS
   - name: T1-Router-PKS-Infra
     switches:
     - name: PKS-Deployment
       subnet_ip: 192.168.20.1 # Last octet should be 1 rather than 0
       subnet_mask: 22
 
+  - name: T1Router-PKS-Clusters
+    switches:
+    - name: PKS-PKS-Clusters
+      subnet_ip: 192.168.40.1 # Last octet should be 1 rather than 0
+      subnet_mask: 22
 
 
 # Make sure the ncp/cluster tag matches the one defined on the T0 Router
@@ -258,6 +263,7 @@ nsx_t_external_ip_pool_spec: |
 # Provide snat rules for outbound from either container or a vm by specifying the source_network (cidr) and translated network ip
 nsx_t_nat_rules_spec: |
   nat_rules:
+
   # Sample entries for allowing inbound to Ops Mgr or some exposed service running on private network
   # - t0_router: DefaultT0Router
   #   nat_type: dnat
@@ -282,9 +288,11 @@ nsx_t_nat_rules_spec: |
   #   source_network: 192.168.0.0/16       # IP cidr should match one or more logical switches cidr
   #   translated_network: 10.13.12.111
   #   rule_priority: 8001                  # Lower priority
+
+  # Sample entry for allowing inbound to PAS Ops manager
   - t0_router: DefaultT0Router
     nat_type: dnat
-    destination_network: 10.208.40.2     # External IP address for PAS opsmanager
+    destination_network: 10.208.40.2   # External IP address for PAS opsmanager
     translated_network: 192.168.10.2     # Internal IP of PAS Ops manager
     rule_priority: 1024                  # Higher priority
   # Sample entry for allowing outbound from PAS Ops Mgr to external
@@ -299,17 +307,25 @@ nsx_t_nat_rules_spec: |
     source_network: 192.168.10.0/24      # PAS Infra network cidr
     translated_network: 10.208.40.3      # SNAT External Address for PAS networks
     rule_priority: 8000                  # Lower priority
+
+  # Sample entry for PAS ERT network SNAT
+  - t0_router: DefaultT0Router
+    nat_type: snat
+    source_network: 192.168.24.0/24      # PAS ERT network cidr
+    translated_network: 10.208.40.3      # SNAT External Address for PAS networks
+    rule_priority: 8000                  # Lower priority
+
   # Sample entry for PAS Services network SNAT
   - t0_router: DefaultT0Router
     nat_type: snat
-    source_network: 192.168.24.0/24      # PAS Services network cidr
+    source_network: 192.168.28.0/24      # PAS Services network cidr
     translated_network: 10.208.40.3      # SNAT External Address for PAS networks
     rule_priority: 8001                  # Lower priority
 
   # Sample entry for PAS Dynamic Services network SNAT
   - t0_router: DefaultT0Router
     nat_type: snat
-    source_network: 192.168.28.0/24      # PAS Dynamic Services network cidr
+    source_network: 192.168.30.0/24      # PAS Dynamic Services network cidr
     translated_network: 10.208.40.3      # SNAT External Address for PAS networks
     rule_priority: 8001                  # Lower priority
 
@@ -352,5 +368,5 @@ nsx_t_nat_rules_spec: |
     source_network: 192.168.20.4        # Internal IP of PKS controller
     translated_network: 10.208.50.4      # External IP address for PKS controller
     rule_priority: 1024                  # Higher priority
-      
+  
 
