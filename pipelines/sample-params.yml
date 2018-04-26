@@ -1,16 +1,18 @@
-vcenter_host: vcsa-01.corp.local.io
-vcenter_usr: administrator@vsphere.local
-vcenter_pwd: 39adladfasdfl!
-vcenter_datacenter: Datacenter
-vcenter_datastore: Datastore
-vcenter_cluster: Cluster
-vcenter_manager: vcenter-1
-ntpservers: 10.13.12.2
-mgmt_portgroup: 'VM Network'
-dnsserver: 10.13.12.2
-dnsdomain: corp.local.io
-defaultgateway: 10.13.12.1
-netmask: 255.255.255.0
+enable_ansible_debug: false # set value to true for verbose output from ansible
+
+vcenter_host: vcsa-01.corp.local.io       # EDIT
+vcenter_usr: administrator@vsphere.local  # EDIT
+vcenter_pwd: 39adladfasdfl!               # EDIT
+vcenter_datacenter: Datacenter            # EDIT
+vcenter_datastore: Datastore              # EDIT
+vcenter_cluster: Cluster                  # EDIT
+vcenter_manager: vcenter-1                # EDIT
+ntpservers: 10.13.12.2                    # EDIT
+mgmt_portgroup: 'VM Network'              # EDIT
+dnsserver: 10.13.12.2                     # EDIT
+dnsdomain: corp.local.io                  # EDIT
+defaultgateway: 10.13.12.1                # EDIT
+netmask: 255.255.255.0                    # EDIT
 
 # Download NSX-T 2.1 bits from
 # https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-210&productId=673
@@ -23,7 +25,7 @@ nsx_edge_ova: nsx-edge-2.1.0.0.0.7395502.ova
 ovftool_image: VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle
 
 # Specify passwd of the esxi hosts that should be used for nsx-t
-esxi_hosts_root_pwd: rootPasswd  # Root password for the esxi hosts
+esxi_hosts_root_pwd: rootPasswd  # EDIT - Root password for the esxi hosts
 
 # Specify FQDN, ip (and passwd if they are different) for each of the esxi hosts that should be used for nsx-t
 esxi_hosts_config: |
@@ -35,6 +37,7 @@ esxi_hosts_config: |
 #   ip: 10.13.12.11
 #   root_pwd: rootPasswd 
 
+# Edit fololowing parameters
 nsx_t_manager_fqdn: nsx-t-mgr.corp.local.io
 nsx_t_manager_vm_name: 'NSX-T Mgr'
 nsx_t_manager_ip: 10.13.12.50
@@ -48,7 +51,7 @@ nsx_t_controller_root_pwd: VMware1!       # Min 8 chars, upper, lower, number, s
 nsx_t_controller_cluster_pwd: VMware1!    # Min 8 chars, upper, lower, number, special digit
 nsx_t_edge_host_prefix: nsx-t-edge        # Generated edge would be nsx-t-edge-1.corp.local.io,...
 nsx_t_edge_vm_name_prefix: 'NSX-T Edge'   # Generated edge host name would be "NSX-T Edge-1"
-nsx_t_edge_ips: 10.13.12.54,10.13.12.55   # comma separated ips
+nsx_t_edge_ips: 10.13.12.54,10.13.12.55   # comma separated ips, requires min 2 for HA
 nsx_t_edge_root_pwd: VMware1!
 nsx_t_edge_portgroup_ext: vlan3032        # For external routing
 nsx_t_edge_portgroup_transport: vlan3127  # For TEP/overlay
@@ -61,6 +64,7 @@ nsx_t_edge_portgroup_transport: vlan3127  # For TEP/overlay
 nsx_t_edge_overlay_interface: fp-eth1 # Wired to Network3
 nsx_t_edge_uplink_interface: fp-eth0  # Wired to Network2
 
+# Tunnel endpoint network ip pool
 nsx_t_tep_pool_name: tep-ip-pool
 nsx_t_tep_pool_cidr: 192.168.213.0/24
 nsx_t_tep_pool_gateway: 192.168.213.1
@@ -137,14 +141,15 @@ nsx_t_esxi_vmnics: vmnic1 # vmnic1,vmnic2...
 
 # Configs for T0Router (only one per run), T1Routers, Logical switches and tags...
 # Make sure the ncp/cluster tag matches the one defined at the top level.
+# Expects to use atleast 2 edge instances for HA
 nsx_t_t0router_spec: |
   t0_router:
     name: DefaultT0Router
     edge_index: nsx-t-edge-01
     ha_mode: 'ACTIVE_STANDBY'
+    vip: 10.13.12.103/27
     ip1: 10.13.12.101/27
     ip2: 10.13.12.102/27
-    vip: 10.13.12.103/27
     vlan_uplink: 0
     static_route:
       next_hop: 10.13.12.1
@@ -165,31 +170,40 @@ nsx_t_t0router_spec: |
 # Name the routers and logical switches and cidrs differently to avoid conflict
 nsx_t_t1router_logical_switches_spec: |
   t1_routers:
-  # Add additional T1 Routers for Mgmt if there is need to have separate 
-  # infra switches for PKS and PAS separately
-  - name: T1Router-Mgmt
+  # Add additional T1 Routers or collapse switches into same T1 Router as needed
+  # Comment off the following T1 Router if there is no PAS
+  - name: T1-Router-PAS-Infra
     switches:
-    - name: InfraLogicalSwitch
+    - name: PAS-Deployment
       subnet_ip: 192.168.10.1 # Last octet should be 1 rather than 0
       subnet_mask: 26
-  # Comment off the following T1 Router if there is no PAS
-  - name: T1Router-PAS
+
+  - name: T1-Router-PAS-Services
     switches:
-    - name: PASDeployment
-      subnet_ip: 192.168.20.1 # Last octet should be 1 rather than 0
-      subnet_mask: 22
-    - name: PASServices
+    - name: PAS-Services
       subnet_ip: 192.168.24.1 # Last octet should be 1 rather than 0
       subnet_mask: 26
-    - name: PASDynamicServices
+
+  - name: T1-Router-PAS-DynamicServices
+    switches:
+    - name: PAS-DynamicServices
       subnet_ip: 192.168.28.1 # Last octet should be 1 rather than 0
       subnet_mask: 22
+
   # Comment off the following T1 Router if there is no PKS
-  - name: T1Router-PKS
+  - name: T1Router-PKS-Mgmt
     switches:
-    - name: PKSServicesLogicalSwitch
+    - name: PKS-PKS-Mgmt
       subnet_ip: 192.168.40.1 # Last octet should be 1 rather than 0
       subnet_mask: 22
+
+  - name: T1-Router-PKS-Infra
+    switches:
+    - name: PKS-Deployment
+      subnet_ip: 192.168.20.1 # Last octet should be 1 rather than 0
+      subnet_mask: 22
+
+
 
 # Make sure the ncp/cluster tag matches the one defined on the T0 Router
 # Additional the ncp/ha tag should be set for HA Spoof guard profile
@@ -224,25 +238,23 @@ nsx_t_external_ip_pool_spec: |
     gateway: 10.100.0.1
     start: 10.100.0.10 # Should not include gateway
     end: 10.100.0.200  # Should not include gateway
-    nameserver: 10.100.0.2
-    dns_domain: corp.local.io
     tags:
-      ncp/cluster: 'pas1' # Should match the top level ncp/cluster tag value
+      ncp/cluster: 'pas1'   # Should match the top level ncp/cluster tag value
       ncp/external: 'true'  # Required for external facing ips
-      testtag: 'testpas1'
+      testtag: 'testpas1'      
   - name: external-ip-pool-for-pks
     cidr: 10.200.0.0/24
     gateway: 10.200.0.1
     start: 10.200.0.10 # Should not include gateway
     end: 10.200.0.200  # Should not include gateway
-    nameserver: 10.200.0.2
-    dns_domain: corp.local.io
     tags:
-      ncp/shared: 'true'
-      ncp/cluster: 'pas1'    
+      ncp/cluster: 'pas1'   # Should match the top level ncp/cluster tag value
       ncp/external: 'true'  # Required for external facing ips
-      testtag: 'testpks1'
+      ncp/shared: 'true'    # Required for PKS
 
+# Specify NAT rules
+# Provide matching dnat and snat rule for specific vms by using ips for destination_network and translated_network that need to be exposed like Ops Mgr
+# Provide snat rules for outbound from either container or a vm by specifying the source_network (cidr) and translated network ip
 nsx_t_nat_rules_spec: |
   nat_rules:
   # Sample entry for allowing inbound to Ops Mgr or some exposed service running on private network
@@ -271,4 +283,3 @@ nsx_t_nat_rules_spec: |
     rule_priority: 8001                  # Lower priority
       
 
-enable_ansible_debug: false # set value to true for verbose output from ansible
