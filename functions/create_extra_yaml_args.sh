@@ -20,12 +20,12 @@ function check_existence_of_tag {
     env_variable=$1
     tag_name=$2
     tag_value=$3
-    
+
     top_key=$(echo "${!env_variable}" | shyaml keys)
     length=$(expr $(echo "${!env_variable}" | shyaml get-values $top_key | grep "^name:" | wc -l) - 1 || true )
  
  	count=0
-    if [ $length -gt 0 ]; then
+    if [ $length -ge 0 ]; then
       for index in $(seq 0 $length) 
       do
         tmpfile=$(mktemp /tmp/temp-yaml.XXXXX)
@@ -64,7 +64,7 @@ function create_extra_yaml_args {
 		exit 1
 		#echo "    ncp/cluster:$NSX_T_PAS_NCP_CLUSTER_TAG" >> extra_yaml_args.yml
 	fi
-	match=$(check_existence_of_tag NSX_T_EXTERNAL_IP_POOL_SPEC 'ncp/external' $NSX_T_PAS_NCP_CLUSTER_TAG )
+	match=$(check_existence_of_tag NSX_T_EXTERNAL_IP_POOL_SPEC 'ncp/external' 'true' )
 	if [  "$NSX_T_EXTERNAL_IP_POOL_SPEC" != "" -a "$match" == "" ]; then
 		# There can be multiple entries and we can fail to add tag for previous ones
 		echo "Missing matching ncp/external tag in the External IP Pool defn"
@@ -89,7 +89,7 @@ function create_extra_yaml_args {
 	if [ "$NSX_T_HA_SWITCHING_PROFILE_SPEC" != "" -a "$match" == "" ]; then
 		echo "    ncp/cluster: $NSX_T_PAS_NCP_CLUSTER_TAG" >> extra_yaml_args.yml
 	fi
-	match=$(check_existence_of_tag NSX_T_HA_SWITCHING_PROFILE_SPEC 'ncp/ha' $NSX_T_PAS_NCP_CLUSTER_TAG )
+	match=$(check_existence_of_tag NSX_T_HA_SWITCHING_PROFILE_SPEC 'ncp/ha' 'true' )
 	if [ "$match" == "" ]; then
 		echo "    ncp/ha: true" >> extra_yaml_args.yml
 	fi	

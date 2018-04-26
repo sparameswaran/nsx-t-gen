@@ -169,6 +169,8 @@ jobs:
   - aggregate:
     - get: nsx-t-gen-pipeline
     - get: nsxt-ansible
+      params: {globs: []}
+      passed: [install-nsx-t]
 
   - task: add-nsx-t-routers
     file: nsx-t-gen-pipeline/tasks/add-nsx-t-routers/task.yml
@@ -179,6 +181,8 @@ jobs:
   - aggregate:
     - get: nsx-t-gen-pipeline
     - get: nsxt-ansible
+      params: {globs: []}
+      passed: [add-nsx-t-routers]    
 
   - task: config-nsx-t-extras
     file: nsx-t-gen-pipeline/tasks/config-nsx-t-extras/task.yml
