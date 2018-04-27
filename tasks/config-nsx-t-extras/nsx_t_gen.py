@@ -487,6 +487,8 @@ def list_certs():
 	print('Done listing CSRs\n')
 
 def generate_self_signed_cert():
+	
+	nsx_t_manager_fqdn = os.getenv('NSX_T_MANAGER_FQDN')
 	csr_request = yaml.load(os.getenv('NSX_T_CSR_REQUEST_SPEC'))['csr_request']
 	
 	api_endpoint = TRUST_MGMT_CSRS_ENDPOINT
@@ -505,12 +507,12 @@ def generate_self_signed_cert():
 	payload = { 
 						'subject': {            
 							'attributes': [              
-								{'key':'CN','value': csr_request['common_name']},
-								{'key':'O','value':  csr_request['org_name']},
-								{'key':'OU','value': csr_request['org_unit']},
-								{'key':'C','value':  csr_request['country']},
-								{'key':'ST','value': csr_request['state']},
-								{'key':'L','value':  csr_request['city']}
+								{ 'key':'CN','value': nsx_t_manager_fqdn },
+								{ 'key':'O','value':  csr_request['org_name'] },
+								{ 'key':'OU','value': csr_request['org_unit'] },
+								{ 'key':'C','value':  csr_request['country'] },
+								{ 'key':'ST','value': csr_request['state'] },
+								{ 'key':'L','value':  csr_request['city'] }
 							]
 						},
 						'key_size': csr_request['key_size'],

@@ -370,11 +370,11 @@ nsx_t_nat_rules_spec: |
   
 nsx_t_csr_request_spec: |
   csr_request:
-    common_name: nsx-t-mgr.corp.local.io # EDIT - Should be FQDN
-    org_name: Company
-    org_unit: net-integ                  # EDIT
-    country: US
-    state: CA
-    city: SF
-    key_size: 2048
-    algorithm: RSA
+    #common_name not required - would use nsx_t_manager_fqdn
+    org_name: Company            # EDIT
+    org_unit: net-integ          # EDIT
+    country: US                  # EDIT
+    state: CA                    # EDIT
+    city: SF                     # EDIT
+    key_size: 2048               # Valid values: 2048 or 3072
+    algorithm: RSA               # Valid values: RSA or DSA
