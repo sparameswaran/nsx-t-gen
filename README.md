@@ -101,9 +101,9 @@ After registering the pipeline, unpause the pipeline before kicking off any job 
 * Run the full-install-nsx-t group for full deployment of ova's followed by configuration of routers and nat rules.
 
 * Run the smaller independent group:
-** `base-install` for just deployment of ovas and control management plan.
+> `base-install` for just deployment of ovas and control management plan.
 This uses ansible scripts under the covers.
   
-** `add-routers` for creation of the various transport zones, nodes, hostswitches and T0/T1 Routers with Logical switches. This also uses ansible scripts under the covers.
+> `add-routers` for creation of the various transport zones, nodes, hostswitches and T0/T1 Routers with Logical switches. This also uses ansible scripts under the covers.
 
-** `config-nsx-t-extras` for adding nat rules, route redistribution, HA Switching Profile, Self-signed certs. This particular job is currently done via direct api calls and does not use Ansible scripts.
+> `config-nsx-t-extras` for adding nat rules, route redistribution, HA Switching Profile, Self-signed certs. This particular job is currently done via direct api calls and does not use Ansible scripts.
