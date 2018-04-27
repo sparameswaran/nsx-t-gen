@@ -528,7 +528,7 @@ def generate_self_signed_cert():
 	self_sign_csr_id = self_sign_csr_response['id'] 
 
 	update_api_endpint = '%s%s%s' % (TRUST_MGMT_UPDATE_CERT, '&certificate_id=', self_sign_csr_id)
-	update_csr_response = client.post(update_api_endpint + self_sign_csr_id, '' ).json()
+	update_csr_response = client.post(update_api_endpint, '' ).json()
 
 	print('NSX Mgr updated to use newly generated CSR!!,\n\t response:{}'.format(update_csr_response))
 
