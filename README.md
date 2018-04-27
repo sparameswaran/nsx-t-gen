@@ -1,7 +1,10 @@
 # nsx-t-gen
 Concourse pipeline to install NSX-T v2.1
 
+The concourse pipeline uses [ansible scripts](https://github.com/yasensim/nsxt-ansible) created by Yasen Simeonov and [forked](https://github.com/sparameswaran/nsxt-ansible) by the author of this pipeline.
+
 Things handled by the pipeline:
+
 * Deploy the VMware NSX-T Manager, Controller and Edge ova images
 * Configure the Controller cluster and add it to the management plane
 * Configure hostswitches, profiles, transport zones
@@ -14,10 +17,10 @@ Things handled by the pipeline:
 * Route redistribution
 * HA Spoofguard Switching Profile
 
-The pipeline uses [ansible scripts](https://github.com/yasensim/nsxt-ansibl) created by Yasen Simeonov and [forked](https://github.com/sparameswaran/nsxt-ansible) by the author of this pipeline
-
 Not handled by pipeline (as of 4/26/18):
+
 * Load Balancer creation
+* BGP or Static Route setup (outside of NSX-T) for T0 Routers
 
 ## Warning
 This is purely a trial work-in-progress and not officially supported by anyone. Please use caution while using it.
@@ -25,7 +28,7 @@ This is purely a trial work-in-progress and not officially supported by anyone. 
 ## Pre-reqs
 * Concourse setup
 * There should be atleast one free vmnic on each of the ESXI hosts
-* Ovftool would fail to deploy in the absence of `VM Network` or non NSX-T logical network with `Host did not have any virtual network defined` error message. So, ensure presence of either one.
+* Ovftool would fail to deploy the Edge VMs in the absence of `VM Network` or standard switch (non NSX-T) with `Host did not have any virtual network defined` error message. So, ensure presence of either one.
 * Web server to serve the ova images and ovftool
 * Docker hub connectivity to pull docker image for the concourse pipeline
 * NSX-T 2.1 ova images and ovftool install bits for linux
@@ -67,9 +70,40 @@ VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle
 Edit the pipelines/nsx-t-install.yml with the correct webserver endpoint and path to the files.
 
 ## Register with concourse   
-Use the sample params template file to fill in the nsx-t, vsphere and other configuration details.
-Register the pipeline and params against concourse
+Use the sample params template file (under pipelines) to fill in the nsx-t, vsphere and other configuration details.
+Register the pipeline and params against concourse.
+
+## Sample setup
+Copy over the sample params as nsx-t-params.yml and then use following script to register the pipeline (after eding the concourse endpoint, target etc.)
+
+```
+#!/bin/bash
+
+# EDIT names and domain 
+CONCOURSE_ENDPOINT=concourse.corp.local.com
+CONCOURSE_TARGET=nsx-concourse
+PIPELINE_NAME=install-nsx-t
+
+alias fly-s="fly -t $CONCOURSE_TARGET set-pipeline -p $PIPELINE_NAME -c pipelines/nsx-t-install.yml -l nsx-t-params.yml"
+alias fly-l="fly -t $CONCOURSE_TARGET containers | grep $PIPELINE_NAME"
+alias fly-h="fly -t $CONCOURSE_TARGET hijack -b "
+
+echo "Concourse target set to $CONCOURSE_ENDPOINT"
+echo "Login using fly"
+echo ""
+
+fly --target $CONCOURSE_TARGET login --insecure --concourse-url https://${CONCOURSE_ENDPOINT} -n main
+
+```
+After registering the pipeline, unpause the pipeline before kicking off any job group
 
 ## Options to run
-* Run the full-install-nsx-t group for full deployment of ova's followed by configuration of routers.
-* Run the smaller group `install-nsx-t` or `add-routers` for either stopping at deployment of ovas and basic controller setup or configuration of the T0 and T1 routers and logical switches respectively.
+* Run the full-install-nsx-t group for full deployment of ova's followed by configuration of routers and nat rules.
+
+* Run the smaller independent group:
+** `base-install` for just deployment of ovas and control management plan.
+This uses ansible scripts under the covers.
+  
+** `add-routers` for creation of the various transport zones, nodes, hostswitches and T0/T1 Routers with Logical switches. This also uses ansible scripts under the covers.
+
+** `config-nsx-t-extras` for adding nat rules, route redistribution, HA Switching Profile, Self-signed certs. This particular job is currently done via direct api calls and does not use Ansible scripts.
