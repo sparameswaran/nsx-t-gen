@@ -493,11 +493,11 @@ def generate_self_signed_cert():
 	
 	api_endpoint = TRUST_MGMT_CSRS_ENDPOINT
 	existing_csrs_response = client.get(api_endpoint).json()
-	if existing_csrs_response['result_count'] > 0:
-		print('Error! CSR already exists!!,\n\t count of csrs:{}'.format( existing_csrs_response['result_count']))
-		for csr_entry in existing_csrs_response['results']:
-			print('\t CSR Entry: {}'.format(csr_entry))
-		return
+	# if existing_csrs_response['result_count'] > 0:
+	# 	print('Error! CSR already exists!!,\n\t count of csrs:{}'.format( existing_csrs_response['result_count']))
+	# 	for csr_entry in existing_csrs_response['results']:
+	# 		print('\t CSR Entry: {}'.format(csr_entry))
+	# 	return
 
 	tokens = csr_request['common_name'].split('.')
 	if len(tokens) < 3:
@@ -524,15 +524,15 @@ def generate_self_signed_cert():
 
 	self_sign_cert_api_endpint = TRUST_MGMT_SELF_SIGN_CERT
 	self_sign_cert_url = '%s%s%s' % (self_sign_cert_api_endpint, csr_id, '?action=self_sign')
-	print('Self signed url:{}'.format(self_sign_cert_url))
 	self_sign_csr_response = client.post(self_sign_cert_url, '').json()
 
 	self_sign_csr_id = self_sign_csr_response['id'] 
 
 	update_api_endpint = '%s%s%s' % (TRUST_MGMT_UPDATE_CERT, '&certificate_id=', self_sign_csr_id)
-	update_csr_response = client.post(update_api_endpint, '' ).json()
+	update_csr_response = client.post(update_api_endpint, '')
 
-	print('NSX Mgr updated to use newly generated CSR!!,\n\t response:{}'.format(update_csr_response))
+	print('NSX Mgr updated to use newly generated CSR!!'
+	 			+ '\n\tUpdate response code:{}'.format(update_csr_response.status_code))
 
 def build_routers():
 	init()
@@ -587,18 +587,49 @@ def print_t0_route_nat_rules():
 			resp = client.get(api_endpoint).json()
 			print('NAT Rules for T0 Router: {}\n{}'.format(t0_router_id, resp))
 
+def reset_t0_route_nat_rules():
+	for key in global_id_map:
+		if key.startswith('ROUTER:TIER0:'):
+			t0_router_id = global_id_map[key]
+			api_endpoint = '%s/%s/%s' % (ROUTERS_ENDPOINT, t0_router_id, 'nat/rules')
+			resp = client.get(api_endpoint).json()
+			nat_rules = resp['results']
+			for nat_rule in nat_rules:
+				delete_api_endpint = '%s%s%s' % (api_endpoint, '/', nat_rule['id'])
+				resp = client.delete(delete_api_endpint )
+
+
+def check_for_existing_rule(existing_nat_rules, new_nat_rule):
+	if (len(existing_nat_rules) == 0):
+		return None
+
+	for existing_nat_rule in existing_nat_rules:
+		if (
+			existing_nat_rule['translated_network'] == new_nat_rule['translated_network']
+		   and existing_nat_rule['action'] == new_nat_rule['action']
+		   and existing_nat_rule.get('match_destination_network') == new_nat_rule.get('match_destination_network')
+		   and existing_nat_rule.get('match_source_network') == new_nat_rule.get('match_source_network')
+	   ):
+			return existing_nat_rule
+	return None
+
 def add_t0_route_nat_rules():
 
 	nat_rules_defn = yaml.load(os.getenv('NSX_T_NAT_RULES_SPEC'))['nat_rules']
+	if len(nat_rules_defn) <= 0:
+		return
 
+	t0_router_id = global_id_map['ROUTER:TIER0:' + nat_rules_defn[0]['t0_router']]
+	if t0_router_id is None:
+		print('Error!! No T0Router found with name: {}'.format(nat_rules_defn[0]['t0_router']))
+		exit -1
+
+	api_endpoint = '%s/%s/%s' % (ROUTERS_ENDPOINT, t0_router_id, 'nat/rules')
+
+	changes_detected = False
+	existing_nat_rules = client.get(api_endpoint ).json()['results']
 	for nat_rule in nat_rules_defn:
-		#print 'Nat rule: {}'.format(nat_rule)
-		t0_router_id = global_id_map['ROUTER:TIER0:' + nat_rule['t0_router']]
-		if t0_router_id is None:
-			print('Error!! No T0Router found with name: {}'.format(nat_rule['t0_router']))
-			exit -1
-
-		api_endpoint = '%s/%s/%s' % (ROUTERS_ENDPOINT, t0_router_id, 'nat/rules')
+		
 		rule_payload = {
 				'resource_type': 'NatRule',
 				'enabled' : True,
@@ -613,21 +644,25 @@ def add_t0_route_nat_rules():
 			rule_payload['action'] = 'SNAT'
 			rule_payload['match_source_network'] = nat_rule['source_network']
 
-		# match_service = {}
-		# if nat_rule.get('source_ports') is not None:
-		#   new_ports = nat_rule.get('source_ports').split(',')
-		#   #ports = [ for port in nat_rule.get('source_ports').split(',') '"' + port + '"' ]
-		#   match_service['source_ports'] = new_ports
+		existing_nat_rule = check_for_existing_rule(existing_nat_rules, rule_payload )
+		if None == existing_nat_rule:
+			changes_detected = True
+			print('Adding new Nat rule: {}'.format(rule_payload))
+			resp = client.post(api_endpoint, rule_payload )
+		else:
+			rule_payload['id'] = existing_nat_rule['id']
+			rule_payload['display_name'] = existing_nat_rule['display_name']
+			rule_payload['_revision'] = existing_nat_rule['_revision']
+			if rule_payload['rule_priority'] != existing_nat_rule['rule_priority']:
+				changes_detected = True
+				print('Updating just the priority of existing nat rule: {}'.format(rule_payload))
+				update_api_endpint = '%s%s%s' % (api_endpoint, '/', existing_nat_rule['id'])
+				resp = client.put(update_api_endpint, rule_payload )
 		
-		# if nat_rule.get('destination_ports') is not None:
-		#   new_ports = nat_rule.get('destination_ports').split(',')
-		#   match_service['destination_ports'] = new_ports
-		
-		# rule_payload['match_service'] = match_service
-		print('Adding Nat rule: {}'.format(rule_payload))
-		resp = client.post(api_endpoint, rule_payload )
-		#print('Response on adding nat rule: {}'.format(resp.json()))
-	print('Done adding nat rules for T0Routers\n')
+	if changes_detected:
+		print('Done adding/updating nat rules for T0Routers!!\n')
+	else:
+		print('Detected no change with nat rules for T0Routers!!\n')
 
 def main():
 	
@@ -641,11 +676,13 @@ def main():
 	# So create directly
 	create_ha_switching_profile()
 
+	# # Set the route redistribution
 	set_t0_route_redistribution()
 
-	#print_t0_route_nat_rules()
+	# #print_t0_route_nat_rules()
 	add_t0_route_nat_rules()
 
+	# Generate self-signed cert
 	generate_self_signed_cert()
 
 

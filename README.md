@@ -8,16 +8,28 @@ Things handled by the pipeline:
 * Configure the Edges and ESXi Hosts to be part of the Fabric
 * Create T0 Router (one per run, in HA vip mode) with uplink and static route
 * Configure set of T1 Routers with logical switches and ports
+* NAT setup for T0 Router
+* Container IP Pools and External IP Blocks
+* Self-signed cert generation and registration against NSX-T Manager
+* Route redistribution
+* HA Spoofguard Switching Profile
 
 The pipeline uses [ansible scripts](https://github.com/yasensim/nsxt-ansibl) created by Yasen Simeonov and [forked](https://github.com/sparameswaran/nsxt-ansible) by the author of this pipeline
 
-Not handled by pipeline (as of 4/24/18):
+Not handled by pipeline (as of 4/26/18):
 * Load Balancer creation
-* NAT setup
-* Route distribution
 
-## Alert
+## Warning
 This is purely a trial work-in-progress and not officially supported by anyone. Please use caution while using it.
+
+## Pre-reqs
+* Concourse setup
+* There should be atleast one free vmnic on each of the ESXI hosts
+* Ovftool would fail to deploy in the absence of `VM Network` or non NSX-T logical network with `Host did not have any virtual network defined` error message. So, ensure presence of either one.
+* Web server to serve the ova images and ovftool
+* Docker hub connectivity to pull docker image for the concourse pipeline
+* NSX-T 2.1 ova images and ovftool install bits for linux
+* vCenter Access
 
 ## Offline envs
 This is only applicable if the docker image `nsxedgegen/nsx-t-gen-worker:latest` is unavailable or env is restricted to offline. 

@@ -67,7 +67,6 @@ nsx_t_gen_params: &nsx-t-gen-params
   NSX_T_CSR_REQUEST_SPEC: ((nsx_t_csr_request_spec))
   ENABLE_ANSIBLE_DEBUG: ((enable_ansible_debug))
   
-
 groups:
 
 - name: full-install
@@ -78,15 +77,15 @@ groups:
 
 - name: base-install
   jobs:
-  - install-nsx-t
+  - standalone-install-nsx-t
 
 - name: add-routers
   jobs:
-  - add-nsx-t-routers
+  - standalone-add-nsx-t-routers
 
 - name: config-nsx-t-extras
   jobs:
-  - config-nsx-t-extras
+  - standalone-config-nsx-t-extras
 
 # - name: cleanup
 #   jobs:
@@ -191,33 +190,38 @@ jobs:
     file: nsx-t-gen-pipeline/tasks/config-nsx-t-extras/task.yml
     params: *nsx-t-gen-params
 
-# - name: full-install-nsx-t
-#   plan:
-#   - aggregate:
-#     - get: nsx-t-gen-pipeline
-#     - get: nsxt-ansible
-#     - get: nsx-mgr-ova
-#     - get: nsx-ctrl-ova
-#     - get: nsx-edge-ova
-#     - get: ovftool
+- name: standalone-install-nsx-t
+  plan:
+  - aggregate:
+    - get: nsx-t-gen-pipeline
+    - get: nsxt-ansible
+    - get: nsx-mgr-ova
+    - get: nsx-ctrl-ova
+    - get: nsx-edge-ova
+    - get: ovftool
 
-#   - task: install-nsx-t
-#     file: nsx-t-gen-pipeline/tasks/install-nsx-t/task.yml
-#     params: *nsx-t-gen-params
+  - task: install-nsx-t
+    file: nsx-t-gen-pipeline/tasks/install-nsx-t/task.yml
+    params: *nsx-t-gen-params
+    
+- name: standalone-add-nsx-t-routers
+  plan:
+  - aggregate:
+    - get: nsx-t-gen-pipeline
+    - get: nsxt-ansible
+      params: {globs: []}
+      
+  - task: add-nsx-t-routers
+    file: nsx-t-gen-pipeline/tasks/add-nsx-t-routers/task.yml
+    params: *nsx-t-gen-params
 
-#   - task: add-nsx-t-routers
-#     file: nsx-t-gen-pipeline/tasks/add-nsx-t-routers/task.yml
-#     params: *nsx-t-gen-params
-
-#   - task: config-nsx-t-extras
-#     file: nsx-t-gen-pipeline/tasks/config-nsx-t-extras/task.yml
-#     params: *nsx-t-gen-params
-
-# - name: uninstall-nsx-t
-#   plan:
-#   - aggregate:
-#     - get: nsx-t-gen-pipeline
-
-#   - task: uninstall-nsx-t
-#     file: nsx-t-gen-pipeline/tasks/uninstall-nsx-t/task.yml
-
+- name: standalone-config-nsx-t-extras
+  plan:
+  - aggregate:
+    - get: nsx-t-gen-pipeline
+    - get: nsxt-ansible
+      params: {globs: []}
+      
+  - task: config-nsx-t-extras
+    file: nsx-t-gen-pipeline/tasks/config-nsx-t-extras/task.yml
+    params: *nsx-t-gen-params
