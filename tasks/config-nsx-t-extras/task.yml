@@ -19,6 +19,7 @@ params:
   NSX_T_CONTAINER_IP_BLOCK_SPEC:
   NSX_T_EXTERNAL_IP_POOL_SPEC:
   NSX_T_NAT_RULES_SPEC:
+  NSX_T_CSR_REQUEST_SPEC:
     
 inputs:
   - name: nsx-t-gen-pipeline

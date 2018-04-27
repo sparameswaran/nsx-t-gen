@@ -368,4 +368,13 @@ nsx_t_nat_rules_spec: |
     translated_network: 10.13.12.7      # External IP address for PKS controller
     rule_priority: 1024                 # Higher priority
   
-
+nsx_t_csr_request_spec: |
+  csr_request:
+    common_name: nsx-t-mgr.corp.local.io # EDIT - Should be FQDN
+    org_name: Company
+    org_unit: net-integ                  # EDIT
+    country: US
+    state: CA
+    city: SF
+    key_size: 2048
+    algorithm: RSA
