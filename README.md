@@ -100,17 +100,8 @@ After registering the pipeline, unpause the pipeline before kicking off any job 
 ## Video Recording of Pipeline Execution
 
 Follow the two part video for more details on the steps and usage of the pipeline:
-* 
-<video src="docs/nsx-t-gen-Part1.mp4" controls
-preload="auto" width="683" height="384" data-setup="{}">
-Part 1  - Install of OVAs and waiting for VMs to come up 
-</video>
-
-* 
-<video src="docs/nsx-t-gen-Part2.mp4" controls
-preload="auto" width="683" height="384" data-setup="{}">
-Part 2 - Rest of install and config
-</video>
+* [Part 1](docs/nsx-t-gen-Part1.mp4)  - Install of OVAs and bringing up VMs
+* [Part 2](docs/nsx-t-gen-Part1.mp4) - Rest of install and config
 
 ## Options to run
 * Run the full-install-nsx-t group for full deployment of ova's followed by configuration of routers and nat rules.
