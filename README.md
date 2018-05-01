@@ -10,20 +10,20 @@ Things handled by the pipeline:
 * Configure hostswitches, profiles, transport zones
 * Configure the Edges and ESXi Hosts to be part of the Fabric
 * Create T0 Router (one per run, in HA vip mode) with uplink and static route
-* Configure set of T1 Routers with logical switches and ports
-* NAT setup for T0 Router
+* Configure arbitrary set of T1 Routers with logical switches and ports
+* NAT Rules setup for T0 Router
 * Container IP Pools and External IP Blocks
 * Self-signed cert generation and registration against NSX-T Manager
-* Route redistribution
+* Route redistribution for T0 Router
 * HA Spoofguard Switching Profile
+* Load Balancer (with virtual servers and server pool) creation
 
-Not handled by pipeline (as of 4/26/18):
+Not handled by pipeline:
 
-* Load Balancer creation
 * BGP or Static Route setup (outside of NSX-T) for T0 Routers
 
 ## Warning
-This is purely a trial work-in-progress and not officially supported by anyone. Please use caution while using it.
+This is purely a trial work-in-progress and not officially supported by anyone. Use caution while using it at your own Risk!!.
 
 ## Pre-reqs
 * Concourse setup

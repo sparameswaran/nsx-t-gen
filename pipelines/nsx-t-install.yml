@@ -65,6 +65,7 @@ nsx_t_gen_params: &nsx-t-gen-params
   NSX_T_EXTERNAL_IP_POOL_SPEC: ((nsx_t_external_ip_pool_spec))
   NSX_T_NAT_RULES_SPEC: ((nsx_t_nat_rules_spec))
   NSX_T_CSR_REQUEST_SPEC: ((nsx_t_csr_request_spec))
+  NSX_T_LBR_SPEC: ((nsx_t_lbr_spec))
   ENABLE_ANSIBLE_DEBUG: ((enable_ansible_debug))
   
 groups:
@@ -203,7 +204,7 @@ jobs:
   - task: install-nsx-t
     file: nsx-t-gen-pipeline/tasks/install-nsx-t/task.yml
     params: *nsx-t-gen-params
-    
+
 - name: standalone-add-nsx-t-routers
   plan:
   - aggregate:
