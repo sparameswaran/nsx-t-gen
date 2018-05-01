@@ -97,6 +97,25 @@ fly --target $CONCOURSE_TARGET login --insecure --concourse-url https://${CONCOU
 ```
 After registering the pipeline, unpause the pipeline before kicking off any job group
 
+## Video Recording of Pipeline Execution
+
+Follow the two part video for more details on the steps and usage of the pipeline:
+* 
+<script src="http://vjs.zencdn.net/4.0/video.js"></script>
+<video id="part1-installation" class="video-js vjs-default-skin" controls
+preload="auto" width="683" height="384" data-setup="{}">
+Part 1  - Install of OVAs and waiting for VMs to come up 
+<source src="docs/nsx-t-gen-Part1.mp4" type='video/mp4'>
+</video>
+
+* 
+<script src="http://vjs.zencdn.net/4.0/video.js"></script>
+<video id="part1-installation" class="video-js vjs-default-skin" controls
+preload="auto" width="683" height="384" data-setup="{}">
+Part 2 - Rest of install and config
+<source src="docs/nsx-t-gen-Part2.mp4" type='video/mp4'>
+</video>
+
 ## Options to run
 * Run the full-install-nsx-t group for full deployment of ova's followed by configuration of routers and nat rules.
 
