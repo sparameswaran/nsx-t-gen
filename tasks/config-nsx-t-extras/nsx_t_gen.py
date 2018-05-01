@@ -539,7 +539,7 @@ def generate_self_signed_cert():
   update_csr_response = client.post(update_api_endpint, '')
 
   print('NSX Mgr updated to use newly generated CSR!!'
-        + '\n\tUpdate response code:{}'.format(update_csr_response.status_code))
+        + '\n    Update response code:{}'.format(update_csr_response.status_code))
 
 def build_routers():
   init()
@@ -771,30 +771,33 @@ def add_lbr_pool(virtual_server_defn):
     index += 1
   pool_payload['members'] = members
 
-  print 'Payload for Pool: {}'.format(pool_payload)
+  print 'Payload for Server Pool: {}'.format(pool_payload)
 
   if existing_pool is None:
     resp = client.post(pool_api_endpoint, pool_payload ).json()
-    print 'Created Server Pool with name: {}'.format(virtual_server_name)
-  else:
-    pool_payload['_revision'] = existing_pool['_revision']
-    pool_payload['id'] = existing_pool['id']
-    resp = client.put( '%s/%s' % (pool_api_endpoint, existing_pool['id']), pool_payload ).json()
-    print 'Updated Server Pool with name: {}'.format(virtual_server_name)
+    print 'Created Server Pool: {}'.format(virtual_server_name)
+    print ''
+    return resp['id']
 
-  #print 'Response for pool: {}'.format(resp)
+  # Update existing server pool
+  pool_payload['_revision'] = existing_pool['_revision']
+  pool_payload['id'] = existing_pool['id']
+  pool_update_api_endpoint = '%s/%s' % (pool_api_endpoint, existing_pool['id'])
+  resp = client.put( pool_update_api_endpoint, pool_payload, check=False )
+  print 'Updated Server Pool: {}'.format(virtual_server_name)
   print ''
-  return resp['id']
+  return existing_pool['id']
 
 def add_lbr_virtual_server(virtual_server_defn):
   virtual_server_name = virtual_server_defn['name']
 
-  existing_vip_name = ( '%s%s' % (virtual_server_defn, 'Vip') )
+  existing_vip_name = ( '%s%s' % (virtual_server_defn['name'], 'Vip') )
   existing_virtual_server = check_for_existing_lbr_virtual_server(existing_vip_name)
 
   virtual_server_api_endpoint = LBR_VIRTUAL_SERVER_ENDPOINT
   pool_id = add_lbr_pool(virtual_server_defn)
 
+  # Go with TCP App profile and source-ip persistence profile
   lbFastTcpAppProfile = global_id_map['APP_PROFILE:nsx-default-lb-fast-tcp-profile']
   lbSourceIpPersistenceProfile = global_id_map['PERSISTENCE_PROFILE:nsx-default-source-ip-persistence-profile']
 
@@ -814,16 +817,18 @@ def add_lbr_virtual_server(virtual_server_defn):
     
   if existing_virtual_server is None:
     resp = client.post(virtual_server_api_endpoint, vs_payload ).json()
-    print 'Created Virtual Server with name: {}'.format(virtual_server_name)
-  else:
-    vs_payload['_revision'] = existing_virtual_server['_revision']
-    vs_payload['id'] = existing_virtual_server['id']
-    resp = client.put('%s/%s' % (virtual_server_api_endpoint, existing_virtual_server['id']), vs_payload ).json()
-    print 'Updated Virtual Server with name: {}'.format(virtual_server_name)
+    print 'Created Virtual Server: {}'.format(virtual_server_name)
+    return resp['id']
 
-  #print 'Response for VS: {}'.format(resp)
-  print ''
-  return resp['id']
+  # Update existing virtual server
+  vs_payload['_revision'] = existing_virtual_server['_revision']
+  vs_payload['id'] = existing_virtual_server['id']
+  vs_update_api_endpoint = '%s/%s' % (virtual_server_api_endpoint, existing_virtual_server['id'])
+  
+  resp = client.put(vs_update_api_endpoint, vs_payload, check=False )
+  print 'Updated Virtual Server: {}'.format(virtual_server_name)
+  print ''  
+  return existing_virtual_server['id']
 
 def add_loadbalancers():
 
@@ -837,39 +842,43 @@ def add_loadbalancers():
       print('Error!! No T1Router found with name: {} referred against LBR: {}'.format(lbr['t1_router'], lbr['name']))
       exit -1
 
+    lbr_api_endpoint = LBR_SERVICES_ENDPOINT
+    lbr_service_payload = {
+        'resource_type': 'LbService',
+        'size' : lbr['size'].upper(),
+        'error_log_level' : 'INFO',
+        'display_name' : lbr['name'],
+        'attachment': {
+            'target_display_name': lbr['t1_router'],
+            'target_type': 'LogicalRouter',
+            'target_id': t1_router_id
+        }     
+    }
+
+    virtual_servers = []
+    for virtual_server_defn in lbr['virtual_servers']:
+      virtual_server_id = add_lbr_virtual_server(virtual_server_defn)
+      virtual_servers.append(virtual_server_id)
+
+    lbr_service_payload['virtual_server_ids'] = virtual_servers
+
     existing_lbr = check_for_existing_lbr(lbr['name'])
     if existing_lbr is None:
-      lbr_api_endpoint = LBR_SERVICES_ENDPOINT
-      lbr_service_payload = {
-          'resource_type': 'LbService',
-          'size' : lbr['size'].upper(),
-          'error_log_level' : 'INFO',
-          'display_name' : lbr['name'],
-          'attachment': {
-              'target_display_name': lbr['t1_router'],
-              'target_type': 'LogicalRouter',
-              'target_id': t1_router_id
-          }     
-      }
-
-      virtual_servers = []
-      for virtual_server_defn in lbr['virtual_servers']:
-        virtual_server_id = add_lbr_virtual_server(virtual_server_defn)
-        virtual_servers.append(virtual_server_id)
-  
-      lbr_service_payload['virtual_server_ids'] = virtual_servers
       resp = client.post(lbr_api_endpoint, lbr_service_payload ).json()
       lbr_id = resp['id']
-      print 'Created LBR with name: {}'.format(lbr['name'])
-    else:
-      lbr_id = existing_lbr['id']
-      print 'Updated LBR with name: {}'.format(lbr['name'])
-    
+      print 'Created LBR: {}'.format(lbr['name'])
+      print ''
+
+    # Update existing LBR
+    lbr_id = existing_lbr['id']
+  
+    lbr_service_payload['_revision'] = existing_lbr['_revision']
+    lbr_service_payload['id'] = existing_lbr['id']    
+
+    lbr_update_api_endpoint = '%s/%s' % (lbr_api_endpoint, lbr_id)
+    resp = client.put(lbr_update_api_endpoint, lbr_service_payload, check=False )
+    print 'Updated LBR: {}'.format(lbr['name'])
     print ''
-
-
-
-
 
 def main():
   
@@ -896,6 +905,7 @@ def main():
   # Generate self-signed cert
   generate_self_signed_cert()
 
+  # Add Loadbalancers, update if already existing
   add_loadbalancers()
 
 if __name__ == '__main__':
