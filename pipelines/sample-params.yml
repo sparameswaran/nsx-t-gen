@@ -386,6 +386,19 @@ nsx_t_csr_request_spec: |
 # In scenarios where both Clients and Pool Members are attached to the same Logical Router, 
 # SNAT (Auto Map or IP List) must be used.
 
+# LBR Sizing guide 
+# LB Size | Virtual Servers | Pool Members
+# small   |   10            |   30
+# medium  |  100            |  300
+# large   | 1000            | 3000
+
+# No. of LBs per edge
+# Edge Size| Small LBs| Medium LBs| Large LBs
+# small    |    0     |   0       | 0
+# medium   |    1     |   0       | 0
+# large    |    4     |   1       | 1
+# Bare metal - not covered here
+
 nsx_t_lbr_spec: |
   loadbalancers:
   # Sample entry for creating LBR for PAS ERT

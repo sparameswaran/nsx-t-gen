@@ -868,10 +868,11 @@ def add_loadbalancers():
       lbr_id = resp['id']
       print 'Created LBR: {}'.format(lbr['name'])
       print ''
+      return
 
     # Update existing LBR
     lbr_id = existing_lbr['id']
-  
+
     lbr_service_payload['_revision'] = existing_lbr['_revision']
     lbr_service_payload['id'] = existing_lbr['id']    
 
