@@ -18,6 +18,7 @@ nsx_t_gen_params: &nsx-t-gen-params
   ESXI_HOSTS_CONFIG: ((esxi_hosts_config))
   NSX_T_MANAGER_FQDN: ((nsx_t_manager_fqdn))
   NSX_T_MANAGER_VM_NAME: ((nsx_t_manager_vm_name))
+  NSX_T_MANAGER_HOST_NAME: ((nsx_t_manager_host_name))
   NSX_T_MANAGER_IP: ((nsx_t_manager_ip))
   NSX_T_MANAGER_ADMIN_USER: ((nsx_t_manager_admin_user))
   NSX_T_MANAGER_ADMIN_PWD: ((nsx_t_manager_admin_pwd))

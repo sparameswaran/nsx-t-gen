@@ -29,7 +29,7 @@ controllerClusterPass: $NSX_T_CONTROLLER_CLUSTER_PWD
 
 managers:
   nsxmanager:
-    hostname: $NSX_T_MANAGER_FQDN
+    hostname: $NSX_T_MANAGER_HOST_NAME
     vmName: $NSX_T_MANAGER_VM_NAME
     ipAddress: $NSX_T_MANAGER_IP
     ovaFile: $NSX_T_MANAGER_OVA
@@ -64,7 +64,7 @@ EOF
 	  cat >> controller_config.yml <<-EOF
 $controller_config
   nsxController0${count}:
-    hostname: ${NSX_T_CONTROLLER_HOST_PREFIX}-0${count}.${DNSDOMAIN} 
+    hostname: "${NSX_T_CONTROLLER_HOST_PREFIX}-0${count}.${DNSDOMAIN}" 
     vmName: "${NSX_T_CONTROLLER_VM_NAME_PREFIX}-0${count}" 
     ipAddress: $controller_ip
     ovaFile: $NSX_T_CONTROLLER_OVA
@@ -85,8 +85,8 @@ EOF
 	  cat >> edge_config.yml <<-EOF
 $edge_config
   ${NSX_T_EDGE_HOST_PREFIX}-0${count}:
-    hostname: ${NSX_T_EDGE_HOST_PREFIX}-0${count}  
-    vmName: "${NSX_T_EDGE_VM_NAME_PREFIX} 0${count}" 
+    hostname: "${NSX_T_EDGE_HOST_PREFIX}-0${count}"
+    vmName: "${NSX_T_EDGE_VM_NAME_PREFIX}-0${count}" 
     ipAddress: $edge_ip
     ovaFile: $NSX_T_EDGE_OVA
     portgroupExt: $NSX_T_EDGE_PORTGROUP_EXT

@@ -39,17 +39,18 @@ esxi_hosts_config: |
 
 # Edit fololowing parameters
 nsx_t_manager_fqdn: nsx-t-mgr.corp.local.io
-nsx_t_manager_vm_name: 'NSX-T Mgr'
+nsx_t_manager_host_name: 'nsx-t-mgr' # Without spaces
+nsx_t_manager_vm_name: 'NSX-T Mgr'   # Can have spaces
 nsx_t_manager_ip: 10.13.12.50
 nsx_t_manager_admin_user: admin
 nsx_t_manager_admin_pwd: VMware1!         # Min 8 chars, upper, lower, number, special digit
 nsx_t_manager_root_pwd: VMware1!          # Min 8 chars, upper, lower, number, special digit
-nsx_t_controller_host_prefix: nsx-t-ctl   # Generated controller would be nsx-t-ctrl-1.corp.local.io,...
+nsx_t_controller_host_prefix: nsx-t-ctl   # Without spaces, Generated controller would be nsx-t-ctrl-1.corp.local.io,...
 nsx_t_controller_vm_name_prefix: 'NSX-T Controller' # Generated edge host name would be "NSX-T Controller-1"
 nsx_t_controller_ips: 10.13.12.51,10.13.12.52,10.13.12.53 # Should be 1 or 3 ips to maintain quorum for Controller Cluster
 nsx_t_controller_root_pwd: VMware1!       # Min 8 chars, upper, lower, number, special digit
 nsx_t_controller_cluster_pwd: VMware1!    # Min 8 chars, upper, lower, number, special digit
-nsx_t_edge_host_prefix: nsx-t-edge        # Generated edge would be nsx-t-edge-1.corp.local.io,...
+nsx_t_edge_host_prefix: nsx-t-edge        # Without spaces, generated edge would be nsx-t-edge-1.corp.local.io,...
 nsx_t_edge_vm_name_prefix: 'NSX-T Edge'   # Generated edge host name would be "NSX-T Edge-1"
 nsx_t_edge_ips: 10.13.12.54,10.13.12.55   # comma separated ips, requires min 2 for HA
 nsx_t_edge_root_pwd: VMware1!

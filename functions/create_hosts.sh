@@ -17,6 +17,7 @@ nsx-controller0${count} \
   portgroup="$MGMT_PORTGROUP" \
   gw=$DEFAULTGATEWAY \
   mask=$NETMASK \
+  vmname="${NSX_T_CONTROLLER_VM_NAME_PREFIX}-0${count}" \
   hostname="${NSX_T_CONTROLLER_HOST_PREFIX}-0${count}" 
 EOF
     (( count++ ))
@@ -40,6 +41,7 @@ ${NSX_T_EDGE_HOST_PREFIX}-0${count}  \
   portgroup="$MGMT_PORTGROUP" \
   gw=$DEFAULTGATEWAY \
   mask=$NETMASK \
+  vmname="${NSX_T_EDGE_VM_NAME_PREFIX}-0${count}" \
   hostname="${NSX_T_EDGE_HOST_PREFIX}-0${count}" \
   portgroupExt="$NSX_T_EDGE_PORTGROUP_EXT" \
   portgroupTransport="$NSX_T_EDGE_PORTGROUP_TRANSPORT" 
@@ -86,7 +88,8 @@ nsx-manager  \
   portgroup="$MGMT_PORTGROUP" \
   gw=$DEFAULTGATEWAY \
   mask=$NETMASK \
-  hostname="$NSX_T_MANAGER_VM_NAME"
+  vmname="$NSX_T_MANAGER_VM_NAME" \
+  hostname="$NSX_T_MANAGER_HOST_NAME"
 
 [localhost:vars]
 
