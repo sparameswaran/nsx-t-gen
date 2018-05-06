@@ -107,6 +107,8 @@ resources:
   source:
     uri: https://github.com/sparameswaran/nsx-t-gen.git
     branch: master
+    params:
+      disable_git_lfs: true
 
 - name: nsxt-ansible
   type: git
