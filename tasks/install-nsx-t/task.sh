@@ -65,7 +65,13 @@ if [ "$NSX_MGR_OVA_DEPLOYED" != "true" ]; then
 	copy_ovas_to_OVA_ISO_PATH
 	create_customize_ova_params
 
-	ansible-playbook $DEBUG -i localhost customize_ovas.yml -e @customize_ova_vars.yml
+	if [ "$NSX_T_KEEP_RESERVATION" != "true" ]; then
+		echo "Reservation turned off, customizing the ovas to turn off reservation!!"
+		echo ""
+		ansible-playbook $DEBUG -i localhost customize_ovas.yml -e @customize_ova_vars.yml
+		echo ""
+	fi
+
     ansible-playbook $DEBUG -i hosts deploy_ovas.yml -e @extra_yaml_args.yml
     STATUS=$?
 
