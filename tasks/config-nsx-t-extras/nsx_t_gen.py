@@ -869,18 +869,17 @@ def add_loadbalancers():
       lbr_id = resp['id']
       print 'Created LBR: {}'.format(lbr['name'])
       print ''
-      return
+    else:
+      # Update existing LBR
+      lbr_id = existing_lbr['id']
 
-    # Update existing LBR
-    lbr_id = existing_lbr['id']
+      lbr_service_payload['_revision'] = existing_lbr['_revision']
+      lbr_service_payload['id'] = existing_lbr['id']    
 
-    lbr_service_payload['_revision'] = existing_lbr['_revision']
-    lbr_service_payload['id'] = existing_lbr['id']    
-
-    lbr_update_api_endpoint = '%s/%s' % (lbr_api_endpoint, lbr_id)
-    resp = client.put(lbr_update_api_endpoint, lbr_service_payload, check=False )
-    print 'Updated LBR: {}'.format(lbr['name'])
-    print ''
+      lbr_update_api_endpoint = '%s/%s' % (lbr_api_endpoint, lbr_id)
+      resp = client.put(lbr_update_api_endpoint, lbr_service_payload, check=False )
+      print 'Updated LBR: {}'.format(lbr['name'])
+      print ''
 
 def main():
   

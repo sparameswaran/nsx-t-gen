@@ -94,11 +94,14 @@ nsx_t_keep_reservation: true # for Prod setup
 
 # Controller is fixed to the 4 vCPU and 16 GB RAM
 # Change default size for deployment for edge and mgr
-nsx_t_mgr_deploy_size: small   # recommended for POCs, smaller setup
-nsx_t_edge_deploy_size: medium # recommended for POCs, smaller setup
+# Size of the edge determines size of loadbalancers and # of lbrs.
+# So, choose the size of edge based on requirements
+nsx_t_mgr_deploy_size: small   # Recommended for real barebones demo, smallest setup
+#nsx_t_edge_deploy_size: medium # Recommended for POCs, smaller setup (# of lbrs very limited)
+nsx_t_edge_deploy_size: large  # Recommended when 4 small lbrs are required
 
 # More control over memory and vcpu to use
-# Not exposed
+# Not exposed and support removed
 # nsx_t_sizing_spec: |
 #   nsx_t_sizing:
 #     mgr:
@@ -393,12 +396,13 @@ nsx_t_csr_request_spec: |
 # medium  |  100            |  300
 # large   | 1000            | 3000
 
-# No. of LBs per edge
-# Edge Size| Small LBs| Medium LBs| Large LBs
-# small    |    0     |   0       | 0
-# medium   |    1     |   0       | 0
-# large    |    4     |   1       | 1
-# Bare metal - not covered here
+# No. of LBs per edge based on size of edge
+# Edge Size | Small LBs| Medium LBs| Large LBs
+#
+# small     |    0     |   0       | 0
+# medium    |    1     |   0       | 0 # Recommended for running only PAS or PKS
+# large     |    4     |   1       | 1 # Recommended for running PAS + PKS
+# Bare metal - not handled here
 
 nsx_t_lbr_spec: |
   loadbalancers:
@@ -407,25 +411,25 @@ nsx_t_lbr_spec: |
     t1_router: T1-Router-PAS-ERT # Should match a previously declared T1 Router
     size: small                  # Allowed sizes: small, medium, large
     virtual_servers:
-    - name: goRouter443         # Name that signifies function being exposed
-      vip: 10.13.12.150         # Exposed VIP for LBR to listen on
+    - name: goRouter443          # Unique name that signifies function being exposed
+      vip: 10.13.12.150          # Exposed VIP for LBR to listen on
       port: 443
       members:
-      - ip: 192.168.24.31       # Internal ip of GoRouter instance 1
+      - ip: 192.168.24.31        # Internal ip of GoRouter instance 1
         port: 443
-      - ip: 192.168.24.32       # Internal ip of GoRouter instance 2
+      - ip: 192.168.24.32        # Internal ip of GoRouter instance 2
         port: 443
     - name: goRouter80
       vip: 10.13.12.150
       port: 80
       members:
-      - ip: 192.168.24.31       # Internal ip of GoRouter instance 1
+      - ip: 192.168.24.31        # Internal ip of GoRouter instance 1
         port: 80
-      - ip: 192.168.24.32       # Internal ip of GoRouter instance 2
+      - ip: 192.168.24.32        # Internal ip of GoRouter instance 2
         port: 80 
-    - name: sshProxy            # SSH Proxy exposed to outside
+    - name: sshProxy             # SSH Proxy exposed to outside
       vip: 10.13.12.151         
-      port: 2222                # Port 2222 for ssh proxy
+      port: 2222                 # Port 2222 for ssh proxy
       members:
-      - ip: 192.168.24.41       # Internal ip of Diego Brain where ssh proxy runs
+      - ip: 192.168.24.41        # Internal ip of Diego Brain where ssh proxy runs
         port: 2222
