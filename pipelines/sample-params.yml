@@ -38,9 +38,8 @@ esxi_hosts_config: |
 #   root_pwd: rootPasswd 
 
 # Edit fololowing parameters
-nsx_t_manager_fqdn: nsx-t-mgr.corp.local.io
-nsx_t_manager_host_name: 'nsx-t-mgr' # Without spaces
-nsx_t_manager_vm_name: 'NSX-T Mgr'   # Can have spaces
+nsx_t_manager_host_name: nsx-t-mgr.corp.local.io # Without spaces
+nsx_t_manager_vm_name: 'NSX-T Mgr'               # Can have spaces
 nsx_t_manager_ip: 10.13.12.50
 nsx_t_manager_admin_user: admin
 nsx_t_manager_admin_pwd: VMware1!         # Min 8 chars, upper, lower, number, special digit
@@ -374,7 +373,7 @@ nsx_t_nat_rules_spec: |
   
 nsx_t_csr_request_spec: |
   csr_request:
-    #common_name not required - would use nsx_t_manager_fqdn
+    #common_name not required - would use nsx_t_manager_host_name
     org_name: Company            # EDIT
     org_unit: net-integ          # EDIT
     country: US                  # EDIT

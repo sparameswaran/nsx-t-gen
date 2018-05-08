@@ -1,6 +1,8 @@
 #!/bin/bash
 
 function create_base_answerfile {
+	export NSX_T_MANAGER_SHORT_HOSTNAME=$(echo $NSX_T_MANAGER_FQDN | awk -F '\.' '{print $1}')
+
 	cat > answerfile.yml <<-EOF
 ovfToolPath: '/usr/bin'
 deployDataCenterName: "$VCENTER_DATACENTER"
@@ -29,7 +31,7 @@ controllerClusterPass: $NSX_T_CONTROLLER_CLUSTER_PWD
 
 managers:
   nsxmanager:
-    hostname: $NSX_T_MANAGER_HOST_NAME
+    hostname: $NSX_T_MANAGER_SHORT_HOSTNAME
     vmName: $NSX_T_MANAGER_VM_NAME
     ipAddress: $NSX_T_MANAGER_IP
     ovaFile: $NSX_T_MANAGER_OVA

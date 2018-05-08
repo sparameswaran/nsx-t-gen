@@ -496,6 +496,9 @@ def list_certs():
 def generate_self_signed_cert():
   
   nsx_t_manager_fqdn = os.getenv('NSX_T_MANAGER_FQDN')
+  if nsx_t_manager_fqdn is None:
+    nsx_t_manager_fqdn = os.getenv('NSX_T_MANAGER_HOST_NAME')
+
   csr_request = yaml.load(os.getenv('NSX_T_CSR_REQUEST_SPEC'))['csr_request']
   
   api_endpoint = TRUST_MGMT_CSRS_ENDPOINT

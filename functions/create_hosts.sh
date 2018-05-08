@@ -73,6 +73,8 @@ EOF
 
 function create_hosts { 
 
+export NSX_T_MANAGER_SHORT_HOSTNAME=$(echo $NSX_T_MANAGER_FQDN | awk -F '\.' '{print $1}')
+
 cat > hosts <<-EOF
 [localhost]
 localhost       ansible_connection=local
@@ -89,7 +91,7 @@ nsx-manager  \
   gw=$DEFAULTGATEWAY \
   mask=$NETMASK \
   vmname="$NSX_T_MANAGER_VM_NAME" \
-  hostname="$NSX_T_MANAGER_HOST_NAME"
+  hostname="$NSX_T_MANAGER_SHORT_HOSTNAME"
 
 [localhost:vars]
 
