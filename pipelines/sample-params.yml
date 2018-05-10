@@ -38,7 +38,7 @@ esxi_hosts_config: |
 #   root_pwd: rootPasswd 
 
 # Edit fololowing parameters
-nsx_t_manager_host_name: nsx-t-mgr.corp.local.io # Without spaces
+nsx_t_manager_host_name: nsx-t-mgr.corp.local.io # Set as FQDN, will be used also as certificate common name
 nsx_t_manager_vm_name: 'NSX-T Mgr'               # Can have spaces
 nsx_t_manager_ip: 10.13.12.50
 nsx_t_manager_admin_user: admin
@@ -55,6 +55,11 @@ nsx_t_edge_ips: 10.13.12.54,10.13.12.55   # comma separated ips, requires min 2 
 nsx_t_edge_root_pwd: VMware1!
 nsx_t_edge_portgroup_ext: vlan3032        # For external routing
 nsx_t_edge_portgroup_transport: vlan3127  # For TEP/overlay
+
+# If ova deployment succeeded but controller membership failed or edges didnt get to join for any reason
+# enable rerun of the configure controllers
+rerun_configure_controllers: false  # set it to true if you want to rerun the configure controllers 
+                                    # (as part of base ova install job) even as ova deployment succeeded
 
 # Edge network interfaces
 # Network1 and Network4 are for mgmt and not used for uplink
@@ -265,32 +270,6 @@ nsx_t_external_ip_pool_spec: |
 # Provide snat rules for outbound from either container or a vm by specifying the source_network (cidr) and translated network ip
 nsx_t_nat_rules_spec: |
   nat_rules:
-
-  # Sample entries for allowing inbound to Ops Mgr or some exposed service running on private network
-  # - t0_router: DefaultT0Router
-  #   nat_type: dnat
-  #   destination_network: 10.13.12.81   # External IP exposed
-  #   translated_network: 192.168.10.5     # Internal IP of VM (like ops mgr) on one of the logical switches
-  #   rule_priority: 1024                  # Higher priority
-  # # Sample entry for allowing outbound from Ops Mgr to external
-  # - t0_router: DefaultT0Router
-  #   nat_type: snat
-  #   source_network: 192.168.10.5         # This would be a VM (like ops mgr) on one of the logical switches
-  #   translated_network: 10.13.12.81    # Would appear to outside as coming from 10.193.162.81
-  #   rule_priority: 1024                  # Higher priority
-  # # Sample entry for allowing container ip to go outbound external
-  # - t0_router: DefaultT0Router
-  #   nat_type: snat
-  #   source_network: 10.4.0.0/20          # IP cidr should match the container ip block cidr
-  #   translated_network: 10.13.12.101  
-  #   rule_priority: 8000                  # Lower priority
-  # # Sample entry for allowing internal vm to go outbound external
-  # - t0_router: DefaultT0Router
-  #   nat_type: snat
-  #   source_network: 192.168.0.0/16       # IP cidr should match one or more logical switches cidr
-  #   translated_network: 10.13.12.111
-  #   rule_priority: 8001                  # Lower priority
-
   # Sample entry for allowing inbound to PAS Ops manager
   - t0_router: DefaultT0Router
     nat_type: dnat
@@ -331,17 +310,17 @@ nsx_t_nat_rules_spec: |
     translated_network: 10.13.12.3      # SNAT External Address for PAS networks
     rule_priority: 8001                  # Lower priority
 
-  # Sample entry for PKS PKS-Clusters network
-  - t0_router: DefaultT0Router
-    nat_type: snat
-    source_network: 192.168.40.0/24      # PKS Clusters network cidr
-    translated_network: 10.13.12.6       # SNAT External Address for PKS networks
-    rule_priority: 8001                  # Lower priority
-
   # Sample entry for PKS PKS-Infra network
   - t0_router: DefaultT0Router
     nat_type: snat
     source_network: 192.168.20.0/24      # PKS Infra network cidr
+    translated_network: 10.13.12.6       # SNAT External Address for PKS networks
+    rule_priority: 8001                  # Lower priority
+
+  # Sample entry for PKS PKS-Clusters network
+  - t0_router: DefaultT0Router
+    nat_type: snat
+    source_network: 192.168.40.0/24      # PKS Clusters network cidr
     translated_network: 10.13.12.6       # SNAT External Address for PKS networks
     rule_priority: 8001                  # Lower priority
 

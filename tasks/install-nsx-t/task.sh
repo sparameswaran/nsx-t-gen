@@ -87,12 +87,23 @@ if [ "$NSX_MGR_OVA_DEPLOYED" != "true" ]; then
 fi
 
 # Configure the controllers
-NO_OF_CONTROLLERS=$(curl -k -u "admin:$NSX_T_MANAGER_ADMIN_PWD" \
+NO_OF_EDGES_CONFIGURED=$(echo $NSX_T_EDGE_IPS | sed -e 's/,/ /g' | awk '{print NF}' )
+NO_OF_CONTROLLERS_CONFIGURED=$(echo $NSX_T_CONTROLLER_IPS | sed -e 's/,/ /g' | awk '{print NF}' )
+
+# Total number of controllers should be mgr + no of controllers
+EXPECTED_TOTAL_CONTROLLERS=$(expr 1 + $NO_OF_CONTROLLERS_CONFIGURED )
+
+# CURRENT_TOTAL_CONTROLLERS=$(curl -k -u "admin:$NSX_T_MANAGER_ADMIN_PWD" \
+#                     https://${NSX_T_MANAGER_IP}/api/v1/cluster/nodes \
+#                      2>/dev/null | jq '.results[].controller_role.type' | wc -l )
+CURRENT_TOTAL_CONTROLLERS=$(curl -k -u "admin:$NSX_T_MANAGER_ADMIN_PWD" \
                     https://${NSX_T_MANAGER_IP}/api/v1/cluster/nodes \
-                     2>/dev/null | jq '.results[].controller_role.type' | wc -l )
-if [ "$NO_OF_CONTROLLERS" -lt 2 ]; then
-	# There should 1 mgr + 1 contorller (or atmost 3 controllers). 
-	# So min count of 2 if already configured
+                     2>/dev/null | jq '.result_count' )
+
+if [[ $CURRENT_TOTAL_CONTROLLERS -ne $EXPECTED_TOTAL_CONTROLLERS -o "$RERUN_CONFIGURE_CONTROLLERS" == "true" ]]; then
+	# There should 1 mgr + 1 controller (or atmost 3 controllers). 
+	# So if the count does not match, or user requested rerun of configure controllers
+	echo "Configuring Controllers!!"
 	ansible-playbook $DEBUG -i hosts configure_controllers.yml -e @extra_yaml_args.yml
 	STATUS=$?
 else

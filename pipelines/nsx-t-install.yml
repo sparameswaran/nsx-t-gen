@@ -68,6 +68,7 @@ nsx_t_gen_params: &nsx-t-gen-params
   NSX_T_CSR_REQUEST_SPEC: ((nsx_t_csr_request_spec))
   NSX_T_LBR_SPEC: ((nsx_t_lbr_spec))
   ENABLE_ANSIBLE_DEBUG: ((enable_ansible_debug))
+  RERUN_CONFIGURE_CONTROLLERS: ((rerun_configure_controllers))
   
 groups:
 

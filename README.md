@@ -74,7 +74,7 @@ Use the sample params template file (under pipelines) to fill in the nsx-t, vsph
 Register the pipeline and params against concourse.
 
 ## Sample setup
-Copy over the sample params as nsx-t-params.yml and then use following script to register the pipeline (after eding the concourse endpoint, target etc.)
+Copy over the sample params as nsx-t-params.yml and then use following script to register the pipeline (after editing the concourse endpoint, target etc.)
 
 ```
 #!/bin/bash
