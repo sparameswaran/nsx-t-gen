@@ -1,8 +1,8 @@
 enable_ansible_debug: false # set value to true for verbose output from ansible
 
-vcenter_host: vcsa-01.corp.local.io       # EDIT
-vcenter_usr: administrator@vsphere.local  # EDIT
-vcenter_pwd: 39adladfasdfl!               # EDIT
+vcenter_host: vcsa-01.corp.local.io       # EDIT - this is for deployment of the ovas for the mgmt plane
+vcenter_usr: administrator@vsphere.local  # EDIT - this is for deployment of the ovas for the mgmt plane
+vcenter_pwd: 39adladfasdfl!               # EDIT - this is for deployment of the ovas for the mgmt plane
 vcenter_datacenter: Datacenter            # EDIT
 vcenter_datastore: Datastore              # EDIT
 vcenter_cluster: Cluster                  # EDIT
@@ -24,6 +24,10 @@ nsx_controller_ova: nsx-controller-2.1.0.0.0.7395493.ova
 nsx_edge_ova: nsx-edge-2.1.0.0.0.7395502.ova  
 ovftool_image: VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle
 
+# The Esxi Hosts can be added to transport nodes in two ways: 
+# a) specify the esxi hosts individually - first checked for
+# b) or use compute_vcenter_manager to add hosts under a specific vcenter as transport nodes
+
 # Specify passwd of the esxi hosts that should be used for nsx-t
 esxi_hosts_root_pwd: rootPasswd  # EDIT - Root password for the esxi hosts
 
@@ -36,6 +40,15 @@ esxi_hosts_config: |
 # - name: esxi-host2.corp.local.io
 #   ip: 10.13.12.11
 #   root_pwd: rootPasswd 
+
+# Using compute manager to specify esxi hosts
+compute_vcenter_manager: # vcenter-01               # If filled, then comment off the esxi_hosts_config
+compute_vcenter_host: # vcsa-01.corp.local.io       # for addition of Compute vCenter Esxi hosts as transport node
+compute_vcenter_usr: # administrator@vsphere.local  # for addition of Compute vCenter Esxi hosts as transport node
+compute_vcenter_pwd: # 39adladfasdfl!               # for addition of Compute vCenter Esxi hosts as transport node
+compute_vcenter_cluster: # Cluster                  # for addition of Compute vCenter Esxi hosts as transport node
+
+
 
 # Edit fololowing parameters
 nsx_t_manager_host_name: nsx-t-mgr.corp.local.io # Set as FQDN, will be used also as certificate common name
@@ -69,7 +82,7 @@ rerun_configure_controllers: false  # set it to true if you want to rerun the co
 nsx_t_edge_overlay_interface: fp-eth1 # Wired to Network3
 nsx_t_edge_uplink_interface: fp-eth0  # Wired to Network2
 
-# Tunnel endpoint network ip pool
+# Tunnel endpoint network ip pool - change pool_end based on # of members in the tep pool
 nsx_t_tep_pool_name: tep-ip-pool
 nsx_t_tep_pool_cidr: 192.168.213.0/24
 nsx_t_tep_pool_gateway: 192.168.213.1
@@ -138,12 +151,12 @@ nsx_t_single_uplink_profile_name: "single-uplink-profile"
 nsx_t_single_uplink_profile_mtu: 1600 # Min 1600
 nsx_t_single_uplink_profile_vlan: 0 # Default
 
-# For internal overlay connection used by Edge & Esxi hosts
+# For internal overlay connection used by Esxi hosts
 nsx_t_overlay_profile_name: "host-overlay-profile"
 nsx_t_overlay_profile_mtu: 1600 # Min 1600
 nsx_t_overlay_profile_vlan: 0
 
-# Specify a free vmnic on esxi host to be used for nsx-t
+# Specify an unused vmnic on esxi host to be used for nsx-t
 # can be multiple vmnics separated by comma
 nsx_t_esxi_vmnics: vmnic1 # vmnic1,vmnic2...
 
@@ -183,38 +196,38 @@ nsx_t_t1router_logical_switches_spec: |
   - name: T1-Router-PAS-Infra
     switches:
     - name: PAS-Infra
-      subnet_ip: 192.168.10.1 # Last octet should be 1 rather than 0
+      logical_switch_gw: 192.168.10.1 # Last octet should be 1 rather than 0
       subnet_mask: 26
 
   - name: T1-Router-PAS-ERT
     switches:
     - name: PAS-ERT
-      subnet_ip: 192.168.24.1 # Last octet should be 1 rather than 0
+      logical_switch_gw: 192.168.24.1 # Last octet should be 1 rather than 0
       subnet_mask: 26
 
   - name: T1-Router-PAS-Services
     switches:
     - name: PAS-Services
-      subnet_ip: 192.168.28.1 # Last octet should be 1 rather than 0
+      logical_switch_gw: 192.168.28.1 # Last octet should be 1 rather than 0
       subnet_mask: 26
 
   - name: T1-Router-PAS-DynamicServices
     switches:
     - name: PAS-DynamicServices
-      subnet_ip: 192.168.30.1 # Last octet should be 1 rather than 0
+      logical_switch_gw: 192.168.30.1 # Last octet should be 1 rather than 0
       subnet_mask: 22
 
   # Comment off the following T1 Routers if there is no PKS
   - name: T1-Router-PKS-Infra
     switches:
     - name: PKS-Deployment
-      subnet_ip: 192.168.20.1 # Last octet should be 1 rather than 0
+      logical_switch_gw: 192.168.20.1 # Last octet should be 1 rather than 0
       subnet_mask: 22
 
   - name: T1Router-PKS-Clusters
     switches:
     - name: PKS-PKS-Clusters
-      subnet_ip: 192.168.40.1 # Last octet should be 1 rather than 0
+      logical_switch_gw: 192.168.40.1 # Last octet should be 1 rather than 0
       subnet_mask: 22
 
 
@@ -246,7 +259,7 @@ nsx_t_container_ip_block_spec: |
 # Add additional exernal ip pools as needed
 nsx_t_external_ip_pool_spec: |
   external_ip_pools:
-  - name: external-ip-pool-for-pas
+  - name: snat-vip-pool-for-pas
     cidr: 10.100.0.0/24
     gateway: 10.100.0.1
     start: 10.100.0.10 # Should not include gateway
@@ -255,7 +268,7 @@ nsx_t_external_ip_pool_spec: |
       ncp/cluster: 'pas1'   # Should match the top level ncp/cluster tag value for PAS
       ncp/external: 'true'  # Required for external facing ips
       testtag: 'testpas1'      
-  - name: external-ip-pool-for-pks
+  - name: snat-vip-pool-for-pks
     cidr: 10.200.0.0/24
     gateway: 10.200.0.1
     start: 10.200.0.10 # Should not include gateway

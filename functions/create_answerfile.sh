@@ -29,6 +29,12 @@ api_origin: 'localhost'
 
 controllerClusterPass: $NSX_T_CONTROLLER_CLUSTER_PWD
 
+compute_vcenter_host: "$COMPUTE_VCENTER_HOST"
+compute_vcenter_user: "$COMPUTE_VCENTER_USR"
+compute_vcenter_password: "$COMPUTE_VCENTER_PWD"
+compute_vcenter_cluster: "$COMPUTE_VCENTER_CLUSTER"
+compute_vcenter_manager: "$COMPUTE_VCENTER_MANAGER"
+
 managers:
   nsxmanager:
     hostname: $NSX_T_MANAGER_SHORT_HOSTNAME

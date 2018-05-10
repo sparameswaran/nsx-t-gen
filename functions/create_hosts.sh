@@ -109,6 +109,12 @@ deployVcPassword="$VCENTER_PWD"
 compute_manager="$VCENTER_MANAGER"
 cm_cluster="$VCENTER_CLUSTER"
 
+compute_vcenter_host="$COMPUTE_VCENTER_HOST"
+compute_vcenter_user="$COMPUTE_VCENTER_USR"
+compute_vcenter_password="$COMPUTE_VCENTER_PWD"
+compute_vcenter_cluster="$COMPUTE_VCENTER_CLUSTER"
+compute_vcenter_manager="$COMPUTE_VCENTER_MANAGER"
+
 nsxAdminPass="$NSX_T_MANAGER_ADMIN_PWD"
 nsxCliPass="$NSX_T_MANAGER_ROOT_PWD"
 
