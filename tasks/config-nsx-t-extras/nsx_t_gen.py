@@ -512,7 +512,7 @@ def generate_self_signed_cert():
   #tokens = csr_request['common_name'].split('.')
   tokens = nsx_t_manager_fqdn.split('.')
   if len(tokens) < 3:
-    print('Error!! CSR common name is not a full qualified domain name (provided as nsx mgr FQDN): {}!!'.format(csr_request['common_name']))
+    print('Error!! CSR common name is not a full qualified domain name (provided as nsx mgr FQDN): {}!!'.format(nsx_t_manager_fqdn))
     exit(-1)
 
   payload = { 
