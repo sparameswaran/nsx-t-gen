@@ -93,14 +93,31 @@ NO_OF_CONTROLLERS_CONFIGURED=$(echo $NSX_T_CONTROLLER_IPS | sed -e 's/,/ /g' | a
 # Total number of controllers should be mgr + no of controllers
 EXPECTED_TOTAL_CONTROLLERS=$(expr 1 + $NO_OF_CONTROLLERS_CONFIGURED )
 
+CURRENT_TOTAL_EDGES=$(curl -k -u "admin:$NSX_T_MANAGER_ADMIN_PWD" \
+                    https://${NSX_T_MANAGER_IP}/api/v1/fabric/nodes \
+                     2>/dev/null | jq '.result_count' )
+
 # CURRENT_TOTAL_CONTROLLERS=$(curl -k -u "admin:$NSX_T_MANAGER_ADMIN_PWD" \
 #                     https://${NSX_T_MANAGER_IP}/api/v1/cluster/nodes \
 #                      2>/dev/null | jq '.results[].controller_role.type' | wc -l )
 CURRENT_TOTAL_CONTROLLERS=$(curl -k -u "admin:$NSX_T_MANAGER_ADMIN_PWD" \
                     https://${NSX_T_MANAGER_IP}/api/v1/cluster/nodes \
                      2>/dev/null | jq '.result_count' )
+if [ $CURRENT_TOTAL_CONTROLLERS -ne $EXPECTED_TOTAL_CONTROLLERS ]; then
+	RERUN_CONFIGURE_CONTROLLERS=true
+	echo "Total # of Controllers [$CURRENT_TOTAL_CONTROLLERS] not matching expected count of (mgr + $EXPECTED_TOTAL_CONTROLLERS) !!"
+	echo "Will run configure controllers!"
+	echo ""
+fi
 
-if [ $CURRENT_TOTAL_CONTROLLERS -ne $EXPECTED_TOTAL_CONTROLLERS -o "$RERUN_CONFIGURE_CONTROLLERS" == "true" ]; then
+if [ $NO_OF_EDGES_CONFIGURED -ne $CURRENT_TOTAL_EDGES ]; then
+	RERUN_CONFIGURE_CONTROLLERS=true
+	echo "Total # of Edges [$CURRENT_TOTAL_EDGES] not matching expected count of $NO_OF_EDGES_CONFIGURED !!"
+	echo "Will run configure controllers!"
+	echo ""
+fi
+
+if [ "$RERUN_CONFIGURE_CONTROLLERS" == "true" ]; then
 	# There should 1 mgr + 1 controller (or atmost 3 controllers). 
 	# So if the count does not match, or user requested rerun of configure controllers
 	echo "Configuring Controllers!!"

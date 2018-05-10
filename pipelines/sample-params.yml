@@ -1,5 +1,6 @@
 enable_ansible_debug: false # set value to true for verbose output from ansible
 
+# vCenter details to deploy the Mgmt OVAs (Mgr, Edge, Controller)
 vcenter_host: vcsa-01.corp.local.io       # EDIT - this is for deployment of the ovas for the mgmt plane
 vcenter_usr: administrator@vsphere.local  # EDIT - this is for deployment of the ovas for the mgmt plane
 vcenter_pwd: 39adladfasdfl!               # EDIT - this is for deployment of the ovas for the mgmt plane
@@ -7,6 +8,8 @@ vcenter_datacenter: Datacenter            # EDIT
 vcenter_datastore: Datastore              # EDIT
 vcenter_cluster: Cluster                  # EDIT
 vcenter_manager: vcenter-1                # EDIT
+
+# OVA general network settings
 ntpservers: 10.13.12.2                    # EDIT
 mgmt_portgroup: 'VM Network'              # EDIT
 dnsserver: 10.13.12.2                     # EDIT
@@ -42,6 +45,7 @@ esxi_hosts_config: |
 #   root_pwd: rootPasswd 
 
 # Using compute manager to specify esxi hosts
+# If filled, then comment off the esxi_hosts_config
 compute_vcenter_manager: # vcenter-01               # If filled, then comment off the esxi_hosts_config
 compute_vcenter_host: # vcsa-01.corp.local.io       # for addition of Compute vCenter Esxi hosts as transport node
 compute_vcenter_usr: # administrator@vsphere.local  # for addition of Compute vCenter Esxi hosts as transport node
