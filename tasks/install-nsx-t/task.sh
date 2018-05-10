@@ -100,7 +100,7 @@ CURRENT_TOTAL_CONTROLLERS=$(curl -k -u "admin:$NSX_T_MANAGER_ADMIN_PWD" \
                     https://${NSX_T_MANAGER_IP}/api/v1/cluster/nodes \
                      2>/dev/null | jq '.result_count' )
 
-if [[ $CURRENT_TOTAL_CONTROLLERS -ne $EXPECTED_TOTAL_CONTROLLERS -o "$RERUN_CONFIGURE_CONTROLLERS" == "true" ]]; then
+if [ $CURRENT_TOTAL_CONTROLLERS -ne $EXPECTED_TOTAL_CONTROLLERS -o "$RERUN_CONFIGURE_CONTROLLERS" == "true" ]; then
 	# There should 1 mgr + 1 controller (or atmost 3 controllers). 
 	# So if the count does not match, or user requested rerun of configure controllers
 	echo "Configuring Controllers!!"
