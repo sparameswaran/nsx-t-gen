@@ -7,6 +7,13 @@ function install_ovftool {
 	  pushd $ROOT_DIR/ovftool
 	  ovftool_bundle=$(ls *)
 	  chmod +x $ovftool_bundle
+	  is_binary=$(file $ovftool_bundle | grep "executable")
+	  if [ "$is_binary" == "" ]; then
+		echo "ovftool downloaded was not a valid binary image!!"
+		echo "Check the file name/paths. Exiting from ova copy and deploy!!"
+		exit 1
+	  fi
+
 	  ./${ovftool_bundle} --eulas-agreed
 	  popd
 	  echo "Done installing ovftool"
@@ -16,9 +23,26 @@ function install_ovftool {
 	echo ""	
 }
 
+function check_ovas {
+
+	for ova_file in "$ROOT_DIR/nsx-mgr-ova/$NSX_T_MANAGER_OVA \
+	   $ROOT_DIR/nsx-ctrl-ova/$NSX_T_CONTROLLER_OVA \
+	   $ROOT_DIR/nsx-edge-ova/$NSX_T_EDGE_OVA "
+	do
+		is_tar=$(file $ova_file | grep "tar archive")
+		if [ "$is_tar" == "" ]; then
+			echo "File $ova_file downloaded was not a valid OVA image!!"
+			echo "Check the file name/paths. Exiting from ova copy and deploy!!"
+			exit 1
+		fi
+	done
+}
+
 function copy_ovas_to_OVA_ISO_PATH {
 
 	mkdir -p $OVA_ISO_PATH
+	check_ovas
+
 	cp $ROOT_DIR/nsx-mgr-ova/$NSX_T_MANAGER_OVA \
 	   $ROOT_DIR/nsx-ctrl-ova/$NSX_T_CONTROLLER_OVA \
 	   $ROOT_DIR/nsx-edge-ova/$NSX_T_EDGE_OVA \

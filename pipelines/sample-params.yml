@@ -17,14 +17,17 @@ dnsdomain: corp.local.io                  # EDIT
 defaultgateway: 10.13.12.1                # EDIT
 netmask: 255.255.255.0                    # EDIT
 
-# Download NSX-T 2.1 bits from
-# https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-210&productId=673
 # Host a Webserver to serve the ova images and ovftool
 # Please edit the endpoint and the file names
 nsx_image_webserver: http://10.85.24.5:9080/
+
+# Download NSX-T 2.1 bits from
+# https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-210&productId=673
 nsx_mgr_ova: nsx-unified-appliance-2.1.0.0.0.7395503.ova  
 nsx_controller_ova: nsx-controller-2.1.0.0.0.7395493.ova  
 nsx_edge_ova: nsx-edge-2.1.0.0.0.7395502.ova  
+# Ensure ovftool is minimally v4.2
+# https://my.vmware.com/group/vmware/details?productId=614&downloadGroup=OVFTOOL420#
 ovftool_image: VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle
 
 # The Esxi Hosts can be added to transport nodes in two ways: 
@@ -44,15 +47,15 @@ esxi_hosts_config: |
 #   ip: 10.13.12.11
 #   root_pwd: rootPasswd 
 
-# Using compute manager to specify esxi hosts
-# If filled, then comment off the esxi_hosts_config
-compute_vcenter_manager: # vcenter-01               # If filled, then comment off the esxi_hosts_config
-compute_vcenter_host: # vcsa-01.corp.local.io       # for addition of Compute vCenter Esxi hosts as transport node
-compute_vcenter_usr: # administrator@vsphere.local  # for addition of Compute vCenter Esxi hosts as transport node
-compute_vcenter_pwd: # 39adladfasdfl!               # for addition of Compute vCenter Esxi hosts as transport node
-compute_vcenter_cluster: # Cluster                  # for addition of Compute vCenter Esxi hosts as transport node
-
-
+# Using a separate compute manager to specify esxi hosts
+# If filled, then change the the esxi_hosts_config section to be empty 
+# Sample empty config: 
+# esxi_hosts_config: # Provide space after colon
+compute_vcenter_manager: # EDIT - If filled, then comment off the esxi_hosts_config
+compute_vcenter_host: #    EDIT - Use Compute vCenter Esxi hosts as transport node
+compute_vcenter_usr: #     EDIT -  Use Compute vCenter Esxi hosts as transport node
+compute_vcenter_pwd: #     EDIT - Use Compute vCenter Esxi hosts as transport node
+compute_vcenter_cluster: # EDIT - Use Compute vCenter Esxi hosts as transport node
 
 # Edit fololowing parameters
 nsx_t_manager_host_name: nsx-t-mgr.corp.local.io # Set as FQDN, will be used also as certificate common name

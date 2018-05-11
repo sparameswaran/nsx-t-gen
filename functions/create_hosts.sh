@@ -54,21 +54,27 @@ EOF
 function create_esxi_hosts {
   echo "$ESXI_HOSTS_CONFIG" > /tmp/esxi_hosts_config.yml
   echo "[nsxtransportnodes]" > esxi_hosts
+  
+  # if the esxi_hosts config is not empty
+  if [ "$ESXI_HOSTS_CONFIG" != "" ]; then
+   
+    length=$(expr $(cat /tmp/esxi_hosts_config.yml  | shyaml get-values esxi_hosts | grep name: | wc -l) - 1 || true )
+    for index in $(seq 0 $length)
+    do
+      ESXI_INSTANCE_HOST=$(cat /tmp/esxi_hosts_config.yml  | shyaml get-value esxi_hosts.${index}.name)
+      ESXI_INSTANCE_IP=$(cat /tmp/esxi_hosts_config.yml  | shyaml get-value esxi_hosts.${index}.ip)
+      ESXI_INSTANCE_PWD=$(cat /tmp/esxi_hosts_config.yml  | shyaml get-value esxi_hosts.${index}.root_pwd)
+      if [ "$ESXI_INSTANCE_PWD" == "" ]; then
+        ESXI_INSTANCE_PWD=$ESXI_HOSTS_ROOT_PWD
+      fi
 
-  length=$(expr $(cat /tmp/esxi_hosts_config.yml  | shyaml get-values esxi_hosts | grep name: | wc -l) - 1 || true )
-  for index in $(seq 0 $length)
-  do
-    ESXI_INSTANCE_HOST=$(cat /tmp/esxi_hosts_config.yml  | shyaml get-value esxi_hosts.${index}.name)
-    ESXI_INSTANCE_IP=$(cat /tmp/esxi_hosts_config.yml  | shyaml get-value esxi_hosts.${index}.ip)
-    ESXI_INSTANCE_PWD=$(cat /tmp/esxi_hosts_config.yml  | shyaml get-value esxi_hosts.${index}.root_pwd)
-    if [ "$ESXI_INSTANCE_PWD" == "" ]; then
-      ESXI_INSTANCE_PWD=$ESXI_HOSTS_ROOT_PWD
-    fi
-
-    cat >> esxi_hosts <<-EOF
+      cat >> esxi_hosts <<-EOF
 $ESXI_INSTANCE_HOST  ansible_ssh_host=$ESXI_INSTANCE_IP   ansible_ssh_user=root ansible_ssh_pass=$ESXI_INSTANCE_PWD
 EOF
-  done
+    done
+  else
+    echo "" >> esxi_hosts 
+  fi
 }
 
 function create_hosts { 
