@@ -53,11 +53,15 @@ EOF
 
 function create_esxi_hosts {
   echo "$ESXI_HOSTS_CONFIG" > /tmp/esxi_hosts_config.yml
-  echo "[nsxtransportnodes]" > esxi_hosts
-  
-  # if the esxi_hosts config is not empty
-  if [ "$ESXI_HOSTS_CONFIG" != "" ]; then
+  touch esxi_hosts
+
+  is_valid_yml=$(cat /tmp/esxi_hosts_config.yml  | shyaml get-values esxi_hosts || true)
+
+  # Check if the esxi_hosts config is not empty and is valid
+  if [ "$ESXI_HOSTS_CONFIG" != "" -a "$is_valid_yml" != "" ]; then
    
+    echo "[nsxtransportnodes]" > esxi_hosts
+  
     length=$(expr $(cat /tmp/esxi_hosts_config.yml  | shyaml get-values esxi_hosts | grep name: | wc -l) - 1 || true )
     for index in $(seq 0 $length)
     do
@@ -73,6 +77,8 @@ $ESXI_INSTANCE_HOST  ansible_ssh_host=$ESXI_INSTANCE_IP   ansible_ssh_user=root 
 EOF
     done
   else
+    echo "esxi_hosts_config not set to valid yaml, so ignoring it"
+    echo "Would use computer manager configs to add hosts!!"
     echo "" >> esxi_hosts 
   fi
 }
@@ -163,10 +169,7 @@ edge_cluster="$NSX_T_EDGE_CLUSTER"
 
 EOF
 
-  if  [ ! -z "$ESXI_HOSTS_CONFIG" ]; then
-    create_esxi_hosts
-  fi
-
+  
   create_edge_hosts
   create_controller_hosts
 
@@ -174,7 +177,12 @@ EOF
   echo "" >> hosts
   cat edge_vms >> hosts
   echo "" >> hosts
-  cat esxi_hosts >> hosts
-  echo "" >> hosts
+  
+  if  [ ! -z "$ESXI_HOSTS_CONFIG" ]; then
+    create_esxi_hosts
+    cat esxi_hosts >> hosts
+    echo "" >> hosts
+  fi
+
 }
 
