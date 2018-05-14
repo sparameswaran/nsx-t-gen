@@ -906,11 +906,12 @@ def main():
   # #print_t0_route_nat_rules()
   add_t0_route_nat_rules()
 
-  # Generate self-signed cert
-  generate_self_signed_cert()
-
   # Add Loadbalancers, update if already existing
   add_loadbalancers()
 
+  # Push this to the last step as the login gets kicked off
+  # Generate self-signed cert
+  generate_self_signed_cert()
+  
 if __name__ == '__main__':
   main()
