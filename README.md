@@ -25,13 +25,25 @@ Not handled by pipeline:
 ## Warning
 This is purely a trial work-in-progress and not officially supported by anyone. Use caution while using it at your own Risk!!.
 
+Also, NSX-T cannot co-reside on the same ESXi Host & Cluster as one already running NSX-V. So, ensure you are either using a different set of vCenter, Clusters and hosts or atleast the cluster that does not have NSX-V. Also, the ESXi hosts should be atleast 6.5. Please refer to NSX-T Documentation for detailed set of requirements for NSX-T.
+
 ## Pre-reqs
 * Concourse setup
-* There should be atleast one free vmnic on each of the ESXI hosts
+- If using [docker-compose to bring up local Concourse](https://github.com/concourse/concourse-docker) and there is a web proxy, make sure to specify the proxy server and dns details following the template provided in [docs/docker-compose.yml](docs/docker-compose.yml)
+```
+
+```
+* There should be atleast one free vmnic on each of the ESXi hosts
 * Ovftool would fail to deploy the Edge VMs in the absence of `VM Network` or standard switch (non NSX-T) with `Host did not have any virtual network defined` error message. So, ensure presence of either one.
-* Web server to serve the ova images and ovftool
 * Docker hub connectivity to pull docker image for the concourse pipeline
 * NSX-T 2.1 ova images and ovftool install bits for linux
+* Web server to serve the NSX-T ova images and ovftool
+``` 
+# Sample nginx server to host bits
+sudo apt-get nginx
+cp <*ova> <VMware-ovftool*.bundle> /var/www/html
+# Edit nginx config and start
+```
 * vCenter Access
 
 ## Offline envs
