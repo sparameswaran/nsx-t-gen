@@ -30,9 +30,6 @@ Also, NSX-T cannot co-reside on the same ESXi Host & Cluster as one already runn
 ## Pre-reqs
 * Concourse setup
 - If using [docker-compose to bring up local Concourse](https://github.com/concourse/concourse-docker) and there is a web proxy, make sure to specify the proxy server and dns details following the template provided in [docs/docker-compose.yml](docs/docker-compose.yml)
-```
-
-```
 * There should be atleast one free vmnic on each of the ESXi hosts
 * Ovftool would fail to deploy the Edge VMs in the absence of `VM Network` or standard switch (non NSX-T) with `Host did not have any virtual network defined` error message. So, ensure presence of either one.
 * Docker hub connectivity to pull docker image for the concourse pipeline
