@@ -103,14 +103,14 @@ CURRENT_TOTAL_EDGES=$(curl -k -u "admin:$NSX_T_MANAGER_ADMIN_PWD" \
 CURRENT_TOTAL_CONTROLLERS=$(curl -k -u "admin:$NSX_T_MANAGER_ADMIN_PWD" \
                     https://${NSX_T_MANAGER_IP}/api/v1/cluster/nodes \
                      2>/dev/null | jq '.result_count' )
-if [ $CURRENT_TOTAL_CONTROLLERS -ne $EXPECTED_TOTAL_CONTROLLERS ]; then
+if [ "$CURRENT_TOTAL_CONTROLLERS" != "$EXPECTED_TOTAL_CONTROLLERS" ]; then
 	RERUN_CONFIGURE_CONTROLLERS=true
 	echo "Total # of Controllers [$CURRENT_TOTAL_CONTROLLERS] not matching expected count of (mgr + $EXPECTED_TOTAL_CONTROLLERS) !!"
 	echo "Will run configure controllers!"
 	echo ""
 fi
 
-if [ $NO_OF_EDGES_CONFIGURED -ne $CURRENT_TOTAL_EDGES ]; then
+if [ "$NO_OF_EDGES_CONFIGURED" != "$CURRENT_TOTAL_EDGES" ]; then
 	RERUN_CONFIGURE_CONTROLLERS=true
 	echo "Total # of Edges [$CURRENT_TOTAL_EDGES] not matching expected count of $NO_OF_EDGES_CONFIGURED !!"
 	echo "Will run configure controllers!"
