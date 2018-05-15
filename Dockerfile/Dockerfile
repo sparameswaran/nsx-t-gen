@@ -50,7 +50,8 @@ RUN pip install \
 					cffi \
 					cryptography \
 					enum34 \
-	&& pip uninstall -y enum
+					pyasn1==0.4.1 \
+	&& pip uninstall -y enum 
 
 # Add ansible support
 RUN apt-get update \
@@ -67,13 +68,14 @@ RUN apt-get update \
 
 
 # Add nsx-t python sdk and runtime libraries
-# COPY ./nsx_python_sdk-*.whl .
-# COPY ./vapi_runtime-*.whl .
-# COPY ./vapi_common-*.whl .
-# COPY ./vapi_common_client-*.whl .
-# RUN pip install nsx_python_sdk-*.whl \
-#        vapi_runtime-*.whl vapi_common-*.whl \
-#        vapi_common_client-*.whl
+COPY ./nsx_python_sdk-*.whl .
+COPY ./vapi_runtime-*.whl .
+COPY ./vapi_common-*.whl .
+COPY ./vapi_common_client-*.whl .
+RUN pip install nsx_python_sdk-*.whl \
+        vapi_runtime-*.whl \
+        vapi_common-*.whl \
+        vapi_common_client-*.whl
 
 # Overwrite the pyopenssl 0.15.1 with 17.5.0 as ansible breaks otherwise
-RUN pip install -U pyopenssl==17.5.0
+RUN pip install -U pyopenssl==17.5.0 
