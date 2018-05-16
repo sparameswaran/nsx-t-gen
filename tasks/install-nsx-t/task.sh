@@ -19,23 +19,45 @@ source $FUNCTIONS_DIR/create_answerfile.sh
 source $FUNCTIONS_DIR/create_hosts.sh
 source $FUNCTIONS_DIR/create_extra_yaml_args.sh
 
+function check_status_up {
+	ip_set=$1
+	type_of_resource=$2
+	status_up=true
+
+	resources_down_count=0
+	resources_configured=$(echo $ip_set | sed -e 's/,/ /g' | awk '{print NF}' )
+	for resource_ip in $(echo $ip_set | sed -e 's/,/ /g' )
+	do
+		status=$(nc -vz ${resource_ip} 22 2>&1 | grep -i succeeded || true)
+		if [ "$status" == "" ]; then
+			status_up=false
+			resources_down_count=$(expr $resources_down_count + 1)
+		fi
+	done
+
+	if [ "$status_up" == "true" ]; then
+		echo "true"
+		return
+	fi
+
+  if [ "$resources_down_count" != "$resources_configured" ]; then
+      (>&2 echo "Mismatch in number of VMs of type ${type_of_resource} that are expected to be up!!")
+      (>&2 echo "Configured ${type_of_resource} VM total: ${resources_configured}, VM down: ${resources_down_count}")
+      (>&2 echo "Delete pre-created vms of type ${type_of_resource} and start over!!")
+      (>&2 echo "Exiting now !!")      
+      exit -1
+  else
+      (>&2 echo "All VMs of type ${type_of_resource} down, total: ${resources_configured}")
+      (>&2 echo "Would start with deployment of ${type_of_resource} ovas")
+	fi
+
+	echo "false"
+	return
+}
+
 DEBUG=""
 if [ "$ENABLE_ANSIBLE_DEBUG" == "true" ]; then
   DEBUG="-vvv"
-fi
-
-# Check if NSX MGR is up or not
-nsx_mgr_up_status=$(curl -s -o /dev/null -I -w "%{http_code}" -k \
-	                 https://${NSX_T_MANAGER_IP}:443/login.jsp \
-	                 2>/dev/null || true)
-
-# Deploy the ovas if its not up
-if [ $nsx_mgr_up_status -ne 200 ]; then
-  echo "NSX Mgr not up yet, deploying the ovas followed by configuration of the NSX-T Mgr!!" 
-  NSX_MGR_OVA_DEPLOYED=false
-else
-  echo "NSX Mgr up already, skipping deploying of the ovas!!"
-  NSX_MGR_OVA_DEPLOYED=true
 fi
 
 create_hosts
@@ -44,23 +66,20 @@ create_ansible_cfg
 create_extra_yaml_args
 create_customize_ova_params
 
-# if [ -z "$SUPPORT_NSX_VMOTION" -o "$SUPPORT_NSX_VMOTION" == "false" ]; then
-#   echo "Skipping vmks configuration for NSX-T Mgr!!" 
-#   echo 'configure_vmks: False' >> answerfile.yml
-  
-# else
-#   echo "Allowing vmks configuration for NSX-T Mgr!!" 
-#   echo 'configure_vmks: True' >> answerfile.yml
-# fi
-
 cp hosts answerfile.yml ansible.cfg extra_yaml_args.yml customize_ova_vars.yml nsxt-ansible/.
 cd nsxt-ansible
 
 echo ""
 
+# Check if the status and count of Mgr, Ctrl, Edge
+nsx_mgr_up_status=$(check_status_up $NSX_T_CONTROLLER_IPS "NSX Mgr")
+nsx_controller_up_status=$(check_status_up $NSX_T_CONTROLLER_IPS "NSX Controller")
+nsx_edge_up_status=$(check_status_up $NSX_T_EDGE_IPS "NSX Edge")
+
 STATUS=0
-# Deploy the ovas if its not up
-if [ "$NSX_MGR_OVA_DEPLOYED" != "true" ]; then
+# Copy over the ovas if any of the resources are not up
+if [ "$nsx_mgr_up_status" != "true" -o  "$nsx_controller_up_status" != "true" -o "$nsx_edge_up_status" != "true" ]; then
+	echo "Detected one of the vms (mgr, controller, edge) are not yet up, preparing the ovas"
 	install_ovftool
 	copy_ovas_to_OVA_ISO_PATH
 	create_customize_ova_params
@@ -71,20 +90,77 @@ if [ "$NSX_MGR_OVA_DEPLOYED" != "true" ]; then
 		ansible-playbook $DEBUG -i localhost customize_ovas.yml -e @customize_ova_vars.yml
 		echo ""
 	fi
+fi
 
-    ansible-playbook $DEBUG -i hosts deploy_ovas.yml -e @extra_yaml_args.yml
-    STATUS=$?
+
+# Deploy the Mgr ova if its not up
+if [ "$nsx_mgr_up_status" != "true" ]; then
+	ansible-playbook $DEBUG -i hosts deploy_mgr.yml -e @extra_yaml_args.yml
+	STATUS=$?
 
 	if [[ $STATUS != 0 ]]; then
-		echo "Deployment of ovas failed, vms failed to come up!!"
+		echo "Deployment of NSX Mgr OVA failed, vm failed to come up!!"
 		echo "Check error logs"
 		echo ""
 		exit $STATUS
 	else
-		echo "Deployment of ovas succcessfull!, continuing with configuration of controllers!!"
+		echo "Deployment of NSX Mgr ova succcessfull!! Continuing with rest of configuration!!"
 		echo ""
 	fi
+else
+	echo "NSX Mgr up already, skipping deploying of the Mgr ova!!"
 fi
+
+if [ "$nsx_controller_up_status" != "true" ]; then
+	ansible-playbook $DEBUG -i hosts deploy_ctrl.yml -e @extra_yaml_args.yml
+	STATUS=$?
+
+	if [[ $STATUS != 0 ]]; then
+		echo "Deployment of NSX Controller OVA failed, vms failed to come up!!"
+		echo "Check error logs"
+		echo ""
+		exit $STATUS
+	else
+		echo "Deployment of NSX Controller ova succcessfull!! Continuing with rest of configuration!!"
+		echo ""
+	fi
+else
+	echo "NSX Controllers up already, skipping deploying of the Controller ova!!"
+fi
+
+
+if [ "$nsx_edge_up_status" != "true" ]; then
+	ansible-playbook $DEBUG -i hosts deploy_edge.yml -e @extra_yaml_args.yml
+	STATUS=$?
+
+	if [[ $STATUS != 0 ]]; then
+		echo "Deployment of NSX Edge OVA failed, vm failed to come up!!"
+		echo "Check error logs"
+		echo ""
+		exit $STATUS
+	else
+		echo "Deployment of NSX Edge ova succcessfull!! Continuing with rest of configuration!!"
+		echo ""
+	fi
+else
+	echo "NSX Edges up already, skipping deploying of the Edge ova!!"
+fi
+echo ""
+
+echo "Rechecking the status and count of Mgr, Ctrl, Edge instances !!"
+nsx_mgr_up_status=$(check_status_up $NSX_T_CONTROLLER_IPS "NSX Mgr")
+nsx_controller_up_status=$(check_status_up $NSX_T_CONTROLLER_IPS "NSX Controller")
+nsx_edge_up_status=$(check_status_up $NSX_T_EDGE_IPS "NSX Edge")
+
+if [ "$nsx_mgr_up_status" != "true" \
+			-o  "$nsx_controller_up_status" != "true" \
+			-o "$nsx_edge_up_status" != "true" ]; then
+	echo "Some problem with the VMs, one or more of the vms (mgr, controller, edge) failed to come up or not accessible!"
+	echo "Check the related vms!!"
+	exit 1
+fi
+echo "All Good!! Proceeding with controller configuration!"
+echo ""
 
 # Configure the controllers
 NO_OF_EDGES_CONFIGURED=$(echo $NSX_T_EDGE_IPS | sed -e 's/,/ /g' | awk '{print NF}' )
@@ -97,9 +173,6 @@ CURRENT_TOTAL_EDGES=$(curl -k -u "admin:$NSX_T_MANAGER_ADMIN_PWD" \
                     https://${NSX_T_MANAGER_IP}/api/v1/fabric/nodes \
                      2>/dev/null | jq '.result_count' )
 
-# CURRENT_TOTAL_CONTROLLERS=$(curl -k -u "admin:$NSX_T_MANAGER_ADMIN_PWD" \
-#                     https://${NSX_T_MANAGER_IP}/api/v1/cluster/nodes \
-#                      2>/dev/null | jq '.results[].controller_role.type' | wc -l )
 CURRENT_TOTAL_CONTROLLERS=$(curl -k -u "admin:$NSX_T_MANAGER_ADMIN_PWD" \
                     https://${NSX_T_MANAGER_IP}/api/v1/cluster/nodes \
                      2>/dev/null | jq '.result_count' )
@@ -110,7 +183,7 @@ if [ "$CURRENT_TOTAL_CONTROLLERS" != "$EXPECTED_TOTAL_CONTROLLERS" ]; then
 	echo ""
 fi
 
-if [ "$NO_OF_EDGES_CONFIGURED" != "$CURRENT_TOTAL_EDGES" ]; then
+if [ $NO_OF_EDGES_CONFIGURED -gt "$CURRENT_TOTAL_EDGES" ]; then
 	RERUN_CONFIGURE_CONTROLLERS=true
 	echo "Total # of Edges [$CURRENT_TOTAL_EDGES] not matching expected count of $NO_OF_EDGES_CONFIGURED !!"
 	echo "Will run configure controllers!"

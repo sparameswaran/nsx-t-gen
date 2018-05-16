@@ -1,6 +1,6 @@
 ## Adding *VM Network*
 
-Thanks to Niran Even Chen Twitter: [@NiranEC](https://twitter.com/NiranEC) for the detailed notes
+Thanks to Niran Even Chen, [@NiranEC](https://twitter.com/NiranEC), for the detailed steps.
 
 The ESXi servers where the OVAs get deployed is required to have a default `VM Network` port group.
 This is due to a bug with the Ovftool that the pipeline is utilizing. Users would get an error about `Host did not have any virtual network defined` and ovftool would fail to deploy the NSX Edges on the NSX-T management plane. 
