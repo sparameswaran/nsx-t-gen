@@ -30,8 +30,14 @@ Also, NSX-T cannot co-reside on the same ESXi Host & Cluster as one already runn
 ## Pre-reqs
 * Concourse setup
 - If using [docker-compose to bring up local Concourse](https://github.com/concourse/concourse-docker) and there is a web proxy, make sure to specify the proxy server and dns details following the template provided in [docs/docker-compose.yml](docs/docker-compose.yml)
+- If the webserver & the ova images are not still reachable from concourse without a proxy in middle, check if ubuntu firewall got enabled. This can happen if you used concourse directly as well as docker-compose. In that case, either relax the iptable rules or allow routed in ufw or just disable it:
+```
+sudo ufw allow 8080
+sudo ufw default allow routed
+```
 * There should be atleast one free vmnic on each of the ESXi hosts
 * Ovftool would fail to deploy the Edge VMs in the absence of `VM Network` or standard switch (non NSX-T) with `Host did not have any virtual network defined` error message. So, ensure presence of either one.
+Refer to [Adding *VM Network*](./docs/add-vm-network.md) for detailed instructions.
 * Docker hub connectivity to pull docker image for the concourse pipeline
 * NSX-T 2.1 ova images and ovftool install bits for linux
 * Web server to serve the NSX-T ova images and ovftool
@@ -42,6 +48,7 @@ cp <*ova> <VMware-ovftool*.bundle> /var/www/html
 # Edit nginx config and start
 ```
 * vCenter Access
+* SSH enabled on the Hosts
 
 ## Offline envs
 This is only applicable if the docker image `nsxedgegen/nsx-t-gen-worker:latest` is unavailable or env is restricted to offline. 
@@ -49,9 +56,10 @@ This is only applicable if the docker image `nsxedgegen/nsx-t-gen-worker:latest`
 * Download and copy the VMware ovftool install bundle (linux 64-bit version) along with nsx-t python modules (including vapi_common, vapi_runtime, vapi_common_client libs) and copy that into the Dockerfile folder
 * Create and push the docker image using 
 ```
-docker build -t nsx-t-gen-worker Dockerfile
-docker tag  nsx-t-gen-worker nsxedgegen/nsx-t-gen-worker:latest
-docker push nsxedgegen/nsx-t-gen-worker:latest
+ docker build -t nsx-t-gen-worker Dockerfile
+ # To test image:  docker run --rm -it nsx-t-gen-worker bash
+ docker tag  nsx-t-gen-worker nsxedgegen/nsx-t-gen-worker:latest
+ docker push nsxedgegen/nsx-t-gen-worker:latest
 ```
 
 
