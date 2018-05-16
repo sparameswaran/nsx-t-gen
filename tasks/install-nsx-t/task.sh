@@ -28,8 +28,13 @@ function check_status_up {
 	resources_configured=$(echo $ip_set | sed -e 's/,/ /g' | awk '{print NF}' )
 	for resource_ip in $(echo $ip_set | sed -e 's/,/ /g' )
 	do
-		status=$(nc -vz ${resource_ip} 22 2>&1 | grep -i succeeded || true)
-		if [ "$status" == "" ]; then
+		# no netcat on the docker image
+		#status=$(nc -vz ${resource_ip} 22 2>&1 | grep -i succeeded || true)
+		# following hangs on bad ports
+		#status=$( </dev/tcp/${resource_ip}/22 && echo true || echo false)
+		timeout 1 bash -c '(echo > /dev/tcp/${resource_ip}/22) >/dev/null 2>&1'
+		status=$?
+		if [ "$status" != "0" ]; then
 			status_up=false
 			resources_down_count=$(expr $resources_down_count + 1)
 		fi
@@ -92,14 +97,13 @@ if [ "$nsx_mgr_up_status" != "true" -o  "$nsx_controller_up_status" != "true" -o
 	fi
 fi
 
-
 # Deploy the Mgr ova if its not up
 if [ "$nsx_mgr_up_status" != "true" ]; then
 	ansible-playbook $DEBUG -i hosts deploy_mgr.yml -e @extra_yaml_args.yml
 	STATUS=$?
 
 	if [[ $STATUS != 0 ]]; then
-		echo "Deployment of NSX Mgr OVA failed, vm failed to come up!!"
+		echo "Deployment of NSX Mgr OVA failed, vms failed to come up!!"
 		echo "Check error logs"
 		echo ""
 		exit $STATUS
@@ -108,9 +112,10 @@ if [ "$nsx_mgr_up_status" != "true" ]; then
 		echo ""
 	fi
 else
-	echo "NSX Mgr up already, skipping deploying of the Mgr ova!!"
+	echo "NSX Mgr up already, skipping deploying of the Controller ova!!"
 fi
 
+# Deploy the Controller ova if its not up
 if [ "$nsx_controller_up_status" != "true" ]; then
 	ansible-playbook $DEBUG -i hosts deploy_ctrl.yml -e @extra_yaml_args.yml
 	STATUS=$?
@@ -128,7 +133,7 @@ else
 	echo "NSX Controllers up already, skipping deploying of the Controller ova!!"
 fi
 
-
+# Deploy the Edge ova if its not up
 if [ "$nsx_edge_up_status" != "true" ]; then
 	ansible-playbook $DEBUG -i hosts deploy_edge.yml -e @extra_yaml_args.yml
 	STATUS=$?
