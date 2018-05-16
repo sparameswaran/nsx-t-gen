@@ -54,7 +54,7 @@ function check_status_up {
       exit -1
   else
       (>&2 echo "All VMs of type ${type_of_resource} down, total: ${resources_configured}")
-      (>&2 echo "  Would start with deployment of ${type_of_resource} ovas")
+      (>&2 echo "  Would deploy ${type_of_resource} ovas")
 	fi
 
 	echo "false"
@@ -81,11 +81,14 @@ echo ""
 nsx_mgr_up_status=$(check_status_up $NSX_T_MANAGER_IP "NSX Mgr")
 nsx_controller_up_status=$(check_status_up $NSX_T_CONTROLLER_IPS "NSX Controller")
 nsx_edge_up_status=$(check_status_up $NSX_T_EDGE_IPS "NSX Edge")
+echo ""
 
 STATUS=0
 # Copy over the ovas if any of the resources are not up
 if [ "$nsx_mgr_up_status" != "true" -o  "$nsx_controller_up_status" != "true" -o "$nsx_edge_up_status" != "true" ]; then
 	echo "Detected one of the vms (mgr, controller, edge) are not yet up, preparing the ovas"
+	echo ""
+	
 	install_ovftool
 	copy_ovas_to_OVA_ISO_PATH
 	create_customize_ova_params
@@ -157,6 +160,7 @@ echo "Rechecking the status and count of Mgr, Ctrl, Edge instances !!"
 nsx_mgr_up_status=$(check_status_up $NSX_T_MANAGER_IP "NSX Mgr")
 nsx_controller_up_status=$(check_status_up $NSX_T_CONTROLLER_IPS "NSX Controller")
 nsx_edge_up_status=$(check_status_up $NSX_T_EDGE_IPS "NSX Edge")
+echo ""
 
 if [ "$nsx_mgr_up_status" != "true" \
 			-o  "$nsx_controller_up_status" != "true" \
@@ -165,7 +169,7 @@ if [ "$nsx_mgr_up_status" != "true" \
 	echo "Check the related vms!!"
 	exit 1
 fi
-echo "All Good!! Proceeding with controller configuration!"
+echo "All Good!! Proceeding with Controller configuration!"
 echo ""
 
 # Configure the controllers
