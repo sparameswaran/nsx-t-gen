@@ -88,7 +88,7 @@ STATUS=0
 if [ "$nsx_mgr_up_status" != "true" -o  "$nsx_controller_up_status" != "true" -o "$nsx_edge_up_status" != "true" ]; then
 	echo "Detected one of the vms (mgr, controller, edge) are not yet up, preparing the ovas"
 	echo ""
-	
+
 	install_ovftool
 	copy_ovas_to_OVA_ISO_PATH
 	create_customize_ova_params
@@ -116,7 +116,7 @@ if [ "$nsx_mgr_up_status" != "true" ]; then
 		echo ""
 	fi
 else
-	echo "NSX Mgr up already, skipping deploying of the Controller ova!!"
+	echo "NSX Mgr up already, skipping deploying of the Mgr ova!!"
 fi
 
 # Deploy the Controller ova if its not up
