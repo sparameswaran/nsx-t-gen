@@ -48,7 +48,7 @@ function check_status_up {
       exit -1
   else
       (>&2 echo "All VMs of type ${type_of_resource} down, total: ${resources_configured}")
-      (>&2 echo "Would start with deployment of ${type_of_resource} ovas")
+      (>&2 echo "  Would start with deployment of ${type_of_resource} ovas")
 	fi
 
 	echo "false"
@@ -72,7 +72,7 @@ cd nsxt-ansible
 echo ""
 
 # Check if the status and count of Mgr, Ctrl, Edge
-nsx_mgr_up_status=$(check_status_up $NSX_T_CONTROLLER_IPS "NSX Mgr")
+nsx_mgr_up_status=$(check_status_up $NSX_T_MANAGER_IP "NSX Mgr")
 nsx_controller_up_status=$(check_status_up $NSX_T_CONTROLLER_IPS "NSX Controller")
 nsx_edge_up_status=$(check_status_up $NSX_T_EDGE_IPS "NSX Edge")
 
@@ -148,7 +148,7 @@ fi
 echo ""
 
 echo "Rechecking the status and count of Mgr, Ctrl, Edge instances !!"
-nsx_mgr_up_status=$(check_status_up $NSX_T_CONTROLLER_IPS "NSX Mgr")
+nsx_mgr_up_status=$(check_status_up $NSX_T_MANAGER_IP "NSX Mgr")
 nsx_controller_up_status=$(check_status_up $NSX_T_CONTROLLER_IPS "NSX Controller")
 nsx_edge_up_status=$(check_status_up $NSX_T_EDGE_IPS "NSX Edge")
 
