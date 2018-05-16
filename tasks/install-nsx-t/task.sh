@@ -32,7 +32,7 @@ function check_status_up {
 		#status=$(nc -vz ${resource_ip} 22 2>&1 | grep -i succeeded || true)
 		# following hangs on bad ports
 		#status=$( </dev/tcp/${resource_ip}/22 && echo true || echo false)
-		timeout 1 bash -c '(echo > /dev/tcp/${resource_ip}/22) >/dev/null 2>&1'
+		timeout 5 bash -c "(echo > /dev/tcp/${resource_ip}/22) >/dev/null 2>&1"
 		status=$?
 		if [ "$status" != "0" ]; then
 			status_up=false
@@ -41,6 +41,7 @@ function check_status_up {
 	done
 
 	if [ "$status_up" == "true" ]; then
+		(>&2 echo "All VMs of type ${type_of_resource} up, total: ${resources_configured}")
 		echo "true"
 		return
 	fi
