@@ -1,13 +1,17 @@
 ## FAQs
-
+* Basics of [Concourse](https://concourse-ci.org/)
+* Basics of running [Concourse using docker-compose](https://github.com/concourse/concourse-docker)
+* Basics of the pipeline functioning
+  * Check the blog post: [ Introducing nsx-t-gen: Automating NSX-T Install with Concourse](https://allthingsmdw.blogspot.com/2018/05/introducing-nsx-t-gen-automating-nsx-t.html)
 * `Adding additional edges after first install`.
   * Recommend planning ahead of time and creating the edges all in the beginning rather than adding them later.
   * If its really required, recommend manually installing any additional edges using direct deployment of OVAs while ensuring the names are following previously installed edge instance name convention (like nsx-t-edge-0?), then update the parameters to specify the additional edge ips (assuming they use the same edge naming convention) and let the controller (as part of the base-install or just full-install) to do a rejoin of the edges followed by other jobs/tasks. Only recommended for advanced users who are ready to drill down/debug.
 * Downloading the bits
   * Download NSX-T 2.1 bits from
     https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-210&productId=673
-    Check my.vmware.com for link to new installs
+    Check https://my.vmware.com for link to new installs
   * Download [VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle v4.2](https://my.vmware.com/group/vmware/details?productId=614&downloadGroup=OVFTOOL420#)
+
   Ensure ovftool version is 4.2. Older 4.0 has issues with deploying ova images.
 * Installing Webserver
   Install nginx and copy the bits to be served
@@ -63,13 +67,16 @@
 	esxi_hosts_config: # Leave it blank
 
     # Fill following fields
-	compute_vcenter_manager: # vcenter-manager 
+	compute_vcenter_manager: # FILL ME - any name for the compute vcenter manager 
 	compute_vcenter_host:    # FILL ME - Addr of the vcenter host
 	compute_vcenter_usr:     # FILL ME - Use Compute vCenter Esxi hosts as transport node
 	compute_vcenter_pwd:     # FILL ME - Use Compute vCenter Esxi hosts as transport node
 	compute_vcenter_cluster: # FILL ME - Use Compute vCenter Esxi hosts as transport node
   	```
    Apply the new params using set-pipeline and then rerun the pipeline.
+* Use different compute manager or Esxi hosts for Transport nodes compared vCenter used for NSX-T components
+  * The main vcenter configs would be used for deploying the NSX Mgr, Controller and Edges.
+    The ESXi Hosts for transport nodes can be on a different vcenter or compute manager. Use the compute_vcenter_... fields or esxi_hosts_config to add them as needed.
 * Control/specify which Edges are used to host a given T0 Router.
   * Edit the edge_indexes section within T0Router definition to specify different edge instances.
     Index starts with 1 (would map to nsx-t-edge-01).
