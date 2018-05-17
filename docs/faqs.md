@@ -1,5 +1,8 @@
 ## FAQs
 
+* `Adding additional edges after first install`.
+  * Recommend planning ahead of time and creating the edges all in the beginning rather than adding them later.
+  * If its really required, recommend manually installing any additional edges using direct deployment of OVAs while ensuring the names are following previously installed edge instance name convention (like nsx-t-edge-0?), then update the parameters to specify the additional edge ips (assuming they use the same edge naming convention) and let the controller (as part of the base-install or just full-install) to do a rejoin of the edges followed by other jobs/tasks. Only recommended for advanced users who are ready to drill down/debug.
 * Downloading the bits
   * Download NSX-T 2.1 bits from
     https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-210&productId=673
@@ -32,7 +35,7 @@
 * Pipeline exits after reporting problem with ovas or ovftool
   * Verify the file names and paths are correct. If the download of the ovas by the pipeline at start was too fast, then it means errors with the files downloaded as each of the ova is upwards of 500 MB.
 * Running out of memory resources on vcenter 
-  Turn off reservation
+  * Turn off reservation
   ```
   nsx_t_keep_reservation: false # for POC or memory constrained setup
   ```
@@ -53,21 +56,23 @@
   This should detect the vms are up and no need for redeploying the ovas again and continue to where it left of earlier.
 * Unable to deploy the Edge OVAs with error message: `Host did not have any virtual network defined`. 
   * Refer to [add-vm-network](./add-vm-network.md)
-  * Or Deploy the ovas directly ensuring the name of the edge instances follows the naming convention (like nsx-t-edge-01)
+  * Or deploy the ovas directly ensuring the name of the edge instances follows the naming convention (like nsx-t-edge-01)
 * Unable to add ESXi Hosts. Error: `FAILED - RETRYING: Check Fabric Node Status`
-  Reset the contents for the esxi_hosts_config (set to empty) and fill in compute_vcenter_... section in the parameter file.
-  ```
+  * Empty the value for `esxi_hosts_config` and fill in `compute_vcenter_...` section in the parameter file.
+  	```
 	esxi_hosts_config: # Leave it blank
+
     # Fill following fields
 	compute_vcenter_manager: # vcenter-manager 
 	compute_vcenter_host:    # FILL ME - Addr of the vcenter host
 	compute_vcenter_usr:     # FILL ME - Use Compute vCenter Esxi hosts as transport node
 	compute_vcenter_pwd:     # FILL ME - Use Compute vCenter Esxi hosts as transport node
 	compute_vcenter_cluster: # FILL ME - Use Compute vCenter Esxi hosts as transport node
-   ```
+  	```
    Apply the new params using set-pipeline and then rerun the pipeline.
-* Control/specify which Edges are used to host a given T0 Router
-  Edit the edge_indexes section within T0Router definition to specify different edge instances
+* Control/specify which Edges are used to host a given T0 Router.
+  * Edit the edge_indexes section within T0Router definition to specify different edge instances.
+    Index starts with 1 (would map to nsx-t-edge-01).
   ```
   nsx_t_t0router_spec: |
   t0_router:
@@ -82,14 +87,11 @@
     ....
   ```
 * Adding additional T1 Routers or Logical Switches
-  Modify the parameters to specify additional T1 routers or switches and rerun add-routers.
+  * Modify the parameters to specify additional T1 routers or switches and rerun add-routers.
 * Adding additional T0 Routers
-  Only one T0 Router can be created during a run of the pipeline. But additional T0Routers can be added by modifying the parameters and rerunning the add-routers and config-nsx-t-extras jobs.
-  * Create a new copy or edit the parameters to modify the T0Router definition.
-  * Edit T0Router references across T1 Routers as well as any tags that should be used to identify a specific T0Router.
-  * Add or edit any additional ip blocks or pools, nats, lbrs
-  * Register parameters with the pipeline 
-  * Rerun add-routers followed by config-nsx-t-extras job group
-* Add additional edges after first install.
-  Recommend planning ahead of time and create the edges all in the beginning rather than adding them later.
-  If its really required, recommend manually installing any additional edges using direct deployment of OVAs while ensuring the names are following previously installed edge instance name convention (like nsx-t-edge-0?), then update the parameters to specify the additional edge ips (assuming they use the same edge naming convention) and let the controller (as part of the base-install or just full-install) to do a rejoin of the edges followed by other jobs/tasks.
+  * Only one T0 Router can be created during a run of the pipeline. But additional T0Routers can be added by  modifying the parameters and rerunning the add-routers and config-nsx-t-extras jobs.
+    * Create a new copy or edit the parameters to modify the T0Router definition.
+    * Edit T0Router references across T1 Routers as well as any tags that should be used to identify a specific T0Router.
+    * Add or edit any additional ip blocks or pools, nats, lbrs
+    * Register parameters with the pipeline 
+    * Rerun add-routers followed by config-nsx-t-extras job group
