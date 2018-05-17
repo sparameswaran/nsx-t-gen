@@ -32,7 +32,7 @@ function check_status_up {
 		#status=$(nc -vz ${resource_ip} 22 2>&1 | grep -i succeeded || true)
 		# following hangs on bad ports
 		#status=$( </dev/tcp/${resource_ip}/22 && echo true || echo false)
-		timeout 5 bash -c "(echo > /dev/tcp/${resource_ip}/22) >/dev/null 2>&1"
+		timeout 10 bash -c "(echo > /dev/tcp/${resource_ip}/22) >/dev/null 2>&1"
 		status=$?
 		if [ "$status" != "0" ]; then
 			status_up=false
@@ -50,6 +50,7 @@ function check_status_up {
       (>&2 echo "Mismatch in number of VMs of type ${type_of_resource} that are expected to be up!!")
       (>&2 echo "Configured ${type_of_resource} VM total: ${resources_configured}, VM down: ${resources_down_count}")
       (>&2 echo "Delete pre-created vms of type ${type_of_resource} and start over!!")
+      (>&2 echo "If the vms are up and accessible and suspect its a timing issue, restart the job again!!")
       (>&2 echo "Exiting now !!")      
       exit -1
   else
