@@ -3,7 +3,7 @@ Concourse pipeline to install NSX-T v2.1
 
 The concourse pipeline uses [ansible scripts](https://github.com/yasensim/nsxt-ansible) created by Yasen Simeonov and [forked](https://github.com/sparameswaran/nsxt-ansible) by the author of this pipeline.
 
-There is an associated blog post detailing the features, options here: [ Introducing nsx-t-gen: Automating NSX-T Install with Concourse] (https://allthingsmdw.blogspot.com/2018/05/introducing-nsx-t-gen-automating-nsx-t.html)
+There is an associated blog post detailing the features, options here: [Introducing nsx-t-gen: Automating NSX-T Install with Concourse](https://allthingsmdw.blogspot.com/2018/05/introducing-nsx-t-gen-automating-nsx-t.html)
 
 Recommending check the [FAQs](./docs/faqs.md) for full details on handling various issues/configurations before starting the install.
 
