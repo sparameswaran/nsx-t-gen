@@ -169,12 +169,16 @@ nsx_t_esxi_vmnics: vmnic1 # vmnic1,vmnic2...
 
 # Configs for T0Router (only one per run), T1Routers, Logical switches and tags...
 # Make sure the ncp/cluster tag matches the one defined at the top level.
-# Expects to use atleast 2 edge instances for HA
+# Expects to use atleast 2 edge instances for HA that need to be installed
 nsx_t_t0router_spec: |
   t0_router:
     name: DefaultT0Router
-    edge_index: nsx-t-edge-01
     ha_mode: 'ACTIVE_STANDBY'
+    # Specify the edges to be used for hosting the T0Router instance
+    edge_indexes:
+      # Index starts from 1 -> denoting nsx-t-edge-01
+      primary: 1   # Index for primary edge to be used
+      secondary: 2 # Index for secondary edge to be used
     vip: 10.13.12.103/27
     ip1: 10.13.12.101/27
     ip2: 10.13.12.102/27
@@ -254,7 +258,9 @@ nsx_t_ha_switching_profile_spec: |
 nsx_t_container_ip_block_spec: |
   container_ip_blocks:
   - name: container-ip-block
-    cidr: 10.4.0.0/16    
+    cidr: 10.4.0.0/16 
+    # Specify tags with PAS 2.0 and NSX Tile 2.1.0   
+    # Tags not needed for PAS 2.1 and NSX Tile 2.1.3   
     tags:
       ncp/cluster: 'pas1' # Should match the top level ncp/cluster tag value
       testtag: 'testpas1' 
@@ -271,6 +277,8 @@ nsx_t_external_ip_pool_spec: |
     gateway: 10.100.0.1
     start: 10.100.0.10 # Should not include gateway
     end: 10.100.0.200  # Should not include gateway
+    # Specify tags with PAS 2.0 and NSX Tile 2.1.0   
+    # Tags not needed for PAS 2.1 and NSX Tile 2.1.3   
     tags:
       ncp/cluster: 'pas1'   # Should match the top level ncp/cluster tag value for PAS
       ncp/external: 'true'  # Required for external facing ips
@@ -280,6 +288,8 @@ nsx_t_external_ip_pool_spec: |
     gateway: 10.200.0.1
     start: 10.200.0.10 # Should not include gateway
     end: 10.200.0.200  # Should not include gateway
+    # Specify tags with PAS 2.0 and NSX Tile 2.1.0   
+    # Tags not needed for PAS 2.1 and NSX Tile 2.1.3   
     tags:
       # Needs to have atleast one tag entry
       ncp/external: 'true'  # Required for external facing ips

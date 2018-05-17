@@ -218,7 +218,7 @@ def create_t0_logical_router_and_port(t0_router):
       'description': descp,
       'display_name': name,
       'logical_router_id': router_id,
-      'edge_cluster_member_index' : [ t0_router['edge_index'] ],
+      #'edge_cluster_member_index' : [ t0_router['edge_index'] ],
       'subnets' : [ {
           'ip_addresses' : [ network ],
           'prefix_length' : cidr
