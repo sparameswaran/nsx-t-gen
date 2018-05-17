@@ -165,7 +165,7 @@ echo ""
 echo "Rechecking the status and count of Mgr, Ctrl, Edge instances !!"
 nsx_mgr_up_status=$(check_status_up $NSX_T_MANAGER_IP "NSX Mgr")
 nsx_controller_up_status=$(check_status_up $NSX_T_CONTROLLER_IPS "NSX Controller")
-nsx_edge_up_status=$(check_status_up $NSX_T_EDGE_IPS "NSX Edge")
+#nsx_edge_up_status=$(check_status_up $NSX_T_EDGE_IPS "NSX Edge")
 echo ""
 
 # Ignore checking the edge ssh connection
