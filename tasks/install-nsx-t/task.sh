@@ -168,15 +168,13 @@ nsx_controller_up_status=$(check_status_up $NSX_T_CONTROLLER_IPS "NSX Controller
 nsx_edge_up_status=$(check_status_up $NSX_T_EDGE_IPS "NSX Edge")
 echo ""
 
-if [ "$nsx_edge_up_status" != "true" ]; then
-  sleep 30
-  echo "Rechecking status of edges after waiting for additional 30 seconds!"
-  nsx_edge_up_status=$(check_status_up $NSX_T_EDGE_IPS "NSX Edge")
-fi
+# Ignore checking the edge ssh connection
+# if [ "$nsx_mgr_up_status" != "true" \
+# 			-o "$nsx_controller_up_status" != "true" \
+# 			-o "$nsx_edge_up_status" != "true" ]; then
 
 if [ "$nsx_mgr_up_status" != "true" \
-			-o "$nsx_controller_up_status" != "true" \
-			-o "$nsx_edge_up_status" != "true" ]; then
+			-o "$nsx_controller_up_status" != "true" ]; then
 	echo "Some problem with the VMs, one or more of the vms (mgr, controller, edge) failed to come up or not accessible!"
 	echo "Check the related vms!!"
 	exit 1
