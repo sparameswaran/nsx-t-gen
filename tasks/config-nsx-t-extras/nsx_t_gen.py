@@ -588,7 +588,7 @@ def set_t0_route_redistribution():
           '_revision': cur_redistribution_resp['_revision']
         }
       resp = client.put(api_endpoint, payload )
-  print('Done enabling route redisribution for T0Routers\n')
+  print('Done enabling route redistribution for T0Routers\n')
 
 def print_t0_route_nat_rules():
   for key in global_id_map:

@@ -264,6 +264,10 @@ nsx_t_container_ip_block_spec: |
     tags:
       ncp/cluster: 'pas1' # Should match the top level ncp/cluster tag value
       testtag: 'testpas1' 
+  - name: container-ip-block-with-no-tag
+    cidr: 11.4.0.0/16 
+    # No tags for this block   
+
  
 
 # Make sure the ncp/cluster tag matches the one defined on the T0 Router for PAS
@@ -288,12 +292,7 @@ nsx_t_external_ip_pool_spec: |
     gateway: 10.200.0.1
     start: 10.200.0.10 # Should not include gateway
     end: 10.200.0.200  # Should not include gateway
-    # Specify tags with PAS 2.0 and NSX Tile 2.1.0   
-    # Tags not needed for PAS 2.1 and NSX Tile 2.1.3   
-    tags:
-      # Needs to have atleast one tag entry
-      ncp/external: 'true'  # Required for external facing ips
-      ncp/shared: 'true'    # Required for PKS
+    # No Tags needed for PKS   
 
 # Specify NAT rules
 # Provide matching dnat and snat rule for specific vms by using ips for destination_network and translated_network that need to be exposed like Ops Mgr

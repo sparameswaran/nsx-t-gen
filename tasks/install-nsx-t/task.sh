@@ -157,6 +157,11 @@ else
 fi
 echo ""
 
+# Give some time for vm services to be up before checking the status of the vm instances
+echo "Wait for 30 seconds before checking if VMs are up"
+sleep 30
+echo ""
+
 echo "Rechecking the status and count of Mgr, Ctrl, Edge instances !!"
 nsx_mgr_up_status=$(check_status_up $NSX_T_MANAGER_IP "NSX Mgr")
 nsx_controller_up_status=$(check_status_up $NSX_T_CONTROLLER_IPS "NSX Controller")

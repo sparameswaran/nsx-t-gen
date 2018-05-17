@@ -3,6 +3,9 @@ Concourse pipeline to install NSX-T v2.1
 
 The concourse pipeline uses [ansible scripts](https://github.com/yasensim/nsxt-ansible) created by Yasen Simeonov and [forked](https://github.com/sparameswaran/nsxt-ansible) by the author of this pipeline.
 
+There is an associated blog post detailing the features, options here: [ Introducing nsx-t-gen: Automating NSX-T Install with Concourse] (https://allthingsmdw.blogspot.com/2018/05/introducing-nsx-t-gen-automating-nsx-t.html)
+Check the [FAQs](./docs/faqs.md) for full details on handling various issues/configurations.
+
 Things handled by the pipeline:
 
 * Deploy the VMware NSX-T Manager, Controller and Edge ova images
@@ -21,6 +24,8 @@ Things handled by the pipeline:
 Not handled by pipeline:
 
 * BGP or Static Route setup (outside of NSX-T) for T0 Routers
+
+
 
 ## Warning
 This is purely a trial work-in-progress and not officially supported by anyone. Use caution while using it at your own Risk!!.
