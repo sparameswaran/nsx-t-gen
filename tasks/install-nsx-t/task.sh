@@ -158,23 +158,21 @@ fi
 echo ""
 
 # Give some time for vm services to be up before checking the status of the vm instances
-echo "Wait for 60 seconds before checking if all NSX VMs are up"
-sleep 60
+echo "Wait for 30 seconds before checking if all NSX VMs are up"
+sleep 30
 echo ""
 
 echo "Rechecking the status and count of Mgr, Ctrl, Edge instances !!"
 nsx_mgr_up_status=$(check_status_up $NSX_T_MANAGER_IP "NSX Mgr")
 nsx_controller_up_status=$(check_status_up $NSX_T_CONTROLLER_IPS "NSX Controller")
-#nsx_edge_up_status=$(check_status_up $NSX_T_EDGE_IPS "NSX Edge")
+nsx_edge_up_status=$(check_status_up $NSX_T_EDGE_IPS "NSX Edge")
 echo ""
 
-# Ignore checking the edge ssh connection
-# if [ "$nsx_mgr_up_status" != "true" \
-# 			-o "$nsx_controller_up_status" != "true" \
-# 			-o "$nsx_edge_up_status" != "true" ]; then
-
 if [ "$nsx_mgr_up_status" != "true" \
-			-o "$nsx_controller_up_status" != "true" ]; then
+			-o "$nsx_controller_up_status" != "true" \
+			-o "$nsx_edge_up_status" != "true" ]; then
+# if [ "$nsx_mgr_up_status" != "true" \
+# 			-o "$nsx_controller_up_status" != "true" ]; then
 	echo "Some problem with the VMs, one or more of the vms (mgr, controller, edge) failed to come up or not accessible!"
 	echo "Check the related vms!!"
 	exit 1
