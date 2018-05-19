@@ -432,7 +432,12 @@ def create_pas_tags():
   return pas_tags
 
 def create_container_ip_blocks():
-  ip_blocks = yaml.load(os.getenv('NSX_T_CONTAINER_IP_BLOCK_SPEC'))
+  ip_blocks_defn = os.getenv('NSX_T_CONTAINER_IP_BLOCK_SPEC', '').strip()
+  if ip_blocks_defn == '':
+    print('No yaml payload set for the NSX_T_CONTAINER_IP_BLOCK_SPEC, ignoring Container IP Block section!')
+    return
+
+  ip_blocks = yaml.load(ip_blocks_defn)
   for ip_block in ip_blocks['container_ip_blocks']:
     ip_block_name   = ip_block('name')
     ip_block_cidr   = ip_block('cidr')    
@@ -440,7 +445,12 @@ def create_container_ip_blocks():
     update_tag(CONTAINER_IP_BLOCKS_ENDPOINT + '/' + container_ip_block_id, create_pas_tags())
     
 def create_external_ip_pools():
-  ip_pools    = yaml.load(os.getenv('NSX_T_EXTERNAL_IP_POOL_SPEC'))
+  ip_pools_defn = os.getenv('NSX_T_EXTERNAL_IP_POOL_SPEC', '').strip()
+  if ip_pools_defn == '':
+    print('No yaml payload set for the NSX_T_EXTERNAL_IP_POOL_SPEC, ignoring External IP Pool section!')
+    return
+
+  ip_pools    = yaml.load(ip_pools_defn)
   for ip_pool in ip_pools['external_ip_pools']:
     ip_pool_id - create_external_ip_pool(ip_pool['name'], 
                             ip_pool['cidr'], 
@@ -457,7 +467,13 @@ def create_external_ip_pools():
 
 def create_ha_switching_profile():
   pas_tag_name   = os.getenv('NSX_T_PAS_NCP_CLUSTER_TAG')
-  ha_switching_profiles = yaml.load(os.getenv('NSX_T_HA_SWITCHING_PROFILE_SPEC'))['ha_switching_profiles']
+
+  ha_switching_profiles_defn = os.getenv('NSX_T_HA_SWITCHING_PROFILE_SPEC', '').strip()
+  if ha_switching_profiles_defn == '':
+    print('No yaml payload set for the NSX_T_HA_SWITCHING_PROFILE_SPEC, ignoring HASpoofguard profile section!')
+    return
+
+  ha_switching_profiles = yaml.load(ha_switching_profiles_defn)['ha_switching_profiles']
   
   api_endpoint = SWITCHING_PROFILE_ENDPOINT
 
@@ -495,11 +511,19 @@ def list_certs():
 
 def generate_self_signed_cert():
   
-  nsx_t_manager_fqdn = os.getenv('NSX_T_MANAGER_FQDN')
-  if nsx_t_manager_fqdn is None:
+  nsx_t_manager_fqdn = os.getenv('NSX_T_MANAGER_FQDN', '')
+  if nsx_t_manager_fqdn is None or nsx_t_manager_fqdn is '':
     nsx_t_manager_fqdn = os.getenv('NSX_T_MANAGER_HOST_NAME')
 
-  csr_request = yaml.load(os.getenv('NSX_T_CSR_REQUEST_SPEC'))['csr_request']
+  if nsx_t_manager_fqdn is None or nsx_t_manager_fqdn is '':
+    print('Value not set for the NSX_T_MANAGER_HOST_NAME, cannot create self-signed cert')
+    return    
+
+  csr_request_spec = os.getenv('NSX_T_CSR_REQUEST_SPEC', '').strip()
+  if csr_request_spec == '':
+    return
+
+  csr_request = yaml.load(csr_request_spec)['csr_request']
   
   api_endpoint = TRUST_MGMT_CSRS_ENDPOINT
   existing_csrs_response = client.get(api_endpoint).json()
@@ -626,20 +650,26 @@ def check_for_existing_rule(existing_nat_rules, new_nat_rule):
 
 def add_t0_route_nat_rules():
 
-  nat_rules_defn = yaml.load(os.getenv('NSX_T_NAT_RULES_SPEC'))['nat_rules']
-  if len(nat_rules_defn) <= 0:
+  nat_rules_defn = os.getenv('NSX_T_NAT_RULES_SPEC', '').strip()
+  if nat_rules_defn == '':
+    print('No yaml payload set for the NSX_T_NAT_RULES_SPEC, ignoring nat rules section!')
     return
 
-  t0_router_id = global_id_map['ROUTER:TIER0:' + nat_rules_defn[0]['t0_router']]
+  nat_rules_defns = yaml.load(nat_rules_defn)['nat_rules']
+  if len(nat_rules_defns) <= 0:
+    print('No nat rule entries in the NSX_T_NAT_RULES_SPEC, nothing to add/update!')    
+    return
+
+  t0_router_id = global_id_map['ROUTER:TIER0:' + nat_rules_defns[0]['t0_router']]
   if t0_router_id is None:
-    print('Error!! No T0Router found with name: {}'.format(nat_rules_defn[0]['t0_router']))
+    print('Error!! No T0Router found with name: {}'.format(nat_rules_defns[0]['t0_router']))
     exit -1
 
   api_endpoint = '%s/%s/%s' % (ROUTERS_ENDPOINT, t0_router_id, 'nat/rules')
 
   changes_detected = False
   existing_nat_rules = client.get(api_endpoint ).json()['results']
-  for nat_rule in nat_rules_defn:
+  for nat_rule in nat_rules_defns:
     
     rule_payload = {
         'resource_type': 'NatRule',
@@ -836,8 +866,14 @@ def add_lbr_virtual_server(virtual_server_defn):
 
 def add_loadbalancers():
 
+  lbr_spec_defn = os.getenv('NSX_T_LBR_SPEC', '').strip()
+  if lbr_spec_defn == '':
+    print('No yaml payload set for the NSX_T_LBR_SPEC, ignoring loadbalancer section!')
+    return
+
   lbrs_defn = yaml.load(os.getenv('NSX_T_LBR_SPEC'))['loadbalancers']
   if len(lbrs_defn) <= 0:
+    print('No nat rule entries in the NSX_T_LBR_SPEC, nothing to add/update for LBR!')    
     return
 
   for lbr in lbrs_defn:
