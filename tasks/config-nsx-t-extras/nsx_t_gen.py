@@ -474,6 +474,9 @@ def create_ha_switching_profile():
     return
 
   ha_switching_profiles = yaml.load(ha_switching_profiles_defn)['ha_switching_profiles']
+  if ha_switching_profiles is None:
+    print('No valid yaml payload set for the NSX_T_HA_SWITCHING_PROFILE_SPEC, ignoring HASpoofguard profile section!')
+    return
   
   api_endpoint = SWITCHING_PROFILE_ENDPOINT
 
@@ -524,7 +527,10 @@ def generate_self_signed_cert():
     return
 
   csr_request = yaml.load(csr_request_spec)['csr_request']
-  
+  if csr_request is None:
+    print('No valid yaml payload set for the NSX_T_CSR_REQUEST_SPEC, ignoring CSR self-signed cert section!')
+    return
+
   api_endpoint = TRUST_MGMT_CSRS_ENDPOINT
   existing_csrs_response = client.get(api_endpoint).json()
   # if existing_csrs_response['result_count'] > 0:
@@ -574,12 +580,20 @@ def build_routers():
   load_edge_clusters()
   load_transport_zones()
   
-  t0_router_content  = os.getenv('NSX_T_T0ROUTER_SPEC')
+  t0_router_content  = os.getenv('NSX_T_T0ROUTER_SPEC').strip()
   t0_router         = yaml.load(t0_router_content)['t0_router']
+  if t0_router is None:
+    print 'No valid T0Router content NSX_T_T0ROUTER_SPEC passed'
+    return
+
   t0_router_id      = create_t0_logical_router_and_port(t0_router)
 
   t1_router_content = os.getenv('NSX_T_T1ROUTER_LOGICAL_SWITCHES_SPEC')
   t1_routers        = yaml.load(t1_router_content)['t1_routers']
+  if t1_routers is None:
+    print 'No valid T1Router content NSX_T_T1ROUTER_LOGICAL_SWITCHES_SPEC passed'
+    return
+  
 
   pas_tags = create_pas_tags()
   update_tag(ROUTERS_ENDPOINT + '/' + t0_router_id, pas_tags)
@@ -656,7 +670,7 @@ def add_t0_route_nat_rules():
     return
 
   nat_rules_defns = yaml.load(nat_rules_defn)['nat_rules']
-  if len(nat_rules_defns) <= 0:
+  if nat_rules_defns is None or len(nat_rules_defns) <= 0:
     print('No nat rule entries in the NSX_T_NAT_RULES_SPEC, nothing to add/update!')    
     return
 
@@ -871,9 +885,9 @@ def add_loadbalancers():
     print('No yaml payload set for the NSX_T_LBR_SPEC, ignoring loadbalancer section!')
     return
 
-  lbrs_defn = yaml.load(os.getenv('NSX_T_LBR_SPEC'))['loadbalancers']
-  if len(lbrs_defn) <= 0:
-    print('No nat rule entries in the NSX_T_LBR_SPEC, nothing to add/update for LBR!')    
+  lbrs_defn = yaml.load(lbr_spec_defn)['loadbalancers']
+  if lbrs_defn is None or len(lbrs_defn) <= 0:
+    print('No valid yaml passed in the NSX_T_LBR_SPEC, nothing to add/update for LBR!')    
     return
 
   for lbr in lbrs_defn:
