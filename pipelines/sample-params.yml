@@ -238,7 +238,7 @@ nsx_t_t1router_logical_switches_spec: |
 
   - name: T1Router-PKS-Clusters
     switches:
-    - name: PKS-PKS-Clusters
+    - name: PKS-Clusters
       logical_switch_gw: 192.168.40.1 # Last octet should be 1 rather than 0
       subnet_mask: 22
 
