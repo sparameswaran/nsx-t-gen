@@ -47,20 +47,21 @@ Refer to [Adding *VM Network*](./docs/add-vm-network.md) for detailed instructio
 * Docker hub connectivity to pull docker image for the concourse pipeline
 * NSX-T 2.1 ova images and ovftool install bits for linux
 * Web server to serve the NSX-T ova images and ovftool
-``` 
+```
 # Sample nginx server to host bits
 sudo apt-get nginx
 cp <*ova> <VMware-ovftool*.bundle> /var/www/html
 # Edit nginx config and start
 ```
+ S3 can also be used to host the bits. Change the reference to s3 so concourse can pull down the bits as needed.
 * vCenter Access
 * SSH enabled on the Hosts
 
 ## Offline envs
-This is only applicable if the docker image `nsxedgegen/nsx-t-gen-worker:latest` is unavailable or env is restricted to offline. 
+This is only applicable if the docker image `nsxedgegen/nsx-t-gen-worker:latest` is unavailable or env is restricted to offline.
 
 * Download and copy the VMware ovftool install bundle (linux 64-bit version) along with nsx-t python modules (including vapi_common, vapi_runtime, vapi_common_client libs) and copy that into the Dockerfile folder
-* Create and push the docker image using 
+* Create and push the docker image using
 ```
  docker build -t nsx-t-gen-worker Dockerfile
  # To test image:  docker run --rm -it nsx-t-gen-worker bash
@@ -102,7 +103,7 @@ Copy over the sample params as nsx-t-params.yml and then use following script to
 ```
 #!/bin/bash
 
-# EDIT names and domain 
+# EDIT names and domain
 CONCOURSE_ENDPOINT=concourse.corp.local.com
 CONCOURSE_TARGET=nsx-concourse
 PIPELINE_NAME=install-nsx-t
@@ -132,7 +133,7 @@ Follow the two part video for more details on the steps and usage of the pipelin
 * Run the smaller independent group:
 > `base-install` for just deployment of ovas and control management plan.
 This uses ansible scripts under the covers.
-  
+
 > `add-routers` for creation of the various transport zones, nodes, hostswitches and T0/T1 Routers with Logical switches. This also uses ansible scripts under the covers.
 
 > `config-nsx-t-extras` for adding nat rules, route redistribution, HA Switching Profile, Self-signed certs. This particular job is currently done via direct api calls and does not use Ansible scripts.
