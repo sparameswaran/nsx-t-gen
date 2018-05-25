@@ -15,17 +15,17 @@
   Ensure ovftool version is 4.2. Older 4.0 has issues with deploying ova images.
 * Installing Webserver
   Install nginx and copy the bits to be served
-	``` 
+	```
 	# Sample nginx server to host bits
 	sudo apt-get nginx
 	cp <*ova> <VMware-ovftool*.bundle> /var/www/html
 	# Edit nginx config and start
 	```
 * Unable to reach the webserver hosting the ova bits
-  * Check for proxy interfering with the concourse containers. 
+  * Check for proxy interfering with the concourse containers.
   If using docker-compose, use the sample [docker-compose](./docker-compose.yml) template to add DNS and proxy settings. Add the webserver to the no_proxy list.
   * Disable ubuntu firewall (ufw) or relax iptables rules if there was usage of both docker concourse and docker-compose.
-    Change ufw 
+    Change ufw
   	```
 	sudo ufw allow 8080
 	sudo ufw default allow routed
@@ -38,7 +38,7 @@
 	```
 * Pipeline exits after reporting problem with ovas or ovftool
   * Verify the file names and paths are correct. If the download of the ovas by the pipeline at start was too fast, then it means errors with the files downloaded as each of the ova is upwards of 500 MB.
-* Running out of memory resources on vcenter 
+* Running out of memory resources on vcenter
   * Turn off reservation
   ```
   nsx_t_keep_reservation: false # for POC or memory constrained setup
@@ -58,25 +58,29 @@
   ```
   If the vms are correctly up but suspect its a timing issue, just rerun the pipeline task.
   This should detect the vms are up and no need for redeploying the ovas again and continue to where it left of earlier.
-* Unable to deploy the Edge OVAs with error message: `Host did not have any virtual network defined`. 
+* Unable to deploy the Edge OVAs with error message: `Host did not have any virtual network defined`.
   * Refer to [add-vm-network](./add-vm-network.md)
   * Or deploy the ovas directly ensuring the name of the edge instances follows the naming convention (like nsx-t-edge-01)
-* Unable to add ESXi Hosts. Error: `FAILED - RETRYING: Check Fabric Node Status`
+* Unable to add ESXi Hosts. Error: `FAILED - RETRYING: Check Fabric Node Status` with error during ssh connection to the hosts.
   * Empty the value for `esxi_hosts_config` and fill in `compute_vcenter_...` section in the parameter file.
   	```
 	esxi_hosts_config: # Leave it blank
 
     # Fill following fields
-	compute_vcenter_manager: # FILL ME - any name for the compute vcenter manager 
+	compute_vcenter_manager: # FILL ME - any name for the compute vcenter manager
 	compute_vcenter_host:    # FILL ME - Addr of the vcenter host
 	compute_vcenter_usr:     # FILL ME - Use Compute vCenter Esxi hosts as transport node
 	compute_vcenter_pwd:     # FILL ME - Use Compute vCenter Esxi hosts as transport node
 	compute_vcenter_cluster: # FILL ME - Use Compute vCenter Esxi hosts as transport node
   	```
    Apply the new params using set-pipeline and then rerun the pipeline.
-* Use different compute manager or Esxi hosts for Transport nodes compared vCenter used for NSX-T components
+* Error during adding ESXi Hosts as Fabric nodes.
+  Error message: ```mpa_connectivity_status_details : Client has not responded to 2 consecutive heartbeats,```
+  Check the NSX Manager Web UI and see if the Hosts got added as Fabric Nodes (under Fabric -> Hosts) after some delay.
+  If the hosts now appear healthy and part of the Fabric on the NSX Mgr, then retry the add-routers job in concourse and it should proceed to the remaining steps.
+* Use different Compute Manager or ESXi hosts for Transport nodes compared vCenter used for NSX-T components
   * The main vcenter configs would be used for deploying the NSX Mgr, Controller and Edges.
-    The ESXi Hosts for transport nodes can be on a different vcenter or compute manager. Use the compute_vcenter_... fields or esxi_hosts_config to add them as needed.
+    The ESXi Hosts for transport nodes can be on a different vcenter or compute manager. Use the compute_vcenter_... fields or esxi_hosts_config to add them as needed. Caution: If the NSX Edges are really on a completely different network compared to the Hosts, then its suboptimal as the Edge has to be the gateway for the overlay/tep network with the hosts.
 * Control/specify which Edges are used to host a given T0 Router.
   * Edit the edge_indexes section within T0Router definition to specify different edge instances.
     Index starts with 1 (would map to nsx-t-edge-01).
@@ -100,5 +104,5 @@
     * Create a new copy or edit the parameters to modify the T0Router definition.
     * Edit T0Router references across T1 Routers as well as any tags that should be used to identify a specific T0Router.
     * Add or edit any additional ip blocks or pools, nats, lbrs
-    * Register parameters with the pipeline 
+    * Register parameters with the pipeline
     * Rerun add-routers followed by config-nsx-t-extras job group
