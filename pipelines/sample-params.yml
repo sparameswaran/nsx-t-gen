@@ -209,38 +209,38 @@ nsx_t_t1router_logical_switches_spec: |
     switches:
     - name: PAS-Infra
       logical_switch_gw: 192.168.10.1 # Last octet should be 1 rather than 0
-      subnet_mask: 26
+      subnet_mask: 24
 
   - name: T1-Router-PAS-ERT
     switches:
     - name: PAS-ERT
       logical_switch_gw: 192.168.24.1 # Last octet should be 1 rather than 0
-      subnet_mask: 26
+      subnet_mask: 24
 
   - name: T1-Router-PAS-Services
     switches:
     - name: PAS-Services
       logical_switch_gw: 192.168.28.1 # Last octet should be 1 rather than 0
-      subnet_mask: 26
+      subnet_mask: 24
 
   - name: T1-Router-PAS-DynamicServices
     switches:
     - name: PAS-DynamicServices
       logical_switch_gw: 192.168.30.1 # Last octet should be 1 rather than 0
-      subnet_mask: 22
+      subnet_mask: 24
 
   # Comment off the following T1 Routers if there is no PKS
   - name: T1-Router-PKS-Infra
     switches:
     - name: PKS-Deployment
       logical_switch_gw: 192.168.20.1 # Last octet should be 1 rather than 0
-      subnet_mask: 22
+      subnet_mask: 24
 
   - name: T1Router-PKS-Clusters
     switches:
     - name: PKS-Clusters
       logical_switch_gw: 192.168.40.1 # Last octet should be 1 rather than 0
-      subnet_mask: 22
+      subnet_mask: 24
 
 
 # Make sure the ncp/cluster tag matches the one defined on the T0 Router
