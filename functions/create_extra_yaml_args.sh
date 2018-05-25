@@ -23,16 +23,16 @@ function check_existence_of_tag {
 
     top_key=$(echo "${!env_variable}" | shyaml keys)
     length=$(expr $(echo "${!env_variable}" | shyaml get-values $top_key | grep "^name:" | wc -l) - 1 || true )
- 
+
  	count=0
     if [ $length -ge 0 ]; then
-      for index in $(seq 0 $length) 
+      for index in $(seq 0 $length)
       do
         tmpfile=$(mktemp /tmp/temp-yaml.XXXXX)
         echo "${!env_variable}" | shyaml get-value ${top_key}.${index} > $tmpfile
         given_tag_value=$(cat $tmpfile | grep $tag_name | awk '{print $2}' | sed -e "s/'//g" | sed -e 's/"//g' )
         if [ "$given_tag_value" == "$tag_value" ]; then
-          count=$(expr $count + 1)        
+          count=$(expr $count + 1)
        	fi
         rm $tmpfile
       done
@@ -51,7 +51,7 @@ function check_existence_of_tag {
 }
 
 function create_extra_yaml_args {
-	
+
 	# Start the extra yaml args
 	echo "" > extra_yaml_args.yml
 
@@ -70,8 +70,8 @@ function create_extra_yaml_args {
 		echo "Missing matching ncp/external tag in the External IP Pool defn, unsure if its for PAS or PKS"
 		#exit 1
 		#echo "    ncp/cluster:$NSX_T_PAS_NCP_CLUSTER_TAG" >> extra_yaml_args.yml
-	fi	
-	echo "" >> extra_yaml_args.yml	
+	fi
+	echo "" >> extra_yaml_args.yml
 
 	# Has root element
 	echo "$NSX_T_CONTAINER_IP_BLOCK_SPEC" >> extra_yaml_args.yml
@@ -92,7 +92,7 @@ function create_extra_yaml_args {
 	match=$(check_existence_of_tag NSX_T_HA_SWITCHING_PROFILE_SPEC 'ncp/ha' 'true' )
 	if [ "$match" == "" ]; then
 		echo "    ncp/ha: true" >> extra_yaml_args.yml
-	fi	
+	fi
 	echo "" >> extra_yaml_args.yml
 
 	# Has root element
@@ -100,8 +100,8 @@ function create_extra_yaml_args {
 	match=$(check_existence_of_tag NSX_T_T0ROUTER_SPEC 'ncp/cluster' $NSX_T_PAS_NCP_CLUSTER_TAG )
 	if [  "$NSX_T_T0ROUTER_SPEC" != "" -a "$match" == "" ]; then
 		echo "Missing matching 'ncp/cluster' tag in the T0 Router defn, check tags once T0Router is up!!"
-		#exit 1		
-	fi	
+		#exit 1
+	fi
 	echo "" >> extra_yaml_args.yml
 
 	# Has root element
@@ -123,7 +123,7 @@ function create_extra_yaml_args {
 	# Going with single profile uplink ; so use uplink-1 for both vmnics for edge
 	echo "edge_uplink_vmnics:" >> extra_yaml_args.yml
 	echo "  - uplink-1: ${NSX_T_EDGE_OVERLAY_INTERFACE} # network3 used for overlay/tep" >> extra_yaml_args.yml
-	echo "  - uplink-1: ${NSX_T_EDGE_UPLINK_INTERFACE} # network2 used for vlan uplink" >> extra_yaml_args.yml
+	echo "  - uplink-1: ${NSX_T_EDGE_UPLINK_INTERFACE}  # network2 used for vlan uplink" >> extra_yaml_args.yml
 	echo "# network1 and network4 are for mgmt and not used for uplink" >> extra_yaml_args.yml
 	echo "" >> extra_yaml_args.yml
 

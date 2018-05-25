@@ -32,7 +32,7 @@ function check_status_up {
 		#status=$(nc -vz ${resource_ip} 22 2>&1 | grep -i succeeded || true)
 		# following hangs on bad ports
 		#status=$( </dev/tcp/${resource_ip}/22 && echo true || echo false)
-		timeout 30 bash -c "(echo > /dev/tcp/${resource_ip}/22) >/dev/null 2>&1"
+		timeout 15 bash -c "(echo > /dev/tcp/${resource_ip}/22) >/dev/null 2>&1"
 		status=$?
 		if [ "$status" != "0" ]; then
 			status_up=false
@@ -51,7 +51,7 @@ function check_status_up {
       (>&2 echo "Configured ${type_of_resource} VM total: ${resources_configured}, VM down: ${resources_down_count}")
       (>&2 echo "Delete pre-created vms of type ${type_of_resource} and start over!!")
       (>&2 echo "If the vms are up and accessible and suspect its a timing issue, restart the job again!!")
-      (>&2 echo "Exiting now !!")      
+      (>&2 echo "Exiting now !!")
       exit -1
   else
       (>&2 echo "All VMs of type ${type_of_resource} down, total: ${resources_configured}")
@@ -209,7 +209,7 @@ if [ $NO_OF_EDGES_CONFIGURED -gt "$CURRENT_TOTAL_EDGES" ]; then
 fi
 
 if [ "$RERUN_CONFIGURE_CONTROLLERS" == "true" ]; then
-	# There should 1 mgr + 1 controller (or atmost 3 controllers). 
+	# There should 1 mgr + 1 controller (or atmost 3 controllers).
 	# So if the count does not match, or user requested rerun of configure controllers
 	echo "Configuring Controllers!!"
 	ansible-playbook $DEBUG -i hosts configure_controllers.yml -e @extra_yaml_args.yml

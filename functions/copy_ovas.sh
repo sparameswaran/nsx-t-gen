@@ -20,7 +20,7 @@ function install_ovftool {
 	else
 	  echo "ovftool already installed!!"
 	fi
-	echo ""	
+	echo ""
 }
 
 function check_ovas {
@@ -43,12 +43,12 @@ function copy_ovas_to_OVA_ISO_PATH {
 	mkdir -p $OVA_ISO_PATH
 	check_ovas
 
-	cp $ROOT_DIR/nsx-mgr-ova/$NSX_T_MANAGER_OVA \
+	mv $ROOT_DIR/nsx-mgr-ova/$NSX_T_MANAGER_OVA \
 	   $ROOT_DIR/nsx-ctrl-ova/$NSX_T_CONTROLLER_OVA \
 	   $ROOT_DIR/nsx-edge-ova/$NSX_T_EDGE_OVA \
 	   $OVA_ISO_PATH
 
-	echo "Done copying ova images into $OVA_ISO_PATH"
+	echo "Done moving ova images into $OVA_ISO_PATH"
 	echo ""
 }
 
