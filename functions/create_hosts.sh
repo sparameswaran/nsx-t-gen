@@ -44,7 +44,20 @@ ${NSX_T_EDGE_HOST_PREFIX}-0${count}  \
   vmname="${NSX_T_EDGE_VM_NAME_PREFIX}-0${count}" \
   hostname="${NSX_T_EDGE_HOST_PREFIX}-0${count}" \
   portgroupExt="$NSX_T_EDGE_PORTGROUP_EXT" \
-  portgroupTransport="$NSX_T_EDGE_PORTGROUP_TRANSPORT"
+  portgroupTransport="$NSX_T_EDGE_PORTGROUP_TRANSPORT" \
+  edge_vcenter_host="$EDGE_VCENTER_HOST" \
+  edge_vcenter_user="$EDGE_VCENTER_USR" \
+  edge_vcenter_password="$EDGE_VCENTER_PWD" \
+  edge_vcenter_cluster="$EDGE_VCENTER_CLUSTER" \
+  edge_dc="$EDGE_VCENTER_DATACENTER" \
+  edge_datastore="$EDGE_VCENTER_DATASTORE" \
+  edge_portgroup="$EDGE_MGMT_PORTGROUP" \
+  edge_dns_server="$EDGE_DNSSERVER" \
+  edge_dns_domain="$EDGE_DNSDOMAIN" \
+  edge_ntp_server="$EDGE_NTPSERVERS" \
+  edge_gw="$EDGE_DEFAULTGATEWAY" \
+  edge_mask="$EDGE_NETMASK"
+
 EOF
     (( count++ ))
   done
@@ -131,6 +144,14 @@ edge_vcenter_host="$EDGE_VCENTER_HOST"
 edge_vcenter_user="$EDGE_VCENTER_USR"
 edge_vcenter_password="$EDGE_VCENTER_PWD"
 edge_vcenter_cluster="$EDGE_VCENTER_CLUSTER"
+edge_dc="$EDGE_VCENTER_DATACENTER"
+edge_datastore="$EDGE_VCENTER_DATASTORE"
+edge_portgroup="$EDGE_MGMT_PORTGROUP"
+edge_dns_server="$EDGE_DNSSERVER"
+edge_dns_domain="$EDGE_DNSDOMAIN"
+edge_ntp_server="$EDGE_NTPSERVERS"
+edge_gw="$EDGE_DEFAULTGATEWAY"
+edge_mask="$EDGE_NETMASK"
 
 nsxAdminPass="$NSX_T_MANAGER_ADMIN_PWD"
 nsxCliPass="$NSX_T_MANAGER_ROOT_PWD"
