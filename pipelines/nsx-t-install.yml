@@ -21,6 +21,10 @@ nsx_t_gen_params: &nsx-t-gen-params
   COMPUTE_VCENTER_PWD: ((compute_vcenter_pwd))
   COMPUTE_VCENTER_CLUSTER: ((compute_vcenter_cluster))
   COMPUTE_VCENTER_MANAGER: ((compute_vcenter_manager))
+  EDGE_VCENTER_HOST: ((edge_vcenter_host))
+  EDGE_VCENTER_USR: ((edge_vcenter_usr))
+  EDGE_VCENTER_PWD: ((edge_vcenter_pwd))
+  EDGE_VCENTER_CLUSTER: ((edge_vcenter_cluster))
   NSX_T_MANAGER_FQDN: ((nsx_t_manager_host_name))
   NSX_T_MANAGER_VM_NAME: ((nsx_t_manager_vm_name))
   NSX_T_MANAGER_HOST_NAME: ((nsx_t_manager_host_name))
@@ -74,7 +78,7 @@ nsx_t_gen_params: &nsx-t-gen-params
   NSX_T_LBR_SPEC: ((nsx_t_lbr_spec))
   ENABLE_ANSIBLE_DEBUG: ((enable_ansible_debug))
   RERUN_CONFIGURE_CONTROLLERS: ((rerun_configure_controllers))
-  
+
 groups:
 
 - name: full-install
@@ -131,23 +135,23 @@ resources:
     #username: username
     #password: password
     url: ((nsx_image_webserver))/((nsx_mgr_ova))
-    filename: ((nsx_mgr_ova))  
+    filename: ((nsx_mgr_ova))
 
 - name: nsx-ctrl-ova
   type: file-url
   source:
     #username: username
     #password: password
-    url: ((nsx_image_webserver))/((nsx_controller_ova))  
-    filename: ((nsx_controller_ova)) 
+    url: ((nsx_image_webserver))/((nsx_controller_ova))
+    filename: ((nsx_controller_ova))
 
 - name: nsx-edge-ova
   type: file-url
   source:
     #username: username
     #password: password
-    url: ((nsx_image_webserver))/((nsx_edge_ova)) 
-    filename: ((nsx_edge_ova)) 
+    url: ((nsx_image_webserver))/((nsx_edge_ova))
+    filename: ((nsx_edge_ova))
 
 # Download from https://my.vmware.com/group/vmware/details?productId=614&downloadGroup=OVFTOOL420#
 - name: ovftool
@@ -156,7 +160,7 @@ resources:
     #username: username
     #password: password
     url: ((nsx_image_webserver))/((ovftool_image))
-    filename: ((ovftool_image))   
+    filename: ((ovftool_image))
 
 jobs:
 
@@ -194,7 +198,7 @@ jobs:
     - get: nsxt-ansible
       params: {globs: []}
       passed: [add-nsx-t-routers]
-      trigger: true    
+      trigger: true
 
   - task: config-nsx-t-extras
     file: nsx-t-gen-pipeline/tasks/config-nsx-t-extras/task.yml
@@ -220,7 +224,7 @@ jobs:
     - get: nsx-t-gen-pipeline
     - get: nsxt-ansible
       params: {globs: []}
-      
+
   - task: add-nsx-t-routers
     file: nsx-t-gen-pipeline/tasks/add-nsx-t-routers/task.yml
     params: *nsx-t-gen-params
@@ -231,7 +235,7 @@ jobs:
     - get: nsx-t-gen-pipeline
     - get: nsxt-ansible
       params: {globs: []}
-      
+
   - task: config-nsx-t-extras
     file: nsx-t-gen-pipeline/tasks/config-nsx-t-extras/task.yml
     params: *nsx-t-gen-params

@@ -27,6 +27,10 @@ params:
   COMPUTE_VCENTER_PWD:
   COMPUTE_VCENTER_CLUSTER:
   COMPUTE_VCENTER_MANAGER:
+  EDGE_VCENTER_HOST:
+  EDGE_VCENTER_USR:
+  EDGE_VCENTER_PWD:
+  EDGE_VCENTER_CLUSTER:
   NSX_T_MANAGER_FQDN:
   NSX_T_MANAGER_VM_NAME:
   NSX_T_MANAGER_HOST_NAME:
@@ -77,14 +81,14 @@ params:
   ENABLE_ANSIBLE_DEBUG:
   RERUN_CONFIGURE_CONTROLLERS:
 
-    
+
 inputs:
   - name: nsx-t-gen-pipeline
   - name: nsx-mgr-ova
   - name: nsx-ctrl-ova
   - name: nsx-edge-ova
   - name: nsxt-ansible
-  - name: ovftool 
+  - name: ovftool
 
 run:
   path: nsx-t-gen-pipeline/tasks/install-nsx-t/task.sh

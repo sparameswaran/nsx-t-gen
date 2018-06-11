@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function create_controller_hosts {  
+function create_controller_hosts {
 
   count=1
   echo "[nsxcontrollers]" > ctrl_vms
@@ -18,7 +18,7 @@ nsx-controller0${count} \
   gw=$DEFAULTGATEWAY \
   mask=$NETMASK \
   vmname="${NSX_T_CONTROLLER_VM_NAME_PREFIX}-0${count}" \
-  hostname="${NSX_T_CONTROLLER_HOST_PREFIX}-0${count}" 
+  hostname="${NSX_T_CONTROLLER_HOST_PREFIX}-0${count}"
 EOF
     (( count++ ))
   done
@@ -44,7 +44,7 @@ ${NSX_T_EDGE_HOST_PREFIX}-0${count}  \
   vmname="${NSX_T_EDGE_VM_NAME_PREFIX}-0${count}" \
   hostname="${NSX_T_EDGE_HOST_PREFIX}-0${count}" \
   portgroupExt="$NSX_T_EDGE_PORTGROUP_EXT" \
-  portgroupTransport="$NSX_T_EDGE_PORTGROUP_TRANSPORT" 
+  portgroupTransport="$NSX_T_EDGE_PORTGROUP_TRANSPORT"
 EOF
     (( count++ ))
   done
@@ -59,9 +59,9 @@ function create_esxi_hosts {
 
   # Check if the esxi_hosts config is not empty and is valid
   if [ "$ESXI_HOSTS_CONFIG" != "" -a "$is_valid_yml" != "" ]; then
-   
+
     echo "[nsxtransportnodes]" > esxi_hosts
-  
+
     length=$(expr $(cat /tmp/esxi_hosts_config.yml  | shyaml get-values esxi_hosts | grep name: | wc -l) - 1 || true )
     for index in $(seq 0 $length)
     do
@@ -79,11 +79,11 @@ EOF
   else
     echo "esxi_hosts_config not set to valid yaml, so ignoring it"
     echo "Would use computer manager configs to add hosts!!"
-    echo "" >> esxi_hosts 
+    echo "" >> esxi_hosts
   fi
 }
 
-function create_hosts { 
+function create_hosts {
 
 export NSX_T_MANAGER_SHORT_HOSTNAME=$(echo $NSX_T_MANAGER_FQDN | awk -F '\.' '{print $1}')
 
@@ -127,6 +127,11 @@ compute_vcenter_password="$COMPUTE_VCENTER_PWD"
 compute_vcenter_cluster="$COMPUTE_VCENTER_CLUSTER"
 compute_vcenter_manager="$COMPUTE_VCENTER_MANAGER"
 
+edge_vcenter_host="$EDGE_VCENTER_HOST"
+edge_vcenter_user="$EDGE_VCENTER_USR"
+edge_vcenter_password="$EDGE_VCENTER_PWD"
+edge_vcenter_cluster="$EDGE_VCENTER_CLUSTER"
+
 nsxAdminPass="$NSX_T_MANAGER_ADMIN_PWD"
 nsxCliPass="$NSX_T_MANAGER_ROOT_PWD"
 
@@ -169,7 +174,7 @@ edge_cluster="$NSX_T_EDGE_CLUSTER"
 
 EOF
 
-  
+
   create_edge_hosts
   create_controller_hosts
 
@@ -177,7 +182,7 @@ EOF
   echo "" >> hosts
   cat edge_vms >> hosts
   echo "" >> hosts
-  
+
   if  [ ! -z "$ESXI_HOSTS_CONFIG" ]; then
     create_esxi_hosts
     cat esxi_hosts >> hosts
@@ -185,4 +190,3 @@ EOF
   fi
 
 }
-

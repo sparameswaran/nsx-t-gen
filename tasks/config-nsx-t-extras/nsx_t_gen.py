@@ -38,10 +38,10 @@ def init():
   nsx_mgr_user        = os.getenv('NSX_T_MANAGER_ADMIN_USER', 'admin')
   nsx_mgr_pwd         = os.getenv('NSX_T_MANAGER_ROOT_PWD')
   transport_zone_name = os.getenv('NSX_T_OVERLAY_TRANSPORT_ZONE')
-  nsx_mgr_context     = { 
-                          'admin_user' : nsx_mgr_user, 
-                          'url': 'https://' + nsx_mgr_ip, 
-                          'admin_passwd' : nsx_mgr_pwd 
+  nsx_mgr_context     = {
+                          'admin_user' : nsx_mgr_user,
+                          'url': 'https://' + nsx_mgr_ip,
+                          'admin_passwd' : nsx_mgr_pwd
                         }
   global_id_map['DEFAULT_TRANSPORT_ZONE_NAME'] = transport_zone_name
 
@@ -86,7 +86,7 @@ def get_edge_cluster_id():
 #   return global_id_map['EDGE_CLUSTER:' + default_edge_cluster_name]
 
 def load_transport_zones():
-  api_endpoint = TRANSPORT_ZONES_ENDPOINT  
+  api_endpoint = TRANSPORT_ZONES_ENDPOINT
 
   resp=client.get(api_endpoint)
   for result in resp.json()['results']:
@@ -96,7 +96,7 @@ def load_transport_zones():
 
 def get_transport_zone():
 
-  load_transport_zones()      
+  load_transport_zones()
   return global_id_map['DEFAULT_TRANSPORT_ZONE_NAME']
 
 def get_transport_zone_id(transport_zone):
@@ -105,7 +105,7 @@ def get_transport_zone_id(transport_zone):
   transport_zone_id = global_id_map.get('TZ:' + default_transport_zone)
   if transport_zone_id is None:
     return global_id_map['TZ:' + default_transport_zone]
-  
+
   return transport_zone_id
 
 def update_tag(api_endpoint, tag_map):
@@ -118,12 +118,12 @@ def update_tag(api_endpoint, tag_map):
     entry = { 'scope': key, 'tag': tag_map[key] }
     tags.append(entry)
   updated_payload['tags'] = tags
-  
-  resp = client.put(api_endpoint, updated_payload)  
+
+  resp = client.put(api_endpoint, updated_payload)
 
 def check_switching_profile(switching_profile_name):
   api_endpoint = SWITCHING_PROFILE_ENDPOINT
-  
+
   resp = client.get(api_endpoint)
 
   switching_profile_id = None
@@ -145,7 +145,7 @@ def load_logical_routers():
 
 def check_logical_router(router_name):
   api_endpoint = ROUTERS_ENDPOINT
-  
+
   resp = client.get(api_endpoint)
 
   logical_router_id = None
@@ -158,7 +158,7 @@ def check_logical_router(router_name):
 
 def check_logical_router_port(router_id):
   api_endpoint = ROUTER_PORTS_ENDPOINT
-  
+
   resp = client.get(api_endpoint)
 
   logical_router_port_id = None
@@ -171,20 +171,20 @@ def check_logical_router_port(router_id):
 
 def create_t0_logical_router(t0_router):
   api_endpoint = ROUTERS_ENDPOINT
-  
+
   router_type='TIER0'
   edge_cluster_id=get_edge_cluster_id()
 
   router_name = t0_router['name']
   t0_router_id=check_logical_router(router_name)
   if t0_router_id is not None:
-    return t0_router_id  
+    return t0_router_id
 
   payload={
       'resource_type': 'LogicalRouter',
       'description': "Logical router of type {}, created by nsx-t-gen!!".format(router_type),
       'display_name': router_name,
-      'edge_cluster_id': edge_cluster_id,      
+      'edge_cluster_id': edge_cluster_id,
       'router_type': router_type,
       'high_availability_mode': t0_router['ha_mode'],
     }
@@ -200,8 +200,8 @@ def create_t0_logical_router_and_port(t0_router):
   api_endpoint = ROUTER_PORTS_ENDPOINT
   router_name = t0_router['name']
   subnet = t0_router['subnet']
-  
-  router_id=create_t0_logical_router(router_name)  
+
+  router_id=create_t0_logical_router(router_name)
   logical_router_port_id=check_logical_router_port(t0_router_id)
   if logical_router_port_id is not None:
     return t0_router_id
@@ -222,9 +222,9 @@ def create_t0_logical_router_and_port(t0_router):
       'subnets' : [ {
           'ip_addresses' : [ network ],
           'prefix_length' : cidr
-        } ]    
+        } ]
     }
-      
+
   resp = client.post(api_endpoint, payload1)
   target_id=resp.json()['id']
 
@@ -234,19 +234,19 @@ def create_t0_logical_router_and_port(t0_router):
 
 def create_t1_logical_router(router_name):
   api_endpoint = ROUTERS_ENDPOINT
-  
+
   router_type='TIER1'
   edge_cluster_id=get_edge_cluster_id()
 
   t1_router_id=check_logical_router(router_name)
   if t1_router_id is not None:
     return t1_router_id
-  
+
   payload={
       'resource_type': 'LogicalRouter',
       'description': "Logical router of type {}, created by nsx-t-gen!!".format(router_type),
       'display_name': router_name,
-      'edge_cluster_id': edge_cluster_id,      
+      'edge_cluster_id': edge_cluster_id,
       'router_type': router_type
     }
   resp = client.post(api_endpoint, payload )
@@ -259,10 +259,10 @@ def create_t1_logical_router(router_name):
 
 def create_t1_logical_router_and_port(t0_router_name, t1_router_name, t0_router_subnet):
   api_endpoint = ROUTER_PORTS_ENDPOINT
-  
+
   t0_router_id=create_t0_logical_router_and_port(t0_router_name, t0_router_subnet)
   t1_router_id=create_t1_logical_router(t1_router_name)
-  
+
   name = "LogicalRouterLinkPortFrom%sTo%s" % (t0_router_name, t1_router_name )
   descp = "Port created on %s router for %s" % (t0_router_name, t1_router_name )
   target_display_name = "LinkedPort_%sTo%s" % (t0_router_name, t1_router_name )
@@ -271,9 +271,9 @@ def create_t1_logical_router_and_port(t0_router_name, t1_router_name, t0_router_
       'resource_type': 'LogicalRouterLinkPortOnTIER0',
       'description': descp,
       'display_name': name,
-      'logical_router_id': t0_router_id      
+      'logical_router_id': t0_router_id
     }
-      
+
   resp = client.post(api_endpoint, payload1)
   target_id=resp.json()['id']
 
@@ -285,7 +285,7 @@ def create_t1_logical_router_and_port(t0_router_name, t1_router_name, t0_router_
         'resource_type': 'LogicalRouterLinkPortOnTIER1',
         'description': descp,
         'display_name': name,
-        'logical_router_id': t1_router_id,   
+        'logical_router_id': t1_router_id,
         'linked_logical_router_port_id' : {
           'target_display_name' : target_display_name,
           'target_type' : 'LogicalRouterLinkPortOnTIER0',
@@ -300,7 +300,7 @@ def create_t1_logical_router_and_port(t0_router_name, t1_router_name, t0_router_
 
 def check_logical_switch(logical_switch):
   api_endpoint = SWITCHES_ENDPOINT
-  
+
   resp = client.get(api_endpoint )
 
   logical_switch_id = None
@@ -325,7 +325,7 @@ def create_logical_switch(logical_switch_name):
 
   logical_switch_id=resp.json()['id']
   print("Created Logical Switch '{}'".format(logical_switch_name))
-  
+
   global_id_map['LS:' + logical_switch_name] = logical_switch_id
   return logical_switch_id
 
@@ -335,7 +335,7 @@ def create_logical_switch_port(logical_switch_name, logical_switch_id):
 
   payload={
         'logical_switch_id': logical_switch_id,
-        'display_name': switch_port_name,        
+        'display_name': switch_port_name,
         'admin_state': 'UP'
       }
 
@@ -343,7 +343,7 @@ def create_logical_switch_port(logical_switch_name, logical_switch_id):
 
   logical_switch_port_id=resp.json()['id']
   global_id_map['LSP:' + switch_port_name] = logical_switch_port_id
-  
+
   return logical_switch_port_id
 
 def associate_logical_switch_port(t1_router_name, logical_switch_name, subnet):
@@ -351,7 +351,7 @@ def associate_logical_switch_port(t1_router_name, logical_switch_name, subnet):
 
   network=subnet.split('/')[0]
   cidr=subnet.split('/')[1]
-  
+
   t1_router_id=check_logical_router(t1_router_name)
   logical_switch_id=check_logical_switch(logical_switch_name)
   logical_switch_port=create_logical_switch_port(logical_switch_name, logical_switch_id )
@@ -379,34 +379,40 @@ def associate_logical_switch_port(t1_router_name, logical_switch_name, subnet):
   logical_router_port_id=resp.json()['id']
   print("Created Logical Switch Port from Logical Switch {} with name: {} "
         + "to T1Router: {}".format(logical_switch_name, switch_port_name, t1_router_name))
-  
+
   global_id_map['LRP:' + name] = logical_router_port_id
   return logical_router_port_id
 
-def create_container_ip_block(ip_block_name, cidr):
+def create_container_ip_block(ip_block_name, cidr, tags):
   api_endpoint = CONTAINER_IP_BLOCKS_ENDPOINT
-  
+
   payload={
       'resource_type': 'IpBlock',
       'display_name': ip_block_name,
       'cidr': cidr
     }
+  effective_tags = [ ]
+  for key in tags:
+    entry = { 'scope': key, 'tag': tags[key] }
+    effective_tags.append(entry)
+  payload['tags'] = effective_tags
+
   resp = client.post(api_endpoint, payload )
 
   ip_block_id=resp.json()['id']
   print("Created Container IP Block '{}' with cidr: {}".format(ip_block_name, cidr))
-  
+
   global_id_map['IPBLOCK:' + ip_block_name] = ip_block_id
   return ip_block_id
 
-def create_external_ip_pool(ip_pool_name, cidr, gateway, start_ip, end_ip):
+def create_external_ip_pool(ip_pool_name, cidr, gateway, start_ip, end_ip, tags):
   api_endpoint = EXTERNAL_IP_POOL_ENDPOINT
-  
+
   payload={
       'resource_type': 'IpPool',
-      'display_name': ip_pool_name,      
-      'subnets' : [ {  
-        'allocation_ranges' : [ { 
+      'display_name': ip_pool_name,
+      'subnets' : [ {
+        'allocation_ranges' : [ {
           'start' : start_ip,
           'end' : end_ip
         } ],
@@ -415,6 +421,15 @@ def create_external_ip_pool(ip_pool_name, cidr, gateway, start_ip, end_ip):
         'dns_nameservers' : [ ]
        } ],
     }
+
+  effective_tags = [ ]
+  for key in tags:
+    entry = { 'scope': key, 'tag': tags[key] }
+    effective_tags.append(entry)
+  effective_tags.append( { 'scope' : 'ncp/external', 'tag': 'true' } )
+
+  payload['tags'] = effective_tags
+
   resp = client.post(api_endpoint, payload )
 
   ip_pool_id=resp.json()['id']
@@ -424,10 +439,13 @@ def create_external_ip_pool(ip_pool_name, cidr, gateway, start_ip, end_ip):
   return ip_pool_id
 
 def create_pas_tags():
-  pas_tag_name   = os.getenv('NSX_T_PAS_NCP_CLUSTER_TAG') 
-  pas_tags = {  
-            'ncp/cluster': pas_tag_name , 
-            'ncp/shared_resource': 'true' 
+  pas_tag_name   = os.getenv('NSX_T_PAS_NCP_CLUSTER_TAG')
+  if  pas_tag_name is None:
+      return {}
+
+  pas_tags = {
+            'ncp/cluster': pas_tag_name ,
+            'ncp/shared_resource': 'true'
           }
   return pas_tags
 
@@ -440,10 +458,10 @@ def create_container_ip_blocks():
   ip_blocks = yaml.load(ip_blocks_defn)
   for ip_block in ip_blocks['container_ip_blocks']:
     ip_block_name   = ip_block('name')
-    ip_block_cidr   = ip_block('cidr')    
-    container_ip_block_id = create_container_ip_block(ip_block_name, ip_block_cidr)
-    update_tag(CONTAINER_IP_BLOCKS_ENDPOINT + '/' + container_ip_block_id, create_pas_tags())
-    
+    ip_block_cidr   = ip_block('cidr')
+    container_ip_block_id = create_container_ip_block(ip_block_name, ip_block_cidr, ip_block['tags'])
+    #update_tag(CONTAINER_IP_BLOCKS_ENDPOINT + '/' + container_ip_block_id, create_pas_tags())
+
 def create_external_ip_pools():
   ip_pools_defn = os.getenv('NSX_T_EXTERNAL_IP_POOL_SPEC', '').strip()
   if ip_pools_defn == '' or ip_pools_defn == 'null' :
@@ -452,17 +470,18 @@ def create_external_ip_pools():
 
   ip_pools    = yaml.load(ip_pools_defn)
   for ip_pool in ip_pools['external_ip_pools']:
-    ip_pool_id - create_external_ip_pool(ip_pool['name'], 
-                            ip_pool['cidr'], 
-                            ip_pool['gateway'], 
-                            ip_pool['start'], 
-                            ip_pool['end']) 
+    ip_pool_id - create_external_ip_pool(ip_pool['name'],
+                            ip_pool['cidr'],
+                            ip_pool['gateway'],
+                            ip_pool['start'],
+                            ip_pool['end'],
+                            ip_pool['tags'])
 
-    external_ip_pool_profile_tags = {  
-                                'ncp/cluster': pas_tag_name , 
+    external_ip_pool_profile_tags = {
+                                'ncp/cluster': pas_tag_name ,
                                 'ncp/external': 'true'
                               }
-    update_tag(EXTERNAL_IP_POOL_ENDPOINT + '/' + ip_pool_id, external_ip_pool_profile_tags)
+    #update_tag(EXTERNAL_IP_POOL_ENDPOINT + '/' + ip_pool_id, external_ip_pool_profile_tags)
 
 
 def create_ha_switching_profile():
@@ -477,27 +496,27 @@ def create_ha_switching_profile():
   if ha_switching_profiles is None:
     print('No valid yaml payload set for the NSX_T_HA_SWITCHING_PROFILE_SPEC, ignoring HASpoofguard profile section!')
     return
-  
+
   api_endpoint = SWITCHING_PROFILE_ENDPOINT
 
   for ha_switching_profile in ha_switching_profiles:
-    switching_profile_name = ha_switching_profile['name']  
+    switching_profile_name = ha_switching_profile['name']
     switching_profile_id   = check_switching_profile(ha_switching_profile['name'])
     if switching_profile_id is None:
       payload={
           'resource_type': 'SpoofGuardSwitchingProfile',
           'description': 'Spoofguard switching profile for ncp-cluster-ha, created by nsx-t-gen!!',
-          'display_name': switching_profile_name, 
+          'display_name': switching_profile_name,
           'white_list_providers': ['LSWITCH_BINDINGS']
         }
       resp = client.post(api_endpoint, payload )
       switching_profile_id=resp.json()['id']
 
     global_id_map['SP:' + switching_profile_name] = switching_profile_id
-    switching_profile_tags = {  
-                                'ncp/cluster': pas_tag_name , 
-                                'ncp/shared_resource': 'true' , 
-                                'ncp/ha': 'true' 
+    switching_profile_tags = {
+                                'ncp/cluster': pas_tag_name ,
+                                'ncp/shared_resource': 'true' ,
+                                'ncp/ha': 'true'
                               }
     update_tag(SWITCHING_PROFILE_ENDPOINT + '/' + switching_profile_id, switching_profile_tags)
   print('Done creating HASwitchingProfiles\n')
@@ -508,7 +527,7 @@ def list_certs():
     return
 
   csr_request = yaml.load(csr_request_spec)['csr_request']
-  
+
   api_endpoint = TRUST_MGMT_CSRS_ENDPOINT
   existing_csrs_response = client.get(api_endpoint).json()
   if existing_csrs_response['result_count'] > 0:
@@ -517,14 +536,14 @@ def list_certs():
   print('Done listing CSRs\n')
 
 def generate_self_signed_cert():
-  
+
   nsx_t_manager_fqdn = os.getenv('NSX_T_MANAGER_FQDN', '')
   if nsx_t_manager_fqdn is None or nsx_t_manager_fqdn is '':
     nsx_t_manager_fqdn = os.getenv('NSX_T_MANAGER_HOST_NAME')
 
   if nsx_t_manager_fqdn is None or nsx_t_manager_fqdn is '':
     print('Value not set for the NSX_T_MANAGER_HOST_NAME, cannot create self-signed cert')
-    return    
+    return
 
   csr_request_spec = os.getenv('NSX_T_CSR_REQUEST_SPEC', '').strip()
   if csr_request_spec == ''  or csr_request_spec == 'null' :
@@ -549,9 +568,9 @@ def generate_self_signed_cert():
     print('Error!! CSR common name is not a full qualified domain name (provided as nsx mgr FQDN): {}!!'.format(nsx_t_manager_fqdn))
     exit(-1)
 
-  payload = { 
-            'subject': {            
-              'attributes': [              
+  payload = {
+            'subject': {
+              'attributes': [
                 { 'key':'CN','value': nsx_t_manager_fqdn },
                 { 'key':'O','value':  csr_request['org_name'] },
                 { 'key':'OU','value': csr_request['org_unit'] },
@@ -571,7 +590,7 @@ def generate_self_signed_cert():
   self_sign_cert_url = '%s%s%s' % (self_sign_cert_api_endpint, csr_id, '?action=self_sign')
   self_sign_csr_response = client.post(self_sign_cert_url, '').json()
 
-  self_sign_csr_id = self_sign_csr_response['id'] 
+  self_sign_csr_id = self_sign_csr_response['id']
 
   update_api_endpint = '%s%s%s' % (TRUST_MGMT_UPDATE_CERT, '&certificate_id=', self_sign_csr_id)
   update_csr_response = client.post(update_api_endpint, '')
@@ -583,7 +602,7 @@ def build_routers():
   init()
   load_edge_clusters()
   load_transport_zones()
-  
+
   t0_router_content  = os.getenv('NSX_T_T0ROUTER_SPEC').strip()
   t0_router         = yaml.load(t0_router_content)['t0_router']
   if t0_router is None:
@@ -597,7 +616,7 @@ def build_routers():
   if t1_routers is None:
     print 'No valid T1Router content NSX_T_T1ROUTER_LOGICAL_SWITCHES_SPEC passed'
     return
-  
+
 
   pas_tags = create_pas_tags()
   update_tag(ROUTERS_ENDPOINT + '/' + t0_router_id, pas_tags)
@@ -621,7 +640,7 @@ def set_t0_route_redistribution():
     if key.startswith('ROUTER:TIER0'):
       t0_router_id = global_id_map[key]
       api_endpoint = '%s/%s/%s' % (ROUTERS_ENDPOINT, t0_router_id, 'routing/redistribution')
-  
+
       cur_redistribution_resp = client.get(api_endpoint ).json()
       payload={
           'resource_type': 'RedistributionConfig',
@@ -675,7 +694,7 @@ def add_t0_route_nat_rules():
 
   nat_rules_defns = yaml.load(nat_rules_defn)['nat_rules']
   if nat_rules_defns is None or len(nat_rules_defns) <= 0:
-    print('No nat rule entries in the NSX_T_NAT_RULES_SPEC, nothing to add/update!')    
+    print('No nat rule entries in the NSX_T_NAT_RULES_SPEC, nothing to add/update!')
     return
 
   t0_router_id = global_id_map['ROUTER:TIER0:' + nat_rules_defns[0]['t0_router']]
@@ -688,7 +707,7 @@ def add_t0_route_nat_rules():
   changes_detected = False
   existing_nat_rules = client.get(api_endpoint ).json()['results']
   for nat_rule in nat_rules_defns:
-    
+
     rule_payload = {
         'resource_type': 'NatRule',
         'enabled' : True,
@@ -717,7 +736,7 @@ def add_t0_route_nat_rules():
         print('Updating just the priority of existing nat rule: {}'.format(rule_payload))
         update_api_endpint = '%s%s%s' % (api_endpoint, '/', existing_nat_rule['id'])
         resp = client.put(update_api_endpint, rule_payload )
-    
+
   if changes_detected:
     print('Done adding/updating nat rules for T0Routers!!\n')
   else:
@@ -864,9 +883,9 @@ def add_lbr_virtual_server(virtual_server_defn):
             'pool_id': pool_id,
             'enabled': True,
             'ip_protocol': 'TCP',
-            'port': virtual_server_defn['port']     
-  } 
-    
+            'port': virtual_server_defn['port']
+  }
+
   if existing_virtual_server is None:
     resp = client.post(virtual_server_api_endpoint, vs_payload ).json()
     print 'Created Virtual Server: {}'.format(virtual_server_name)
@@ -876,10 +895,10 @@ def add_lbr_virtual_server(virtual_server_defn):
   vs_payload['_revision'] = existing_virtual_server['_revision']
   vs_payload['id'] = existing_virtual_server['id']
   vs_update_api_endpoint = '%s/%s' % (virtual_server_api_endpoint, existing_virtual_server['id'])
-  
+
   resp = client.put(vs_update_api_endpoint, vs_payload, check=False )
   print 'Updated Virtual Server: {}'.format(virtual_server_name)
-  print ''  
+  print ''
   return existing_virtual_server['id']
 
 def add_loadbalancers():
@@ -891,7 +910,7 @@ def add_loadbalancers():
 
   lbrs_defn = yaml.load(lbr_spec_defn)['loadbalancers']
   if lbrs_defn is None or len(lbrs_defn) <= 0:
-    print('No valid yaml passed in the NSX_T_LBR_SPEC, nothing to add/update for LBR!')    
+    print('No valid yaml passed in the NSX_T_LBR_SPEC, nothing to add/update for LBR!')
     return
 
   for lbr in lbrs_defn:
@@ -910,7 +929,7 @@ def add_loadbalancers():
             'target_display_name': lbr['t1_router'],
             'target_type': 'LogicalRouter',
             'target_id': t1_router_id
-        }     
+        }
     }
 
     virtual_servers = []
@@ -931,7 +950,7 @@ def add_loadbalancers():
       lbr_id = existing_lbr['id']
 
       lbr_service_payload['_revision'] = existing_lbr['_revision']
-      lbr_service_payload['id'] = existing_lbr['id']    
+      lbr_service_payload['id'] = existing_lbr['id']
 
       lbr_update_api_endpoint = '%s/%s' % (lbr_api_endpoint, lbr_id)
       resp = client.put(lbr_update_api_endpoint, lbr_service_payload, check=False )
@@ -939,7 +958,7 @@ def add_loadbalancers():
       print ''
 
 def main():
-  
+
   init()
   load_edge_clusters()
   load_transport_zones()
@@ -966,6 +985,6 @@ def main():
   # Push this to the last step as the login gets kicked off
   # Generate self-signed cert
   generate_self_signed_cert()
-  
+
 if __name__ == '__main__':
   main()

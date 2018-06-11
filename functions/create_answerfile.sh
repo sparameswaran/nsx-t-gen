@@ -35,6 +35,11 @@ compute_vcenter_password: "$COMPUTE_VCENTER_PWD"
 compute_vcenter_cluster: "$COMPUTE_VCENTER_CLUSTER"
 compute_vcenter_manager: "$COMPUTE_VCENTER_MANAGER"
 
+edge_vcenter_host: "$EDGE_VCENTER_HOST"
+edge_vcenter_user: "$EDGE_VCENTER_USR"
+edge_vcenter_password: "$EDGE_VCENTER_PWD"
+edge_vcenter_cluster: "$EDGE_VCENTER_CLUSTER"
+
 managers:
   nsxmanager:
     hostname: $NSX_T_MANAGER_SHORT_HOSTNAME
@@ -50,14 +55,14 @@ function create_answerfile {
 
 	create_edge_config
 	create_controller_config
-	
+
 	create_base_answerfile
-	
+
 
 	# Merge controller and edge config with answerfile
 	cat controller_config.yml >> answerfile.yml
 	echo "" >> answerfile.yml
-	cat edge_config.yml >> answerfile.yml 
+	cat edge_config.yml >> answerfile.yml
 	echo "" >> answerfile.yml
 }
 
@@ -72,8 +77,8 @@ EOF
 	  cat >> controller_config.yml <<-EOF
 $controller_config
   nsxController0${count}:
-    hostname: "${NSX_T_CONTROLLER_HOST_PREFIX}-0${count}.${DNSDOMAIN}" 
-    vmName: "${NSX_T_CONTROLLER_VM_NAME_PREFIX}-0${count}" 
+    hostname: "${NSX_T_CONTROLLER_HOST_PREFIX}-0${count}.${DNSDOMAIN}"
+    vmName: "${NSX_T_CONTROLLER_VM_NAME_PREFIX}-0${count}"
     ipAddress: $controller_ip
     ovaFile: $NSX_T_CONTROLLER_OVA
 EOF
@@ -94,7 +99,7 @@ EOF
 $edge_config
   ${NSX_T_EDGE_HOST_PREFIX}-0${count}:
     hostname: "${NSX_T_EDGE_HOST_PREFIX}-0${count}"
-    vmName: "${NSX_T_EDGE_VM_NAME_PREFIX}-0${count}" 
+    vmName: "${NSX_T_EDGE_VM_NAME_PREFIX}-0${count}"
     ipAddress: $edge_ip
     ovaFile: $NSX_T_EDGE_OVA
     portgroupExt: $NSX_T_EDGE_PORTGROUP_EXT

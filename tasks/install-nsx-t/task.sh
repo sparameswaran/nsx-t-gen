@@ -18,6 +18,7 @@ source $FUNCTIONS_DIR/create_ansible_cfg.sh
 source $FUNCTIONS_DIR/create_answerfile.sh
 source $FUNCTIONS_DIR/create_hosts.sh
 source $FUNCTIONS_DIR/create_extra_yaml_args.sh
+source $FUNCTIONS_DIR/check_null_variables.sh
 
 function check_status_up {
 	ip_set=$1

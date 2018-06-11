@@ -23,14 +23,14 @@ nsx_image_webserver: http://10.85.24.5:9080/
 
 # Download NSX-T 2.1 bits from
 # https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-210&productId=673
-nsx_mgr_ova: nsx-unified-appliance-2.1.0.0.0.7395503.ova  
-nsx_controller_ova: nsx-controller-2.1.0.0.0.7395493.ova  
-nsx_edge_ova: nsx-edge-2.1.0.0.0.7395502.ova  
+nsx_mgr_ova: nsx-unified-appliance-2.1.0.0.0.7395503.ova
+nsx_controller_ova: nsx-controller-2.1.0.0.0.7395493.ova
+nsx_edge_ova: nsx-edge-2.1.0.0.0.7395502.ova
 # Ensure ovftool is minimally v4.2
 # https://my.vmware.com/group/vmware/details?productId=614&downloadGroup=OVFTOOL420#
 ovftool_image: VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle
 
-# The Esxi Hosts can be added to transport nodes in two ways: 
+# The Esxi Hosts can be added to transport nodes in two ways:
 # a) specify the esxi hosts individually - first checked for
 # b) or use compute_vcenter_manager to add hosts under a specific vcenter as transport nodes
 
@@ -42,20 +42,26 @@ esxi_hosts_config: |
   esxi_hosts:
   - name: esxi-host1.corp.local.io
     ip: 10.13.12.10
-    root_pwd: rootPasswd 
+    root_pwd: rootPasswd
 # - name: esxi-host2.corp.local.io
 #   ip: 10.13.12.11
-#   root_pwd: rootPasswd 
+#   root_pwd: rootPasswd
 
 # Using a separate compute manager to specify esxi hosts
-# If filled, then change the the esxi_hosts_config section to be empty 
-# Sample empty config: 
+# If filled, then change the the esxi_hosts_config section to be empty
+# Sample empty config:
 # esxi_hosts_config: # Provide space after colon
-compute_vcenter_manager: # EDIT - If filled, then comment off the esxi_hosts_config
+compute_vcenter_manager: # EDIT - Name for vCenter; If filled, then comment off the esxi_hosts_config
 compute_vcenter_host: #    EDIT - Use Compute vCenter Esxi hosts as transport node
 compute_vcenter_usr: #     EDIT -  Use Compute vCenter Esxi hosts as transport node
 compute_vcenter_pwd: #     EDIT - Use Compute vCenter Esxi hosts as transport node
 compute_vcenter_cluster: # EDIT - Use Compute vCenter Esxi hosts as transport node
+
+# Using a separate vcenter to add edges
+edge_vcenter_host: #    EDIT - If filled, then edges would use this separate vcenter
+edge_vcenter_usr: #     EDIT -  Use Edge specific vCenter
+edge_vcenter_pwd: #     EDIT - Use Edge specific vCenter
+edge_vcenter_cluster: # EDIT - Use Edge specific vCenter
 
 # Edit fololowing parameters
 nsx_t_manager_host_name: nsx-t-mgr.corp.local.io # Set as FQDN, will be used also as certificate common name
@@ -78,7 +84,7 @@ nsx_t_edge_portgroup_transport: vlan3127  # For TEP/overlay
 
 # If ova deployment succeeded but controller membership failed or edges didnt get to join for any reason
 # enable rerun of the configure controllers
-rerun_configure_controllers: false  # set it to true if you want to rerun the configure controllers 
+rerun_configure_controllers: false  # set it to true if you want to rerun the configure controllers
                                     # (as part of base ova install job) even as ova deployment succeeded
 
 # Edge network interfaces
@@ -101,7 +107,7 @@ nsx_t_tep_pool_nameserver: 192.168.213.2
 # This would mean a deployment of an edge or a mgr would reserve full memory
 # leading to memory constraints
 # if nsx_t_keep_reservation to true  - would keep reservation ON, recommended for production setups.
-# if nsx_t_keep_reservation to false - would turn reservation OFF, recommended for POCs, smaller setups. 
+# if nsx_t_keep_reservation to false - would turn reservation OFF, recommended for POCs, smaller setups.
 nsx_t_keep_reservation: true # for Prod setup
 
 # Default Sizing of NSX-T VMs
@@ -196,9 +202,9 @@ nsx_t_t0router_spec: |
 # Add additional or comment off unnecessary t1 routers and switches as needed
 # Can have 3 different setups:
 # 1: One shared mgmt T1 Router and infra logical switch for both PKS & PAS
-# 2: One mgmt T1 Router and infra logical switch for either PKS or PAS.. 
+# 2: One mgmt T1 Router and infra logical switch for either PKS or PAS..
 #    Comment off the T1 router not required
-# 3: Separate mgmt T1 Router and infra logical switch for each PKS and PAS.. 
+# 3: Separate mgmt T1 Router and infra logical switch for each PKS and PAS..
 #    Add additional T1Router-Mgmt2 as needed with its infra logical switch
 # Name the routers and logical switches and cidrs differently to avoid conflict
 nsx_t_t1router_logical_switches_spec: |
@@ -259,21 +265,21 @@ nsx_t_ha_switching_profile_spec: |
 nsx_t_container_ip_block_spec: |
   container_ip_blocks:
   - name: container-ip-block
-    cidr: 10.4.0.0/16 
-    # Specify tags with PAS 2.0 and NSX Tile 2.1.0   
-    # Tags not needed for PAS 2.1 and NSX Tile 2.1.3   
+    cidr: 10.4.0.0/16
+    # Specify tags with PAS 2.0 and NSX Tile 2.1.0
+    # Tags not needed for PAS 2.1 and NSX Tile 2.1.3
     tags:
       ncp/cluster: 'pas1' # Should match the top level ncp/cluster tag value
-      testtag: 'testpas1' 
+      testtag: 'testpas1'
   - name: container-ip-block-with-no-tag
-    cidr: 11.4.0.0/16 
-    # No tags for this block   
+    cidr: 11.4.0.0/16
+    # No tags for this block
   - name: container-ip-block-pks-with-tag
-    cidr: 11.4.0.0/16 
+    cidr: 11.4.0.0/16
     ncp/shared_resource: true
-    # No tags for this block   
+    # No tags for this block
 
- 
+
 
 # Make sure the ncp/cluster tag matches the one defined on the T0 Router for PAS
 # Make sure the ncp/shared tag is set to true for PKS
@@ -286,18 +292,18 @@ nsx_t_external_ip_pool_spec: |
     gateway: 10.100.0.1
     start: 10.100.0.10 # Should not include gateway
     end: 10.100.0.200  # Should not include gateway
-    # Specify tags with PAS 2.0 and NSX Tile 2.1.0   
-    # Tags not needed for PAS 2.1 and NSX Tile 2.1.3   
+    # Specify tags with PAS 2.0 and NSX Tile 2.1.0
+    # Tags not needed for PAS 2.1 and NSX Tile 2.1.3
     tags:
       ncp/cluster: 'pas1'   # Should match the top level ncp/cluster tag value for PAS
       ncp/external: 'true'  # Required for external facing ips
-      testtag: 'testpas1'      
+      testtag: 'testpas1'
   - name: snat-vip-pool-with-no-tags
     cidr: 10.200.0.0/24
     gateway: 10.200.0.1
     start: 10.200.0.10 # Should not include gateway
     end: 10.200.0.200  # Should not include gateway
-    # No Tags needed for PKS   
+    # No Tags needed for PKS
   - name: snat-vip-pool-for-pks
     cidr: 10.300.0.0/24
     gateway: 10.300.0.1
@@ -391,7 +397,7 @@ nsx_t_nat_rules_spec: |
     source_network: 192.168.20.4        # Internal IP of PKS controller
     translated_network: 10.13.12.7      # External IP address for PKS controller
     rule_priority: 1024                 # Higher priority
-  
+
 nsx_t_csr_request_spec: |
   csr_request:
     #common_name not required - would use nsx_t_manager_host_name
@@ -406,11 +412,11 @@ nsx_t_csr_request_spec: |
 # LBR definition
 # By default, all the server pools would use Layer 4 - TCP pass through
 # No ssl termination or handling, uses default tcp active monitor & auto map for virtual server
-# Auto Map mode uses LB interface IP and ephemeral port. 
-# In scenarios where both Clients and Pool Members are attached to the same Logical Router, 
+# Auto Map mode uses LB interface IP and ephemeral port.
+# In scenarios where both Clients and Pool Members are attached to the same Logical Router,
 # SNAT (Auto Map or IP List) must be used.
 
-# LBR Sizing guide 
+# LBR Sizing guide
 # LB Size | Virtual Servers | Pool Members
 # small   |   10            |   30
 # medium  |  100            |  300
@@ -446,9 +452,9 @@ nsx_t_lbr_spec: |
       - ip: 192.168.24.31        # Internal ip of GoRouter instance 1
         port: 80
       - ip: 192.168.24.32        # Internal ip of GoRouter instance 2
-        port: 80 
+        port: 80
     - name: sshProxy             # SSH Proxy exposed to outside
-      vip: 10.13.12.151         
+      vip: 10.13.12.151
       port: 2222                 # Port 2222 for ssh proxy
       members:
       - ip: 192.168.24.41        # Internal ip of Diego Brain where ssh proxy runs
