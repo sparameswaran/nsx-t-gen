@@ -124,7 +124,7 @@ resources:
   type: git
   source:
     uri: https://github.com/sparameswaran/nsx-t-gen.git
-    branch: edgeVCenter
+    branch: master
     params:
       disable_git_lfs: true
 
