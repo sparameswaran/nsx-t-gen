@@ -205,7 +205,7 @@ nsx_t_t0router_spec: |
       admin_distance: 1
     tags:
       ncp/cluster: 'pas1' # Should match the top level ncp/cluster tag value
-      ncp/shared_resource: true # required for PKS
+      ncp/shared_resource: 'true' # required for PKS
       testtag: 'testpas1'
 
 # T1 Logical Router with associated logical switches
@@ -286,7 +286,7 @@ nsx_t_container_ip_block_spec: |
     # No tags for this block
   - name: container-ip-block-pks-with-tag
     cidr: 11.4.0.0/16
-    ncp/shared_resource: true
+    ncp/shared_resource: 'true'
     # No tags for this block
 
 
@@ -321,7 +321,7 @@ nsx_t_external_ip_pool_spec: |
     end: 10.300.0.200  # Should not include gateway
     tags:
       ncp/external: 'true'        # Required for external facing ips
-      ncp/shared_resource: true   # Required for PKS
+      ncp/shared_resource: 'true'   # Required for PKS
 
 # Specify NAT rules
 # Provide matching dnat and snat rule for specific vms by using ips for destination_network and translated_network that need to be exposed like Ops Mgr
