@@ -51,27 +51,27 @@ esxi_hosts_config: |
 # If filled, then change the the esxi_hosts_config section to be empty
 # Sample empty config:
 # esxi_hosts_config: # Provide space after colon
-compute_vcenter_manager: # EDIT - Name for vCenter; If filled, then comment off the esxi_hosts_config
-compute_vcenter_host: #    EDIT - Use Compute vCenter Esxi hosts as transport node
-compute_vcenter_usr: #     EDIT -  Use Compute vCenter Esxi hosts as transport node
-compute_vcenter_pwd: #     EDIT - Use Compute vCenter Esxi hosts as transport node
-compute_vcenter_cluster: # EDIT - Use Compute vCenter Esxi hosts as transport node
+compute_vcenter_manager:   # EDIT - Name for vCenter; If filled, then comment off the esxi_hosts_config
+compute_vcenter_host:      # EDIT - Use Compute vCenter Esxi hosts as transport node
+compute_vcenter_usr:       # EDIT -  Use Compute vCenter Esxi hosts as transport node
+compute_vcenter_pwd:       # EDIT - Use Compute vCenter Esxi hosts as transport node
+compute_vcenter_cluster:   # EDIT - Use Compute vCenter Esxi hosts as transport node
 
 # Using a separate vCenter to add Edges
 # Edge Specific vCenter settings
 # If Edges are going to use the same vCenter as Mgr, then dont set any of the following properties
-edge_vcenter_host: #    EDIT - If filled, then Edges would use this separate vcenter
-edge_vcenter_usr: #     EDIT -  Use Edge specific vCenter
-edge_vcenter_pwd: #     EDIT -  Use Edge specific vCenter
-edge_vcenter_datacenter: #     EDIT -  Use Edge specific vCenter
-edge_vcenter_datastore: #     EDIT -  Use Edge specific vCenter
-edge_vcenter_cluster: #     EDIT -  Use Edge specific vCenter
-edge_ntpservers: #     EDIT -  Use Edge specific vCenter
-edge_mgmt_portgroup: #     EDIT -  Use Edge specific vCenter
-edge_dnsserver: #     EDIT -  Use Edge specific vCenter
-edge_dnsdomain: #     EDIT -  Use Edge specific vCenter
-edge_defaultgateway: #     EDIT -  Use Edge specific vCenter
-edge_netmask: #     EDIT -  Use Edge specific vCenter
+edge_vcenter_host:         # EDIT - If filled, then Edges would use this separate vcenter
+edge_vcenter_usr:          # EDIT -  Use Edge specific vCenter
+edge_vcenter_pwd:          # EDIT -  Use Edge specific vCenter
+edge_vcenter_datacenter:   # EDIT -  Use Edge specific vCenter
+edge_vcenter_datastore:    # EDIT -  Use Edge specific vCenter
+edge_vcenter_cluster:      # EDIT -  Use Edge specific vCenter
+edge_ntpservers:           # EDIT -  Use Edge specific vCenter
+edge_mgmt_portgroup:       # EDIT -  Use Edge specific vCenter
+edge_dnsserver:            # EDIT -  Use Edge specific vCenter
+edge_dnsdomain:            # EDIT -  Use Edge specific vCenter
+edge_defaultgateway:       # EDIT -  Use Edge specific vCenter
+edge_netmask:              # EDIT -  Use Edge specific vCenter
 
 # Edit fololowing parameters
 nsx_t_manager_host_name: nsx-t-mgr.corp.local.io # Set as FQDN, will be used also as certificate common name
