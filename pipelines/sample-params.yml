@@ -19,7 +19,7 @@ netmask: 255.255.255.0                    # EDIT
 
 # Host a Webserver to serve the ova images and ovftool
 # Please edit the endpoint and the file names
-nsx_image_webserver: http://10.85.24.5:9080/
+nsx_image_webserver: http://10.85.24.5:9080
 
 # Download NSX-T 2.1 bits from
 # https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-210&productId=673
