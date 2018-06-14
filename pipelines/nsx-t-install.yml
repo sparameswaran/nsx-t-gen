@@ -1,6 +1,7 @@
 ---
 # Use reference instead of repeating the nsx-t params
 nsx_t_gen_params: &nsx-t-gen-params
+  NSX_T_INSTALLER: ((nsx_t_installer))
   VCENTER_HOST: ((vcenter_host))
   VCENTER_USR: ((vcenter_usr))
   VCENTER_PWD: ((vcenter_pwd))

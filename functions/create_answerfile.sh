@@ -24,6 +24,7 @@ compute_manager: "$VCENTER_MANAGER"
 cm_cluster: "$VCENTER_CLUSTER"
 sshEnabled: True
 allowSSHRootAccess: True
+nsxInstaller: "$NSX_T_INSTALLER"
 
 api_origin: 'localhost'
 

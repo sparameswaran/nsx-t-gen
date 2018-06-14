@@ -1,4 +1,5 @@
 enable_ansible_debug: false # set value to true for verbose output from ansible
+nsx_t_installer: nsx-t-gen  # Set to name of installer or env or any value so resources can be identified
 
 # vCenter details to deploy the Mgmt OVAs (Mgr, Edge, Controller)
 vcenter_host: vcsa-01.corp.local.io       # EDIT - this is for deployment of the ovas for the mgmt plane
@@ -160,6 +161,7 @@ nsx_t_overlay_hostswitch: hostswitch2
 nsx_t_vlan_hostswitch: hostswitch1
 
 # For Edge External uplink
+# Check with network admin if its tagged or untagged
 nsx_t_transport_vlan: 0
 
 nsx_t_vlan_transport_zone: vlan-tz
@@ -295,6 +297,8 @@ nsx_t_container_ip_block_spec: |
 # Make sure the ncp/shared tag is set to true for PKS
 # Additional the ncp/external tag should be set for external facing ip pool
 # Add additional exernal ip pools as needed
+# Change the cidr, gateway, nameserver, dns_domain as needed
+# The cidr, gateway, start/end ips should be reachable via static or bgp routing through T0 router
 nsx_t_external_ip_pool_spec: |
   external_ip_pools:
   - name: snat-vip-pool-for-pas

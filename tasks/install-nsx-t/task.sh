@@ -20,6 +20,11 @@ source $FUNCTIONS_DIR/create_hosts.sh
 source $FUNCTIONS_DIR/create_extra_yaml_args.sh
 source $FUNCTIONS_DIR/check_null_variables.sh
 
+# Default installer name to be used for tags
+if [ "$NSX_T_INSTALLER" == "" ]; then
+	NSX_T_INSTALLER='nsx-t-gen'
+fi
+
 function check_status_up {
 	ip_set=$1
 	type_of_resource=$2

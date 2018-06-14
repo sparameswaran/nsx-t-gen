@@ -153,6 +153,7 @@ edge_ntp_server="$EDGE_NTPSERVERS"
 edge_gw="$EDGE_DEFAULTGATEWAY"
 edge_mask="$EDGE_NETMASK"
 
+nsxInstaller="$NSX_T_INSTALLER"
 nsxAdminPass="$NSX_T_MANAGER_ADMIN_PWD"
 nsxCliPass="$NSX_T_MANAGER_ROOT_PWD"
 
