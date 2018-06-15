@@ -21,7 +21,7 @@ nsx-controller0${count} \
   ansible_ssh_pass=$NSX_T_CONTROLLER_ROOT_PWD \
   dc="$VCENTER_DATACENTER" \
   cluster="$VCENTER_CLUSTER" \
-  resource_pool="" \
+  resource_pool="$VCENTER_RP" \
   datastore="$VCENTER_DATASTORE" \
   portgroup="$MGMT_PORTGROUP" \
   gw=$DEFAULTGATEWAY \
@@ -98,6 +98,7 @@ ${NSX_T_EDGE_HOST_PREFIX}-0${count}  \
   ansible_ssh_pass=$NSX_T_EDGE_ROOT_PWD \
   dc="$VCENTER_DATACENTER" \
   cluster="$VCENTER_CLUSTER" \
+  resource_pool="$VCENTER_RP" \
   datastore="$VCENTER_DATASTORE" \
   portgroup="$MGMT_PORTGROUP" \
   gw=$DEFAULTGATEWAY \
@@ -172,6 +173,7 @@ nsx-manager  \
   ansible_ssh_pass=$NSX_T_MANAGER_ROOT_PWD \
   dc="$VCENTER_DATACENTER" \
   cluster="$VCENTER_CLUSTER" \
+  resource_pool="$VCENTER_RP" \
   datastore="$VCENTER_DATASTORE" \
   portgroup="$MGMT_PORTGROUP" \
   gw=$DEFAULTGATEWAY \
@@ -257,6 +259,9 @@ edge_cluster="$NSX_T_EDGE_CLUSTER"
 
 EOF
 
+  if [ "$VCENTER_RP" == "null" ]; then
+    export VCENTER_RP=""
+  fi
 
   create_edge_hosts
   create_controller_hosts

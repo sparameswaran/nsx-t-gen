@@ -9,6 +9,7 @@ vcenter_datacenter: Datacenter            # EDIT
 vcenter_datastore: Datastore              # EDIT
 vcenter_cluster: Cluster                  # EDIT
 vcenter_manager: vcenter-1                # EDIT
+vcenter_rp: nsx_resource_pool             # EDIT - resource pool where mgmt plane vms would get deployed
 
 # OVA general network settings
 ntpservers: 10.13.12.2                    # EDIT

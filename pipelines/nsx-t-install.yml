@@ -9,6 +9,7 @@ nsx_t_gen_params: &nsx-t-gen-params
   VCENTER_DATASTORE: ((vcenter_datastore))
   VCENTER_CLUSTER: ((vcenter_cluster))
   VCENTER_MANAGER: ((vcenter_manager))
+  VCENTER_RP: ((vcenter_rp))
   NTPSERVERS: ((ntpservers))
   MGMT_PORTGROUP: ((mgmt_portgroup))
   DNSSERVER: ((dnsserver))
