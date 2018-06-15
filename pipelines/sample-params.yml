@@ -9,7 +9,7 @@ vcenter_datacenter: Datacenter            # EDIT
 vcenter_datastore: Datastore              # EDIT
 vcenter_cluster: Cluster                  # EDIT
 vcenter_manager: vcenter-1                # EDIT
-vcenter_rp: nsx_resource_pool             # EDIT - resource pool where mgmt plane vms would get deployed
+vcenter_rp:                               # EDIT - resource pool where mgmt plane vms would get deployed
 
 # OVA general network settings
 ntpservers: 10.13.12.2                    # EDIT
@@ -102,12 +102,15 @@ nsx_t_controllers_config: |
     - ip: 10.13.12.51
       cluster: Cluster1
       resource_pool: nsx_rp1
+      datastore: store1
     - ip: 10.13.12.52
       cluster: Cluster2
       resource_pool: nsx_rp2
+      datastore: store2
     - ip: 10.13.12.53
       cluster: Cluster3
       resource_pool: nsx_rp3
+      datastore: store3
 
 nsx_t_edge_host_prefix: nsx-t-edge        # Without spaces, generated edge would be nsx-t-edge-1.corp.local.io,...
 nsx_t_edge_vm_name_prefix: 'NSX-T Edge'   # Generated edge host name would be "NSX-T Edge-1"

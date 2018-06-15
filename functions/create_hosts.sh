@@ -63,6 +63,7 @@ function create_controller_hosts_across_clusters {
       NSX_T_CONTROLLER_INSTANCE_IP=$(cat /tmp/controllers_config.yml  | shyaml get-value controllers.members.${index}.ip)
       NSX_T_CONTROLLER_INSTANCE_CLUSTER=$(cat /tmp/controllers_config.yml  | shyaml get-value controllers.members.${index}.cluster)
       NSX_T_CONTROLLER_INSTANCE_RP=$(cat /tmp/controllers_config.yml  | shyaml get-value controllers.members.${index}.resource_pool)
+      NSX_T_CONTROLLER_INSTANCE_DATASTORE=$(cat /tmp/controllers_config.yml  | shyaml get-value controllers.members.${index}.datastore)
 
       cat >> ctrl_vms <<-EOF
       nsx-controller0${count} \
@@ -72,7 +73,7 @@ function create_controller_hosts_across_clusters {
         dc="$VCENTER_DATACENTER" \
         cluster="$NSX_T_CONTROLLER_INSTANCE_CLUSTER" \
         resource_pool="$NSX_T_CONTROLLER_INSTANCE_RP" \
-        datastore="$VCENTER_DATASTORE" \
+        datastore="$NSX_T_CONTROLLER_INSTANCE_DATASTORE" \
         portgroup="$MGMT_PORTGROUP" \
         gw=$DEFAULTGATEWAY \
         mask=$NETMASK \
