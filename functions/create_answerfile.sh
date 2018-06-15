@@ -90,6 +90,7 @@ $controller_config
     vmName: "${NSX_T_CONTROLLER_VM_NAME_PREFIX}-0${count}"
     ipAddress: $controller_ip
     ovaFile: $NSX_T_CONTROLLER_OVA
+		resource_pool: ""
 EOF
 	  (( count++ ))
 	done

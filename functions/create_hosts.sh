@@ -1,6 +1,14 @@
 #!/bin/bash
 
 function create_controller_hosts {
+  if [ "$NSX_T_CONTROLLERS_CONFIG" == "" -o "$NSX_T_CONTROLLERS_CONFIG" == "null" ]; then
+    create_controller_hosts_on_cluster
+  else
+    create_controller_hosts_across_clusters
+  fi
+}
+
+function create_controller_hosts_on_cluster {
 
   count=1
   echo "[nsxcontrollers]" > ctrl_vms
@@ -13,6 +21,7 @@ nsx-controller0${count} \
   ansible_ssh_pass=$NSX_T_CONTROLLER_ROOT_PWD \
   dc="$VCENTER_DATACENTER" \
   cluster="$VCENTER_CLUSTER" \
+  resource_pool="" \
   datastore="$VCENTER_DATASTORE" \
   portgroup="$MGMT_PORTGROUP" \
   gw=$DEFAULTGATEWAY \
@@ -24,6 +33,58 @@ EOF
   done
 
 }
+
+
+function create_controller_hosts_across_clusters {
+
+  count=1
+  echo "[nsxcontrollers]" > ctrl_vms
+
+  echo "$NSX_T_CONTROLLERS_CONFIG" > /tmp/controllers_config.yml
+  is_valid_yml=$(cat /tmp/controllers_config.yml  | shyaml get-values controllers || true)
+
+  # Check if the esxi_hosts config is not empty and is valid
+  if [ "$NSX_T_CONTROLLERS_CONFIG" != "" -a "$is_valid_yml" != "" ]; then
+
+    NSX_T_CONTROLLER_VM_NAME_PREFIX=$(cat /tmp/controllers_config.yml  | shyaml get-value controllers.vm_name_prefix)
+    NSX_T_CONTROLLER_HOST_PREFIX=$(cat /tmp/controllers_config.yml  | shyaml get-value controllers.host_prefix)
+    NSX_T_CONTROLLER_ROOT_PWD=$(cat /tmp/controllers_config.yml  | shyaml get-value controllers.root_pwd)
+    NSX_T_CONTROLLER_CLUSTER_PWD=$(cat /tmp/controllers_config.yml  | shyaml get-value controllers.cluster_pwd)
+
+    length=$(expr $(cat /tmp/controllers_config.yml  | shyaml get-values controllers.members | grep ip: | wc -l) - 1 || true )
+    if ! [ $length == 0 -o $length == 2 ]; then
+      echo "Error with # of controllers - should be 1 or 3!!"
+      echo "Exiting!!"
+      exit -1
+    fi
+
+    for index in $(seq 0 $length)
+    do
+      NSX_T_CONTROLLER_INSTANCE_IP=$(cat /tmp/controllers_config.yml  | shyaml get-value controllers.members.${index}.ip)
+      NSX_T_CONTROLLER_INSTANCE_CLUSTER=$(cat /tmp/controllers_config.yml  | shyaml get-value controllers.members.${index}.cluster)
+      NSX_T_CONTROLLER_INSTANCE_RP=$(cat /tmp/controllers_config.yml  | shyaml get-value controllers.members.${index}.resource_pool)
+
+      cat >> ctrl_vms <<-EOF
+      nsx-controller0${count} \
+        ansible_ssh_host=$NSX_T_CONTROLLER_INSTANCE_IP \
+        ansible_ssh_user=root \
+        ansible_ssh_pass=$NSX_T_CONTROLLER_ROOT_PWD \
+        dc="$VCENTER_DATACENTER" \
+        cluster="$NSX_T_CONTROLLER_INSTANCE_CLUSTER" \
+        resource_pool="$NSX_T_CONTROLLER_INSTANCE_RP" \
+        datastore="$VCENTER_DATASTORE" \
+        portgroup="$MGMT_PORTGROUP" \
+        gw=$DEFAULTGATEWAY \
+        mask=$NETMASK \
+        vmname="${NSX_T_CONTROLLER_VM_NAME_PREFIX}-0${count}" \
+        hostname="${NSX_T_CONTROLLER_HOST_PREFIX}-0${count}"
+EOF
+      (( count++ ))
+    done
+fi
+
+}
+
 
 function create_edge_hosts {
   count=1
