@@ -58,6 +58,10 @@
   ```
   If the vms are correctly up but suspect its a timing issue, just rerun the pipeline task.
   This should detect the vms are up and no need for redeploying the ovas again and continue to where it left of earlier.
+
+  If the vms appear to be not reachable over ssh and they are on same host, problem might be due to known issue: https://kb.vmware.com/s/article/2093588
+  ```Deploying a high number of virtual machines at the same time results in the network adapter connection failure and reports the error: Failed to connect virtual device Ethernet0 (2093588)```
+  Reboot the esxi host thats hosting the vms and rerun the pipeline.
 * Unable to deploy the Edge OVAs with error message: `Host did not have any virtual network defined`.
   * Refer to [add-vm-network](./add-vm-network.md)
   * Or deploy the ovas directly ensuring the name of the edge instances follows the naming convention (like nsx-t-edge-01)

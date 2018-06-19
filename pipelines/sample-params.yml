@@ -309,11 +309,11 @@ nsx_t_container_ip_block_spec: |
     tags:
       ncp/cluster: 'pas1' # Should match the top level ncp/cluster tag value
       testtag: 'testpas1'
-  - name: container-ip-block-with-no-tag
+  - name: node-container-ip-block-with-no-tag
     cidr: 11.4.0.0/16
     # No tags for this block
-  - name: container-ip-block-pks-with-tag
-    cidr: 11.4.0.0/16
+  - name: pod-container-ip-block-pks-with-tag
+    cidr: 12.4.0.0/16
     ncp/shared_resource: 'true'
     # No tags for this block
 
