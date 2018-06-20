@@ -60,14 +60,14 @@ function create_extra_yaml_args {
 	match=$(check_existence_of_tag NSX_T_EXTERNAL_IP_POOL_SPEC 'ncp/cluster' $NSX_T_PAS_NCP_CLUSTER_TAG )
 	if [  "$NSX_T_EXTERNAL_IP_POOL_SPEC" != "" -a "$match" == "" ]; then
 		# There can be multiple entries and we can fail to add tag for previous ones
-		echo "Missing matching ncp/cluster tag in the External IP Pool defn, unsure if its for PAS or PKS"
+		echo "[Warning] Missing matching ncp/cluster tag in the External IP Pool defn, unsure if its for PAS or PKS"
 		#exit 1
 		#echo "    ncp/cluster:$NSX_T_PAS_NCP_CLUSTER_TAG" >> extra_yaml_args.yml
 	fi
 	match=$(check_existence_of_tag NSX_T_EXTERNAL_IP_POOL_SPEC 'ncp/external' 'true' )
 	if [  "$NSX_T_EXTERNAL_IP_POOL_SPEC" != "" -a "$match" == "" ]; then
 		# There can be multiple entries and we can fail to add tag for previous ones
-		echo "Missing matching ncp/external tag in the External IP Pool defn, unsure if its for PAS or PKS"
+		echo "[Warning] Missing matching ncp/external tag in the External IP Pool defn, unsure if its for PAS or PKS"
 		#exit 1
 		#echo "    ncp/cluster:$NSX_T_PAS_NCP_CLUSTER_TAG" >> extra_yaml_args.yml
 	fi
@@ -77,7 +77,7 @@ function create_extra_yaml_args {
 	echo "$NSX_T_CONTAINER_IP_BLOCK_SPEC" >> extra_yaml_args.yml
 	match=$(check_existence_of_tag NSX_T_CONTAINER_IP_BLOCK_SPEC 'ncp/cluster' $NSX_T_PAS_NCP_CLUSTER_TAG )
 	if [  "$NSX_T_CONTAINER_IP_BLOCK_SPEC" != "" -a "$match" == "" ]; then
-		echo "Missing matching 'ncp/cluster' tag in the Container IP Block defn"
+		echo "[Warning] Missing matching 'ncp/cluster' tag in the Container IP Block defn"
 		#exit 1
 		#echo "    ncp/cluster:$NSX_T_PAS_NCP_CLUSTER_TAG" >> extra_yaml_args.yml
 	fi
@@ -99,7 +99,7 @@ function create_extra_yaml_args {
 	echo "$NSX_T_T0ROUTER_SPEC" >> extra_yaml_args.yml
 	match=$(check_existence_of_tag NSX_T_T0ROUTER_SPEC 'ncp/cluster' $NSX_T_PAS_NCP_CLUSTER_TAG )
 	if [  "$NSX_T_T0ROUTER_SPEC" != "" -a "$match" == "" ]; then
-		echo "Missing matching 'ncp/cluster' tag in the T0 Router defn, check tags once T0Router is up!!"
+		echo "[Warning] Missing matching 'ncp/cluster' tag in the T0 Router defn, check tags once T0Router is up!!"
 		#exit 1
 	fi
 	echo "" >> extra_yaml_args.yml
