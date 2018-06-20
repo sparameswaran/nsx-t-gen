@@ -188,6 +188,11 @@ if [ "$nsx_mgr_up_status" != "true" \
 # 			-o "$nsx_controller_up_status" != "true" ]; then
 	echo "Some problem with the VMs, one or more of the vms (mgr, controller, edge) failed to come up or not accessible!"
 	echo "Check the related vms!!"
+	echo "Notes: "
+	echo "   Its possible a vm is not reachable or temporarily unavailable, try restarting the concourse job"
+	echo "   In rare cases, delete any older non-running vms (same name can affect new ova deployment) "
+	echo "       as well as any vms that did not form a not complete set (like only 1 controller up out of 3)"
+	echo "   Check also the FAQs here: https://github.com/sparameswaran/nsx-t-gen/blob/master/docs/faqs.md"
 	exit 1
 fi
 echo "All Good!! Proceeding with Controller configuration!"

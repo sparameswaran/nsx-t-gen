@@ -7,16 +7,17 @@ function install_ovftool {
 		pushd $ROOT_DIR/ovftool
 		ovftool_bundle=$(ls *)
 		chmod +x $ovftool_bundle
-		is_binary=$(file $ovftool_bundle | grep "executable")
-		if [ "$is_binary" == "" ]; then
-			echo "ovftool downloaded was not a valid binary image!!"
-			echo "Check the file name/paths. Exiting from ova copy and deploy!!"
-			exit 1
-		fi
 
 		size_of_tool=$(ls -al $ovftool_bundle | awk '{print $5}')
 		if [ $size_of_tool -lt 10000000 ]; then
 			echo "ovftool downloaded is lesser than 10 MB!!"
+			echo "Check the file name/paths. Exiting from ova copy and deploy!!"
+			exit 1
+		fi
+
+		is_binary=$(file $ovftool_bundle | grep "executable" || true)
+		if [ "$is_binary" == "" ]; then
+			echo "ovftool downloaded was not a valid binary image!!"
 			echo "Check the file name/paths. Exiting from ova copy and deploy!!"
 			exit 1
 		fi
