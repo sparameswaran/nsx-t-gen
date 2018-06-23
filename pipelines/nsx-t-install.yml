@@ -62,7 +62,6 @@ nsx_t_gen_params: &nsx-t-gen-params
   NSX_T_TEP_POOL_GATEWAY: ((nsx_t_tep_pool_gateway))
   NSX_T_TEP_POOL_START: ((nsx_t_tep_pool_start))
   NSX_T_TEP_POOL_END: ((nsx_t_tep_pool_end))
-  NSX_T_TEP_POOL_NAMESERVER: ((nsx_t_tep_pool_nameserver))
   NSX_T_EDGE_OVERLAY_INTERFACE: ((nsx_t_edge_overlay_interface))
   NSX_T_EDGE_UPLINK_INTERFACE: ((nsx_t_edge_uplink_interface))
   NSX_T_OVERLAY_TRANSPORT_ZONE: ((nsx_t_overlay_transport_zone))
@@ -127,7 +126,7 @@ resources:
   type: git
   source:
     uri: https://github.com/sparameswaran/nsx-t-gen.git
-    branch: edge-deploy
+    branch: master
     params:
       disable_git_lfs: true
 
@@ -135,7 +134,7 @@ resources:
   type: git
   source:
     uri: https://github.com/sparameswaran/nsxt-ansible
-    branch: masedge-deploy
+    branch: master
 
 # Download NSX-T 2.1 bits from
 # https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-210&productId=673

@@ -52,7 +52,7 @@ function create_controller_hosts_across_clusters {
 
     length=$(expr $(cat /tmp/controllers_config.yml  | shyaml get-values controllers.members | grep ip: | wc -l) - 1 || true )
     if ! [ $length == 0 -o $length == 2 ]; then
-      echo "Error with # of controllers - should be 1 or 3!!"
+      echo "Error with # of controllers - should be odd (1 or 3)!!"
       echo "Exiting!!"
       exit -1
     fi
@@ -85,14 +85,20 @@ fi
 
 }
 
-
 function create_edge_hosts {
+  if [ "$EDGE_VCENTER_HOST" != "" -a "$EDGE_VCENTER_HOST" != "null" ]; then
+    create_edge_hosts_using_edge_vcenter
+  else
+    create_edge_hosts_using_mgmt_vcenter
+  fi
+}
+
+function create_edge_hosts_using_edge_vcenter {
   count=1
   echo "[nsxedges]" > edge_vms
   for edge_ip in $(echo $NSX_T_EDGE_IPS | sed -e 's/,/ /g')
   do
-    if [ "$EDGE_VCENTER_HOST" != "" -a "$EDGE_VCENTER_HOST" != "null" ]; then
-      cat >> edge_vms <<-EOF
+    cat >> edge_vms <<-EOF
 ${NSX_T_EDGE_HOST_PREFIX}-0${count}  \
   ansible_ssh_host=$edge_ip \
   ansible_ssh_user=root \
@@ -113,10 +119,18 @@ ${NSX_T_EDGE_HOST_PREFIX}-0${count}  \
   hostname="${NSX_T_EDGE_HOST_PREFIX}-0${count}" \
   portgroup="$EDGE_MGMT_PORTGROUP" \
   portgroupExt="$NSX_T_EDGE_PORTGROUP_EXT" \
-  portgroupTransport="$NSX_T_EDGE_PORTGROUP_TRANSPORT" \
+  portgroupTransport="$NSX_T_EDGE_PORTGROUP_TRANSPORT"
 EOF
-    else
-      cat >> edge_vms <<-EOF
+  (( count++ ))
+  done
+}
+
+function create_edge_hosts_using_mgmt_vcenter {
+  count=1
+  echo "[nsxedges]" > edge_vms
+  for edge_ip in $(echo $NSX_T_EDGE_IPS | sed -e 's/,/ /g')
+  do
+    cat >> edge_vms <<-EOF
 ${NSX_T_EDGE_HOST_PREFIX}-0${count}  \
   ansible_ssh_host=$edge_ip \
   ansible_ssh_user=root \
@@ -137,13 +151,11 @@ ${NSX_T_EDGE_HOST_PREFIX}-0${count}  \
   hostname="${NSX_T_EDGE_HOST_PREFIX}-0${count}" \
   portgroup="$MGMT_PORTGROUP" \
   portgroupExt="$NSX_T_EDGE_PORTGROUP_EXT" \
-  portgroupTransport="$NSX_T_EDGE_PORTGROUP_TRANSPORT" \
+  portgroupTransport="$NSX_T_EDGE_PORTGROUP_TRANSPORT"
 EOF
-    fi
     (( count++ ))
   done
 }
-
 
 function create_esxi_hosts {
   echo "$ESXI_HOSTS_CONFIG" > /tmp/esxi_hosts_config.yml
@@ -257,8 +269,6 @@ overlay_hostswitch=$NSX_T_OVERLAY_HOSTSWITCH
 tep_pool_name=$NSX_T_TEP_POOL_NAME
 tep_pool_cidr=$NSX_T_TEP_POOL_CIDR
 tep_pool_range="${NSX_T_TEP_POOL_START}-${NSX_T_TEP_POOL_END}"
-tep_pool_nameserver="$NSX_T_TEP_POOL_NAMESERVER"
-tep_pool_suffix=$DNSDOMAIN
 tep_pool_gw=$NSX_T_TEP_POOL_GATEWAY
 
 edge_single_uplink_profile_name=$NSX_T_SINGLE_UPLINK_PROFILE_NAME
