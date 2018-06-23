@@ -127,7 +127,7 @@ resources:
   type: git
   source:
     uri: https://github.com/sparameswaran/nsx-t-gen.git
-    branch: master
+    branch: edge-deploy
     params:
       disable_git_lfs: true
 
@@ -135,7 +135,7 @@ resources:
   type: git
   source:
     uri: https://github.com/sparameswaran/nsxt-ansible
-    branch: master
+    branch: masedge-deploy
 
 # Download NSX-T 2.1 bits from
 # https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-210&productId=673

@@ -34,7 +34,6 @@ EOF
 
 }
 
-
 function create_controller_hosts_across_clusters {
 
   count=1
@@ -92,36 +91,55 @@ function create_edge_hosts {
   echo "[nsxedges]" > edge_vms
   for edge_ip in $(echo $NSX_T_EDGE_IPS | sed -e 's/,/ /g')
   do
-    cat >> edge_vms <<-EOF
+    if [ "$EDGE_VCENTER_HOST" != "" -a "$EDGE_VCENTER_HOST" != "null" ]; then
+      cat >> edge_vms <<-EOF
 ${NSX_T_EDGE_HOST_PREFIX}-0${count}  \
   ansible_ssh_host=$edge_ip \
   ansible_ssh_user=root \
   ansible_ssh_pass=$NSX_T_EDGE_ROOT_PWD \
+  vcenter_host="$EDGE_VCENTER_HOST" \
+  vcenter_user="$EDGE_VCENTER_USR" \
+  vcenter_pwd="$EDGE_VCENTER_PWD" \
+  dc="$EDGE_VCENTER_DATACENTER" \
+  datastore="$EDGE_VCENTER_DATASTORE" \
+  cluster="$EDGE_VCENTER_CLUSTER" \
+  resource_pool="$EDGE_VCENTER_RP" \
+  dns_server="$EDGE_DNSSERVER" \
+  dns_domain="$EDGE_DNSDOMAIN" \
+  ntp_server="$EDGE_NTPSERVERS" \
+  gw="$EDGE_DEFAULTGATEWAY" \
+  mask="$EDGE_NETMASK" \
+  vmname="${NSX_T_EDGE_VM_NAME_PREFIX}-0${count}" \
+  hostname="${NSX_T_EDGE_HOST_PREFIX}-0${count}" \
+  portgroup="$EDGE_MGMT_PORTGROUP" \
+  portgroupExt="$NSX_T_EDGE_PORTGROUP_EXT" \
+  portgroupTransport="$NSX_T_EDGE_PORTGROUP_TRANSPORT" \
+EOF
+    else
+      cat >> edge_vms <<-EOF
+${NSX_T_EDGE_HOST_PREFIX}-0${count}  \
+  ansible_ssh_host=$edge_ip \
+  ansible_ssh_user=root \
+  ansible_ssh_pass=$NSX_T_EDGE_ROOT_PWD \
+  vcenter_host="$VCENTER_HOST" \
+  vcenter_user="$VCENTER_USR" \
+  vcenter_pwd="$VCENTER_PWD" \
   dc="$VCENTER_DATACENTER" \
+  datastore="$VCENTER_DATASTORE" \
   cluster="$VCENTER_CLUSTER" \
   resource_pool="$VCENTER_RP" \
-  datastore="$VCENTER_DATASTORE" \
-  portgroup="$MGMT_PORTGROUP" \
+  dns_server="$DNSSERVER" \
+  dns_domain="$DNSDOMAIN" \
+  ntp_server="$NTPSERVERS" \
   gw=$DEFAULTGATEWAY \
   mask=$NETMASK \
   vmname="${NSX_T_EDGE_VM_NAME_PREFIX}-0${count}" \
   hostname="${NSX_T_EDGE_HOST_PREFIX}-0${count}" \
+  portgroup="$MGMT_PORTGROUP" \
   portgroupExt="$NSX_T_EDGE_PORTGROUP_EXT" \
   portgroupTransport="$NSX_T_EDGE_PORTGROUP_TRANSPORT" \
-  edge_vcenter_host="$EDGE_VCENTER_HOST" \
-  edge_vcenter_user="$EDGE_VCENTER_USR" \
-  edge_vcenter_password="$EDGE_VCENTER_PWD" \
-  edge_vcenter_cluster="$EDGE_VCENTER_CLUSTER" \
-  edge_dc="$EDGE_VCENTER_DATACENTER" \
-  edge_datastore="$EDGE_VCENTER_DATASTORE" \
-  edge_portgroup="$EDGE_MGMT_PORTGROUP" \
-  edge_dns_server="$EDGE_DNSSERVER" \
-  edge_dns_domain="$EDGE_DNSDOMAIN" \
-  edge_ntp_server="$EDGE_NTPSERVERS" \
-  edge_gw="$EDGE_DEFAULTGATEWAY" \
-  edge_mask="$EDGE_NETMASK"
-
 EOF
+    fi
     (( count++ ))
   done
 }

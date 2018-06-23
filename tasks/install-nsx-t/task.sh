@@ -147,17 +147,11 @@ fi
 # Deploy the Edge ova if its not up
 if [ "$nsx_edge_up_status" != "true" ]; then
 
-	EDGE_DEPLOY_SCRIPT="deploy_edge_on_mgmt_vcenter.yml"
-	# Check if Edge needs to be deployed on a different vCenter
-	if [ "$EDGE_VCENTER_HOST" != "" -a  "$EDGE_VCENTER_HOST" != "null"  ]; then
-		EDGE_DEPLOY_SCRIPT="deploy_edge_on_edge_vcenter.yml"
-	fi
-
-	ansible-playbook $DEBUG -i hosts $EDGE_DEPLOY_SCRIPT -e @extra_yaml_args.yml
+	ansible-playbook $DEBUG -i hosts deploy_edge.yml -e @extra_yaml_args.yml
 	STATUS=$?
 
 	if [[ $STATUS != 0 ]]; then
-		echo "Deployment of NSX Edge OVA failed, vm failed to come up!!"
+		echo "Deployment of NSX Edge OVA failed, vms failed to come up!!"
 		echo "Check error logs"
 		echo ""
 		exit $STATUS
