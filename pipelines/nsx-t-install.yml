@@ -23,6 +23,7 @@ nsx_t_gen_params: &nsx-t-gen-params
   COMPUTE_VCENTER_PWD: ((compute_vcenter_pwd))
   COMPUTE_VCENTER_CLUSTER: ((compute_vcenter_cluster))
   COMPUTE_VCENTER_MANAGER: ((compute_vcenter_manager))
+  COMPUTE_VCENTER_CONFIGS: ((compute_vcenter_configs))
   EDGE_VCENTER_HOST: ((edge_vcenter_host))
   EDGE_VCENTER_USR: ((edge_vcenter_usr))
   EDGE_VCENTER_PWD: ((edge_vcenter_pwd))
@@ -126,7 +127,7 @@ resources:
   type: git
   source:
     uri: https://github.com/sparameswaran/nsx-t-gen.git
-    branch: master
+    branch: multi-compute
     params:
       disable_git_lfs: true
 
@@ -134,7 +135,7 @@ resources:
   type: git
   source:
     uri: https://github.com/sparameswaran/nsxt-ansible
-    branch: master
+    branch: multi-compute
 
 # Download NSX-T 2.1 bits from
 # https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-210&productId=673

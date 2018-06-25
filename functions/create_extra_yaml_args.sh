@@ -99,7 +99,7 @@ function create_extra_yaml_args {
 	echo "$NSX_T_T0ROUTER_SPEC" >> extra_yaml_args.yml
 	match=$(check_existence_of_tag NSX_T_T0ROUTER_SPEC 'ncp/cluster' $NSX_T_PAS_NCP_CLUSTER_TAG )
 	if [  "$NSX_T_T0ROUTER_SPEC" != "" -a "$match" == "" ]; then
-		echo "[Warning] Missing matching 'ncp/cluster' tag in the T0 Router defn, check tags once T0Router is up!!"
+		echo "[Warning] `Missing matching 'ncp/cluster' tag in the T0 Router defn, check tags once T0Router is up!!"
 		#exit 1
 	fi
 	echo "" >> extra_yaml_args.yml
@@ -120,11 +120,15 @@ function create_extra_yaml_args {
 	done
 	echo "" >> extra_yaml_args.yml
 
+  echo "$COMPUTE_VCENTER_CONFIGS" >> extra_yaml_args.yml
+
 	# Going with single profile uplink ; so use uplink-1 for both vmnics for edge
 	echo "edge_uplink_vmnics:" >> extra_yaml_args.yml
 	echo "  - uplink-1: ${NSX_T_EDGE_OVERLAY_INTERFACE} # network3 used for overlay/tep" >> extra_yaml_args.yml
-	echo "  - uplink-1: ${NSX_T_EDGE_UPLINK_INTERFACE}  # network2 used for vlan uplink" >> extra_yaml_args.yml
+  echo "  - uplink-1: ${NSX_T_EDGE_UPLINK_INTERFACE}  # network2 used for vlan uplink" >> extra_yaml_args.yml
 	echo "# network1 and network4 are for mgmt and not used for uplink" >> extra_yaml_args.yml
 	echo "" >> extra_yaml_args.yml
+
+
 
 }

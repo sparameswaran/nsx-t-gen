@@ -184,7 +184,7 @@ EOF
     done
   else
     echo "esxi_hosts_config not set to valid yaml, so ignoring it"
-    echo "Would use computer manager configs to add hosts!!"
+    echo "Would use compute manager configs to add hosts!!"
     echo "" >> esxi_hosts
   fi
 }
