@@ -99,7 +99,7 @@ function create_extra_yaml_args {
 	echo "$NSX_T_T0ROUTER_SPEC" >> extra_yaml_args.yml
 	match=$(check_existence_of_tag NSX_T_T0ROUTER_SPEC 'ncp/cluster' $NSX_T_PAS_NCP_CLUSTER_TAG )
 	if [  "$NSX_T_T0ROUTER_SPEC" != "" -a "$match" == "" ]; then
-		echo "[Warning] `Missing matching 'ncp/cluster' tag in the T0 Router defn, check tags once T0Router is up!!"
+		echo "[Warning] Missing matching 'ncp/cluster' tag in the T0 Router defn, check tags once T0Router is up!!"
 		#exit 1
 	fi
 	echo "" >> extra_yaml_args.yml

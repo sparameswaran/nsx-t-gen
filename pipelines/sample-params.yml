@@ -56,7 +56,6 @@ esxi_hosts_config: |
 compute_vcenter_configs: |
   compute_vcenters:
   - compute_cluster_name: cluster1
-    vcenter_manager:
     vcenter_host:
     vcenter_usr:
     vcenter_pwd:
