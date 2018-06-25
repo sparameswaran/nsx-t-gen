@@ -94,19 +94,11 @@ nsx_t_controller_cluster_pwd: VMware1!    # Min 8 chars, upper, lower, number, s
 # Controllers would be deployed to the same Mgmt Cluster
 # as specified by the vcenter_host & vcenter_cluster
 # NOT RECOMMENDED To use separate cluster for each controller
-<<<<<<< HEAD
 nsx_t_controllers_config:
 # CAUTION: Using different clusters for controllers require complex anti-affinity rules setup
 # If really want to spread controllers across different controllers,
 # remove previous line (the empty nsx_t_controllers_config) and
 # uncomment following nsx_t_controllers_config section, edit it to allow different clusters and resource pool per controller
-=======
-# CAUTION: Using different clusters for controllers require complex anti-affinity rules setup
-# If really want to spread controllers across different controllers,
-# remove followig line (the empty nsx_t_controllers_config) and
-# uncomment nsx_t_controllers_config section to allow different clusters and resource pool per controller
-nsx_t_controllers_config:
->>>>>>> f631f779df67cf33c39bfc32ceeb77bb3b012771
 # nsx_t_controllers_config: |
 #   controllers:
 #     host_prefix: nsx-t-ctl  # EDIT_ME
@@ -269,13 +261,13 @@ nsx_t_t1router_logical_switches_spec: |
   # Sample for PKS
   - name: T1-Router-PKS-Infra
     switches:
-    - name: PKS-Deployment
+    - name: PKS-Infra
       logical_switch_gw: 192.168.20.1 # Last octet should be 1 rather than 0
       subnet_mask: 24
 
-  - name: T1Router-PKS-Clusters
+  - name: T1Router-PKS-K8s-Clusters
     switches:
-    - name: PKS-Clusters
+    - name: PKS-K8s-Clusters
       logical_switch_gw: 192.168.40.1 # Last octet should be 1 rather than 0
       subnet_mask: 24
 

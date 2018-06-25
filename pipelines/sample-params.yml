@@ -286,13 +286,13 @@ nsx_t_t1router_logical_switches_spec: |
   # Comment off the following T1 Routers if there is no PKS
   - name: T1-Router-PKS-Infra
     switches:
-    - name: PKS-Deployment
+    - name: PKS-Infra
       logical_switch_gw: 192.168.20.1 # Last octet should be 1 rather than 0
       subnet_mask: 24
 
-  - name: T1Router-PKS-Clusters
+  - name: T1Router-PKS-K8s-Clusters
     switches:
-    - name: PKS-Clusters
+    - name: PKS-K8s-Clusters
       logical_switch_gw: 192.168.40.1 # Last octet should be 1 rather than 0
       subnet_mask: 24
 
