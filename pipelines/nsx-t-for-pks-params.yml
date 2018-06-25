@@ -91,29 +91,36 @@ nsx_t_controller_ips: 10.13.12.51,10.13.12.52,10.13.12.53 # Should be 1 or 3 ips
 nsx_t_controller_root_pwd: VMware1!       # Min 8 chars, upper, lower, number, special digit
 nsx_t_controller_cluster_pwd: VMware1!    # Min 8 chars, upper, lower, number, special digit
 
-# Use following section to allow different clusters and resource pool per controller
-# Leave it fully blank like below if all controllers need to be on same management cluster
-# nsx_t_controllers_config:
-nsx_t_controllers_config: |
-  controllers:
-    host_prefix: nsx-t-ctl
-    vm_name_prefix: NSX-T-Controller
-    root_pwd: VMware1!
-    cluster_pwd: VMware1!
-    # Should be 1 or 3 members
-    members:
-    - ip: 10.13.12.51
-      cluster: Cluster1
-      resource_pool: nsx_rp1
-      datastore: store1
-    - ip: 10.13.12.52
-      cluster: Cluster2
-      resource_pool: nsx_rp2
-      datastore: store2
-    - ip: 10.13.12.53
-      cluster: Cluster3
-      resource_pool: nsx_rp3
-      datastore: store3
+# Controllers would be deployed to the same Mgmt Cluster
+# as specified by the vcenter_host & vcenter_cluster
+# NOT RECOMMENDED To use separate cluster for each controller
+nsx_t_controllers_config:
+# CAUTION: Using different clusters for controllers require complex anti-affinity rules setup
+# If really want to spread controllers across different controllers,
+# remove previous line (the empty nsx_t_controllers_config) and
+# uncomment following nsx_t_controllers_config section, edit it to allow different clusters and resource pool per controller
+# nsx_t_controllers_config: |
+#   controllers:
+#     host_prefix: nsx-t-ctl  # EDIT_ME
+#     vm_name_prefix: NSX-T-Controller # EDIT_ME
+#     root_pwd: VMware1!       # EDIT_ME
+#     cluster_pwd: VMware1!    # EDIT_ME
+#     # Should be 1 or 3 members
+#     members:
+#     # EDIT ME to specify the correct cluster,
+#     #   resource pool, datastore per controller member
+#     - ip: 10.13.12.51        # EDIT_ME
+#       cluster: Cluster1      # EDIT_ME
+#       resource_pool: nsx_rp1 # EDIT_ME
+#       datastore: store1      # EDIT_ME
+#     - ip: 10.13.12.52        # EDIT_ME
+#       cluster: Cluster2      # EDIT_ME
+#       resource_pool: nsx_rp2 # EDIT_ME
+#       datastore: store2      # EDIT_ME
+#     - ip: 10.13.12.53        # EDIT_ME
+#       cluster: Cluster3      # EDIT_ME
+#       resource_pool: nsx_rp3 # EDIT_ME
+#       datastore: store3      # EDIT_ME
 
 nsx_t_edge_host_prefix: nsx-t-edge        # Without spaces, generated edge would be nsx-t-edge-1.corp.local.io,...
 nsx_t_edge_vm_name_prefix: 'NSX-T Edge'   # Generated edge host name would be "NSX-T Edge-1"
