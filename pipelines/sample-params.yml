@@ -53,6 +53,7 @@ esxi_hosts_config: |
 # If filled, then change the the esxi_hosts_config section to be empty
 # Sample empty config:
 # esxi_hosts_config: # Provide space after colon
+
 compute_manager_configs: |
   compute_managers:
   - vcenter_name: vcenter-01
@@ -60,21 +61,20 @@ compute_manager_configs: |
     vcenter_usr: administrator@vsphere.local
     vcenter_pwd: VMWare1!
     clusters:
+    # Multiple clusters under same vcenter can be specified
     - vcenter_cluster: Cluster1
       overlay_profile_mtu: 1600 # Min 1600
       overlay_profile_vlan: EDIT_ME # VLAN ID for the TEP/Overlay network
       # Specify an unused vmnic on esxi host to be used for nsx-t
       # can be multiple vmnics separated by comma
-      esxi_vmnics: vmnic1 # vmnic1,vmnic2...
-      esxi_uplink_vmnics:
-        uplink-1: vmnic1
-        #uplink-2: vmnic2
+      uplink_vmnics: vmnic1 # vmnic1,vmnic2...
     # - vcenter_cluster: Cluster2
     #   overlay_profile_mtu: 1600 # Min 1600
     #   overlay_profile_vlan: EDIT_ME # VLAN ID for the TEP/Overlay network
     #   # Specify an unused vmnic on esxi host to be used for nsx-t
     #   # can be multiple vmnics separated by comma
-    #   esxi_vmnics: vmnic1 # vmnic1,vmnic2...
+    #   uplink_vmnics: vmnic1 # vmnic1,vmnic2...
+  # Multiple vcenters can be specified
   # - vcenter_name: vcenter-02
   #   vcenter_host: vcenter-02.corp.local
   #   vcenter_usr: administrator@vsphere.local
@@ -85,7 +85,7 @@ compute_manager_configs: |
   #     overlay_profile_vlan: EDIT_ME # VLAN ID for the TEP/Overlay network
   #     # Specify an unused vmnic on esxi host to be used for nsx-t
   #     # can be multiple vmnics separated by comma
-  #     esxi_vmnics: vmnic4 # vmnic1,vmnic2...
+  #     uplink_vmnics: vmnic1 # vmnic1,vmnic2...
 
 
 # compute_vcenter_manager:   # EDIT - Name for vCenter; If filled, then comment off the esxi_hosts_config
