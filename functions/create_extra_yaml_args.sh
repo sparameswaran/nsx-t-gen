@@ -1,6 +1,7 @@
 #!/bin/bash
 export PAS_NCP_CLUSTER_TAG='ncp/cluster'
 
+
 # function check_pas_cluster_tag {
 #     env_variable=$1
 
@@ -50,12 +51,13 @@ function check_existence_of_tag {
     fi
 }
 
-function create_extra_yaml_args {
 
-	# Start the extra yaml args
-	echo "" > extra_yaml_args.yml
+function handle_external_ip_pool_spec {
+  if [ "$NSX_T_EXTERNAL_IP_POOL_SPEC" == "null" -o "$NSX_T_EXTERNAL_IP_POOL_SPEC" == "" ]; then
+    return
+  fi
 
-	# Has root element
+  # Has root element
 	echo "$NSX_T_EXTERNAL_IP_POOL_SPEC" >> extra_yaml_args.yml
 	match=$(check_existence_of_tag NSX_T_EXTERNAL_IP_POOL_SPEC 'ncp/cluster' $NSX_T_PAS_NCP_CLUSTER_TAG )
 	if [  "$NSX_T_EXTERNAL_IP_POOL_SPEC" != "" -a "$match" == "" ]; then
@@ -73,6 +75,13 @@ function create_extra_yaml_args {
 	fi
 	echo "" >> extra_yaml_args.yml
 
+}
+
+function handle_container_ip_block_spec {
+  if [ "$NSX_T_CONTAINER_IP_BLOCK_SPEC" == "null" -o "$NSX_T_CONTAINER_IP_BLOCK_SPEC" == "" ]; then
+    return
+  fi
+
 	# Has root element
 	echo "$NSX_T_CONTAINER_IP_BLOCK_SPEC" >> extra_yaml_args.yml
 	match=$(check_existence_of_tag NSX_T_CONTAINER_IP_BLOCK_SPEC 'ncp/cluster' $NSX_T_PAS_NCP_CLUSTER_TAG )
@@ -82,18 +91,31 @@ function create_extra_yaml_args {
 		#echo "    ncp/cluster:$NSX_T_PAS_NCP_CLUSTER_TAG" >> extra_yaml_args.yml
 	fi
 	echo "" >> extra_yaml_args.yml
+}
+
+function handle_ha_switching_profile_spec {
+  if [ "$NSX_T_HA_SWITCHING_PROFILE_SPEC" == "null" -o "$NSX_T_HA_SWITCHING_PROFILE_SPEC" == "" ]; then
+    return
+  fi
 
 	# Has root element and we expect only one HA switching profile
 	echo "$NSX_T_HA_SWITCHING_PROFILE_SPEC" >> extra_yaml_args.yml
 	match=$(check_existence_of_tag NSX_T_HA_SWITCHING_PROFILE_SPEC 'ncp/cluster' $NSX_T_PAS_NCP_CLUSTER_TAG )
-	if [ "$NSX_T_HA_SWITCHING_PROFILE_SPEC" != "" -a "$match" == "" ]; then
-		echo "    ncp/cluster: $NSX_T_PAS_NCP_CLUSTER_TAG" >> extra_yaml_args.yml
-	fi
-	match=$(check_existence_of_tag NSX_T_HA_SWITCHING_PROFILE_SPEC 'ncp/ha' 'true' )
-	if [ "$match" == "" ]; then
-		echo "    ncp/ha: true" >> extra_yaml_args.yml
-	fi
+	# if [ "$NSX_T_HA_SWITCHING_PROFILE_SPEC" != "" -a "$match" == "" ]; then
+	# 	echo "    ncp/cluster: $NSX_T_PAS_NCP_CLUSTER_TAG" >> extra_yaml_args.yml
+	# fi
+	# match=$(check_existence_of_tag NSX_T_HA_SWITCHING_PROFILE_SPEC 'ncp/ha' 'true' )
+	# if [ "$match" == "" ]; then
+	# 	echo "    ncp/ha: true" >> extra_yaml_args.yml
+	# fi
 	echo "" >> extra_yaml_args.yml
+
+}
+
+function handle_routers_spec {
+  if [ "$NSX_T_T0ROUTER_SPEC" == "null" -o "$NSX_T_T0ROUTER_SPEC" == "" ]; then
+    return
+  fi
 
 	# Has root element
 	echo "$NSX_T_T0ROUTER_SPEC" >> extra_yaml_args.yml
@@ -104,13 +126,22 @@ function create_extra_yaml_args {
 	fi
 	echo "" >> extra_yaml_args.yml
 
+  if [ "$NSX_T_T1ROUTER_LOGICAL_SWITCHES_SPEC" == "null" -o "$NSX_T_T1ROUTER_LOGICAL_SWITCHES_SPEC" == "" ]; then
+    return
+  fi
+
 	# Has root element
 	echo "$NSX_T_T1ROUTER_LOGICAL_SWITCHES_SPEC" >> extra_yaml_args.yml
 	echo "" >> extra_yaml_args.yml
+}
+
+function handle_exsi_vnics {
+  if [ "$NSX_T_ESXI_VMNICS" == "null" -o "$NSX_T_ESXI_VMNICS" == "" ]; then
+    return
+  fi
 
 	count=1
 	# Create an extra_args.yml file for additional yaml style parameters outside of host and answerfile.yml
-	esxi_host_uplink_vmnics='[ '
 	echo "esxi_uplink_vmnics:" >> extra_yaml_args.yml
 	for vmnic in $( echo $NSX_T_ESXI_VMNICS | sed -e 's/,/ /g')
 	do
@@ -119,8 +150,27 @@ function create_extra_yaml_args {
 	  (( count++ ))
 	done
 	echo "" >> extra_yaml_args.yml
+}
+
+function handle_vcenter_configs {
+  if [ "$COMPUTE_VCENTER_CONFIGS" == "null" -o "$COMPUTE_VCENTER_CONFIGS" == "" ]; then
+    return
+  fi
 
   echo "$COMPUTE_VCENTER_CONFIGS" >> extra_yaml_args.yml
+
+}
+
+
+function create_extra_yaml_args {
+	# Start the extra yaml args
+	echo "" > extra_yaml_args.yml
+  handle_external_ip_pool_spec
+  handle_container_ip_block_spec
+  handle_ha_switching_profile_spec
+  handle_routers_spec
+  handle_exsi_vnics
+  handle_vcenter_configs
 
 	# Going with single profile uplink ; so use uplink-1 for both vmnics for edge
 	echo "edge_uplink_vmnics:" >> extra_yaml_args.yml
@@ -128,7 +178,4 @@ function create_extra_yaml_args {
   echo "  - uplink-1: ${NSX_T_EDGE_UPLINK_INTERFACE}  # network2 used for vlan uplink" >> extra_yaml_args.yml
 	echo "# network1 and network4 are for mgmt and not used for uplink" >> extra_yaml_args.yml
 	echo "" >> extra_yaml_args.yml
-
-
-
 }
