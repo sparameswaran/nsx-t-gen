@@ -18,37 +18,37 @@ export PAS_NCP_CLUSTER_TAG='ncp/cluster'
 # Check for existence of tag matching given value
 # Handle both array items (like external ip pool) and single item (like T0Router)
 function check_existence_of_tag {
-    env_variable=$1
-    tag_name=$2
-    tag_value=$3
+  env_variable=$1
+  tag_name=$2
+  tag_value=$3
 
-    top_key=$(echo "${!env_variable}" | shyaml keys)
-    length=$(expr $(echo "${!env_variable}" | shyaml get-values $top_key | grep "^name:" | wc -l) - 1 || true )
+  top_key=$(echo "${!env_variable}" | shyaml keys)
+  length=$(expr $(echo "${!env_variable}" | shyaml get-values $top_key | grep "^name:" | wc -l) - 1 || true )
 
  	count=0
-    if [ $length -ge 0 ]; then
-      for index in $(seq 0 $length)
-      do
-        tmpfile=$(mktemp /tmp/temp-yaml.XXXXX)
-        echo "${!env_variable}" | shyaml get-value ${top_key}.${index} > $tmpfile
-        given_tag_value=$(cat $tmpfile | grep $tag_name | awk '{print $2}' | sed -e "s/'//g" | sed -e 's/"//g' )
-        if [ "$given_tag_value" == "$tag_value" ]; then
-          count=$(expr $count + 1)
-       	fi
-        rm $tmpfile
-      done
-    else
-        given_tag_value=$(echo "${!env_variable}" | grep $tag_name | awk '{print $2}' | sed -e "s/'//g" | sed -e 's/"//g' )
-        if [ "$given_tag_value" == "$tag_value" ]; then
-          count=$(expr $count + 1)
-       fi
-    fi
+  if [ $length -ge 0 ]; then
+    for index in $(seq 0 $length)
+    do
+      tmpfile=$(mktemp /tmp/temp-yaml.XXXXX)
+      echo "${!env_variable}" | shyaml get-value ${top_key}.${index} > $tmpfile
+      given_tag_value=$(cat $tmpfile | grep $tag_name | awk '{print $2}' | sed -e "s/'//g" | sed -e 's/"//g' )
+      if [ "$given_tag_value" == "$tag_value" ]; then
+        count=$(expr $count + 1)
+     	fi
+      rm $tmpfile
+    done
+  else
+      given_tag_value=$(echo "${!env_variable}" | grep $tag_name | awk '{print $2}' | sed -e "s/'//g" | sed -e 's/"//g' )
+      if [ "$given_tag_value" == "$tag_value" ]; then
+        count=$(expr $count + 1)
+     fi
+  fi
 
-    # Length would be 0 for single items but count would be 1
-    # For arrays, count should greater than length (as we subtracted 1 before)
-    if [ $count -gt $length ]; then
-    	echo "true"
-    fi
+  # Length would be 0 for single items but count would be 1
+  # For arrays, count should greater than length (as we subtracted 1 before)
+  if [ $count -gt $length ]; then
+  	echo "true"
+  fi
 }
 
 
@@ -74,6 +74,12 @@ function handle_external_ip_pool_spec {
 		#echo "    ncp/cluster:$NSX_T_PAS_NCP_CLUSTER_TAG" >> extra_yaml_args.yml
 	fi
 	echo "" >> extra_yaml_args.yml
+}
+
+function handle_container_ip_block_spec {
+  if [ "$NSX_T_CONTAINER_IP_BLOCK_SPEC" == "null" -o "$NSX_T_CONTAINER_IP_BLOCK_SPEC" == "" ]; then
+    return
+  fi
 
 }
 
@@ -109,6 +115,12 @@ function handle_ha_switching_profile_spec {
 	# 	echo "    ncp/ha: true" >> extra_yaml_args.yml
 	# fi
 	echo "" >> extra_yaml_args.yml
+}
+
+function handle_routers_spec {
+  if [ "$NSX_T_T0ROUTER_SPEC" == "null" -o "$NSX_T_T0ROUTER_SPEC" == "" ]; then
+    return
+  fi
 
 }
 
@@ -158,7 +170,6 @@ function handle_vcenter_configs {
   fi
 
   echo "$COMPUTE_VCENTER_CONFIGS" >> extra_yaml_args.yml
-
 }
 
 
