@@ -122,7 +122,7 @@ resources:
   type: git
   source:
     uri: https://github.com/sparameswaran/nsx-t-gen.git
-    branch: multi-compute
+    branch: master
     params:
       disable_git_lfs: true
 
@@ -130,7 +130,7 @@ resources:
   type: git
   source:
     uri: https://github.com/sparameswaran/nsxt-ansible
-    branch: multi-compute
+    branch: master
 
 # Download NSX-T 2.1 bits from
 # https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-210&productId=673
