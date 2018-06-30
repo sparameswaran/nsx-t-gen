@@ -158,8 +158,11 @@ EOF
 }
 
 function create_esxi_hosts {
-  echo "$ESXI_HOSTS_CONFIG" > /tmp/esxi_hosts_config.yml
   touch esxi_hosts
+  if [ "$ESXI_HOSTS_CONFIG" == "null" -o "$ESXI_HOSTS_CONFIG" == "" ]; then
+    return
+  fi
+  echo "$ESXI_HOSTS_CONFIG" > /tmp/esxi_hosts_config.yml
 
   is_valid_yml=$(cat /tmp/esxi_hosts_config.yml  | shyaml get-values esxi_hosts || true)
 
@@ -228,11 +231,11 @@ deployVcPassword="$VCENTER_PWD"
 compute_manager="$VCENTER_MANAGER"
 cm_cluster="$VCENTER_CLUSTER"
 
-compute_vcenter_host="$COMPUTE_VCENTER_HOST"
-compute_vcenter_user="$COMPUTE_VCENTER_USR"
-compute_vcenter_password="$COMPUTE_VCENTER_PWD"
-compute_vcenter_cluster="$COMPUTE_VCENTER_CLUSTER"
-compute_vcenter_manager="$COMPUTE_VCENTER_MANAGER"
+# compute_vcenter_host="$COMPUTE_VCENTER_HOST"
+# compute_vcenter_user="$COMPUTE_VCENTER_USR"
+# compute_vcenter_password="$COMPUTE_VCENTER_PWD"
+# compute_vcenter_cluster="$COMPUTE_VCENTER_CLUSTER"
+# compute_vcenter_manager="$COMPUTE_VCENTER_MANAGER"
 
 edge_vcenter_host="$EDGE_VCENTER_HOST"
 edge_vcenter_user="$EDGE_VCENTER_USR"
