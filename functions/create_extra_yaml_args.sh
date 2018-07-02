@@ -165,11 +165,11 @@ function handle_exsi_vnics {
 }
 
 function handle_vcenter_configs {
-  if [ "$COMPUTE_VCENTER_CONFIGS" == "null" -o "$COMPUTE_VCENTER_CONFIGS" == "" ]; then
+  if [ "$COMPUTE_MANAGER_CONFIGS" == "null" -o "$COMPUTE_MANAGER_CONFIGS" == "" ]; then
     return
   fi
 
-  echo "$COMPUTE_VCENTER_CONFIGS" >> extra_yaml_args.yml
+  echo "$COMPUTE_MANAGER_CONFIGS" >> extra_yaml_args.yml
 }
 
 

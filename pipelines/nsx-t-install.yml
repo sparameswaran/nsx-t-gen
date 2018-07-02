@@ -18,7 +18,7 @@ nsx_t_gen_params: &nsx-t-gen-params
   NETMASK: ((netmask))
   ESXI_HOSTS_ROOT_PWD: ((esxi_hosts_root_pwd))
   ESXI_HOSTS_CONFIG: ((esxi_hosts_config))
-  COMPUTE_VCENTER_CONFIGS: ((compute_vcenter_configs))
+  COMPUTE_MANAGER_CONFIGS: ((compute_manager_configs))
   EDGE_VCENTER_HOST: ((edge_vcenter_host))
   EDGE_VCENTER_USR: ((edge_vcenter_usr))
   EDGE_VCENTER_PWD: ((edge_vcenter_pwd))
