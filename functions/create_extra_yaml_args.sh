@@ -51,6 +51,19 @@ function check_existence_of_tag {
   fi
 }
 
+function check_for_json_payload {
+  var_name=$1
+  var_value="${!var_name}"
+  has_json_open_tag=$(echo "${!var_name}" | grep '{' | wc -l )
+  has_json_close_tag=$(echo "${!var_name}" | grep '}' | wc -l )
+
+  if [ $has_json_open_tag -gt 0 and $has_json_close_tag -gt 0 ]; then
+    echo "$var_name variable is expanding to JSON, probably missing a pipe character in params file!!, Exiting"
+    exit -1
+  else
+    echo 1
+  fi
+}
 
 function handle_external_ip_pool_spec {
   if [ "$NSX_T_EXTERNAL_IP_POOL_SPEC" == "null" -o "$NSX_T_EXTERNAL_IP_POOL_SPEC" == "" ]; then
@@ -164,7 +177,7 @@ function handle_exsi_vnics {
 	echo "" >> extra_yaml_args.yml
 }
 
-function handle_vcenter_configs {
+function handle_compute_manager_configs {
   if [ "$COMPUTE_MANAGER_CONFIGS" == "null" -o "$COMPUTE_MANAGER_CONFIGS" == "" ]; then
     return
   fi
@@ -176,12 +189,13 @@ function handle_vcenter_configs {
 function create_extra_yaml_args {
 	# Start the extra yaml args
 	echo "" > extra_yaml_args.yml
+
   handle_external_ip_pool_spec
   handle_container_ip_block_spec
   handle_ha_switching_profile_spec
   handle_routers_spec
   handle_exsi_vnics
-  handle_vcenter_configs
+  handle_compute_manager_configs
 
 	# Going with single profile uplink ; so use uplink-1 for both vmnics for edge
 	echo "edge_uplink_vmnics:" >> extra_yaml_args.yml

@@ -292,18 +292,25 @@ nsx_t_t0router_spec: |
 nsx_t_t1router_logical_switches_spec: |
   t1_routers:
   # Add additional T1 Routers or collapse switches into same T1 Router as needed
-  # Sample for PKS
+  # Sample for PKS - Ops Mgr, Bosh Director
   - name: T1-Router-PKS-Infra
     switches:
     - name: PKS-Infra
-      logical_switch_gw: 192.168.20.1 # Last octet should be 1 rather than 0
+      logical_switch_gw: 172.23.1.1 # Last octet should be 1 rather than 0
       subnet_mask: 24
 
-  - name: T1Router-PKS-K8s-Clusters
+  # Hosts the PKS Controller & Harbor
+  - name: T1Router-PKS-Services
     switches:
-    - name: PKS-K8s-Clusters
-      logical_switch_gw: 192.168.40.1 # Last octet should be 1 rather than 0
+    - name: PKS-Services
+      logical_switch_gw: 172.23.2.1 # Last octet should be 1 rather than 0
       subnet_mask: 24
+
+  # - name: T1Router-PKS-K8s-Clusters
+  #   switches:
+  #   - name: PKS-K8s-Clusters
+  #     logical_switch_gw: 192.168.40.1 # Last octet should be 1 rather than 0
+  #     subnet_mask: 24
 
 
 # Make sure the ncp/cluster tag matches the one defined on the T0 Router
@@ -321,12 +328,13 @@ nsx_t_ha_switching_profile_spec: |
 # Add additional container ip blocks as needed
 nsx_t_container_ip_block_spec: |
   container_ip_blocks:
+    # For PKS clusters
   - name: node-container-ip-block-pks-with-tag
-    cidr: 11.4.0.0/16
+    cidr: 172.24.0.0/14
     ncp/shared_resource: 'true'
     # No tags for this block
   - name: pod-container-ip-block-pks-with-tag
-    cidr: 12.4.0.0/16
+    cidr: 172.28.0.0/14
     ncp/shared_resource: 'true'
     # No tags for this block
 
@@ -366,14 +374,14 @@ nsx_t_nat_rules_spec: |
   # Sample entry for PKS PKS-Infra network - outbound/egress
   - t0_router: DefaultT0Router
     nat_type: snat
-    source_network: 192.168.20.0/24      # PKS Infra network cidr
+    source_network: 172.23.1.0/24      # PKS Infra network cidr
     translated_network: 10.13.12.6       # SNAT External Address for PKS networks
     rule_priority: 8001                  # Lower priority
 
   # Sample entry for PKS PKS-Clusters network - outbound/egress
   - t0_router: DefaultT0Router
     nat_type: snat
-    source_network: 192.168.40.0/24      # PKS Clusters network cidr
+    source_network: 172.23.2.0/24      # PKS Clusters network cidr
     translated_network: 10.13.12.6       # SNAT External Address for PKS networks
     rule_priority: 8001                  # Lower priority
 
@@ -381,12 +389,12 @@ nsx_t_nat_rules_spec: |
   - t0_router: DefaultT0Router
     nat_type: dnat
     destination_network: 10.13.12.5      # External IP address for PKS opsmanager
-    translated_network: 192.168.20.2     # Internal IP of PKS Ops manager
+    translated_network: 172.23.1.5     # Internal IP of PKS Ops manager
     rule_priority: 1024                  # Higher priority
   # Sample entry for allowing outbound from PKS Ops Mgr to external - egress
   - t0_router: DefaultT0Router
     nat_type: snat
-    source_network: 192.168.20.2         # Internal IP of PAS opsmanager
+    source_network: 172.23.1.5           # Internal IP of PAS opsmanager
     translated_network: 10.13.12.5       # External IP address for PAS opsmanager
     rule_priority: 1024                  # Higher priority
 
@@ -396,12 +404,12 @@ nsx_t_nat_rules_spec: |
   - t0_router: DefaultT0Router
     nat_type: dnat
     destination_network: 10.13.12.7      # External IP address for PKS controller
-    translated_network: 192.168.20.4     # Internal IP of PKS Ops Controller
+    translated_network: 172.23.2.4     # Internal IP of PKS Ops Controller
     rule_priority: 1024                  # Higher priority
   # Sample entry for allowing outbound from PKS Controller to external - egress
   - t0_router: DefaultT0Router
     nat_type: snat
-    source_network: 192.168.20.4        # Internal IP of PKS controller
+    source_network: 172.23.2.4        # Internal IP of PKS controller
     translated_network: 10.13.12.7      # External IP address for PKS controller
     rule_priority: 1024                 # Higher priority
 
