@@ -51,10 +51,7 @@ function copy_ovas_to_OVA_ISO_PATH {
 	mkdir -p $OVA_ISO_PATH
 	check_ovas
 
-	mv $ROOT_DIR/nsx-mgr-ova/$NSX_T_MANAGER_OVA \
-	$ROOT_DIR/nsx-ctrl-ova/$NSX_T_CONTROLLER_OVA \
-	$ROOT_DIR/nsx-edge-ova/$NSX_T_EDGE_OVA \
-	$OVA_ISO_PATH
+	mv $ROOT_DIR/nsx-mgr-ova/$NSX_T_MANAGER_OVA $OVA_ISO_PATH
 
 	echo "Done moving ova images into $OVA_ISO_PATH"
 	echo ""
@@ -65,9 +62,6 @@ function create_customize_ova_params {
 	cat > customize_ova_vars.yml <<-EOF
 	ovftool_path: '/usr/bin'
 	ova_file_path: "$OVA_ISO_PATH"
-	nsx_gw_filename: "$NSX_T_EDGE_OVA"
-	nsx_manager_filename: "$NSX_T_MANAGER_OVA"
-	nsx_controller_filename: "$NSX_T_CONTROLLER_OVA"
 	EOF
 
 	if [ "$NSX_T_KEEP_RESERVATION" == "false" ]; then

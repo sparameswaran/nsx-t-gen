@@ -2,35 +2,56 @@ enable_ansible_debug: false # set value to true for verbose output from ansible
 nsx_t_installer: nsx-t-gen  # Set to name of installer or env or any value so resources can be identified
 
 # vCenter details to deploy the Mgmt OVAs (Mgr, Edge, Controller)
-vcenter_host: vcsa-01.corp.local.io       # EDIT - this is for deployment of the ovas for the mgmt plane
-vcenter_usr: administrator@vsphere.local  # EDIT - this is for deployment of the ovas for the mgmt plane
-vcenter_pwd: 39adladfasdfl!               # EDIT - this is for deployment of the ovas for the mgmt plane
-vcenter_datacenter: Datacenter            # EDIT
-vcenter_datastore: Datastore              # EDIT
-vcenter_cluster: Cluster                  # EDIT
-vcenter_manager: vcenter-1                # EDIT
-vcenter_rp:                               # EDIT - resource pool where mgmt plane vms would get deployed
+vcenter_ip: 10.40.1.206
+vcenter_username: administrator@vsphere.local
+vcenter_password: "Admin!23"
+vcenter_folder: 1-folder-1080
+vcenter_datacenter: 1-datacenter-1080
+vcenter_cluster: 1-cluster-729
+vcenter_datastore: vdnetSharedStorage
+
+# vcenter_manager: vcenter-1                # EDIT
+# vcenter_rp:                               # EDIT - resource pool where mgmt plane vms would get deployed
 
 # OVA general network settings
-ntpservers: 10.13.12.2                    # EDIT
-mgmt_portgroup: 'VM Network'              # EDIT
-dnsserver: 10.13.12.2                     # EDIT
-dnsdomain: corp.local.io                  # EDIT
-defaultgateway: 10.13.12.1                # EDIT
-netmask: 255.255.255.0                    # EDIT
+mgmt_portgroup: 'VM Network'
+dns_server: 10.13.12.2
+dns_domain: corp.local.io
+ntp_servers: 10.13.12.2
+default_gateway: 10.13.12.1
+netmask: 255.255.255.0
+# only NSX manager OVA is required
+path_to_ova: "http://build-squid.eng.vmware.com/build/mts/release/bora-8968195/publish/nsx-unified-appliance/exports/ova/"
+ova_file_name: "nsx-unified-appliance-2.2.0.0.1.8968271.ova"
 
-# Host a Webserver to serve the ova images and ovftool
-# Please edit the endpoint and the file names
-nsx_image_webserver: http://10.85.24.5:9080
+nsx_manager_ip: 10.40.0.20
+nsx_manager_username: admin
+nsx_manager_password: Admin!23Admin
+nsx_manager_assigned_hostname: "nsxt-manager-10" # Set as FQDN, will be used also as certificate common name
+nsx_t_manager_root_pwd: VMware1!          # Min 8 chars, upper, lower, number, special digit
+manager_deploy_size: small   # Recommended for real barebones demo, smallest setup
 
-# Download NSX-T 2.1 bits from
-# https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-210&productId=673
-nsx_mgr_ova: nsx-unified-appliance-2.1.0.0.0.7395503.ova
-nsx_controller_ova: nsx-controller-2.1.0.0.0.7395493.ova
-nsx_edge_ova: nsx-edge-2.1.0.0.0.7395502.ova
+compute_manager_username: "Administrator@vsphere.local"
+compute_manager_password: "Admin!23"
+
+# Tunnel endpoint network ip pool
+# change pool_end based on # of members in the tep pool
+nsx_t_tep_pool_name: tep-ip-pool
+nsx_t_tep_pool_cidr: 192.168.213.0/24
+nsx_t_tep_pool_gateway: 192.168.213.1
+nsx_t_tep_pool_start: 192.168.213.10
+nsx_t_tep_pool_end: 192.168.213.200
+#nsx_t_tep_pool_nameserver: 192.168.213.2 # Not required
+
+# # Host a Webserver to serve the ova images and ovftool
+# # Please edit the endpoint and the file names
+# nsx_image_webserver: http://10.85.24.5:9080
+# # Download NSX-T 2.1 bits from
+# # https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-210&productId=673
+# nsx_mgr_ova: nsx-unified-appliance-2.1.0.0.0.7395503.ova
 # Ensure ovftool is minimally v4.2
 # https://my.vmware.com/group/vmware/details?productId=614&downloadGroup=OVFTOOL420#
-ovftool_image: VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle
+ovftool_image: http://build-squid.eng.vmware.com/build/mts/release/bora-8961634/publish/VMware-ovftool-4.3.0-8961634-lin.i386.bundle
 
 # The Esxi Hosts can be added to transport nodes in two ways:
 # a) specify the esxi hosts individually - first checked for
@@ -77,12 +98,7 @@ edge_defaultgateway:       # EDIT -  Use Edge specific vCenter
 edge_netmask:              # EDIT -  Use Edge specific vCenter
 
 # Edit fololowing parameters
-nsx_t_manager_host_name: nsx-t-mgr.corp.local.io # Set as FQDN, will be used also as certificate common name
-nsx_t_manager_vm_name: 'NSX-T Mgr'               # Can have spaces
-nsx_t_manager_ip: 10.13.12.50
-nsx_t_manager_admin_user: admin
-nsx_t_manager_admin_pwd: VMware1!         # Min 8 chars, upper, lower, number, special digit
-nsx_t_manager_root_pwd: VMware1!          # Min 8 chars, upper, lower, number, special digit
+
 
 # Following properties can be used for deploying controller to same cluster/rp
 nsx_t_controller_host_prefix: nsx-t-ctl   # Without spaces, Generated controller would be nsx-t-ctrl-1.corp.local.io,...
@@ -142,13 +158,7 @@ rerun_configure_controllers: false  # set it to true if you want to rerun the co
 nsx_t_edge_overlay_interface: fp-eth1 # Wired to Network3
 nsx_t_edge_uplink_interface: fp-eth0  # Wired to Network2
 
-# Tunnel endpoint network ip pool - change pool_end based on # of members in the tep pool
-nsx_t_tep_pool_name: tep-ip-pool
-nsx_t_tep_pool_cidr: 192.168.213.0/24
-nsx_t_tep_pool_gateway: 192.168.213.1
-nsx_t_tep_pool_start: 192.168.213.10
-nsx_t_tep_pool_end: 192.168.213.200
-#nsx_t_tep_pool_nameserver: 192.168.213.2 # Not required
+
 
 # Memory reservation is turned ON by default with the NSX-T OVAs.
 # This would mean a deployment of an edge or a mgr would reserve full memory
@@ -173,7 +183,7 @@ nsx_t_keep_reservation: true # for Prod setup
 # Change default size for deployment for edge and mgr
 # Size of the edge determines size of loadbalancers and # of lbrs.
 # So, choose the size of edge based on requirements
-nsx_t_mgr_deploy_size: small   # Recommended for real barebones demo, smallest setup
+
 #nsx_t_edge_deploy_size: medium # Recommended for POCs, smaller setup (# of lbrs very limited)
 nsx_t_edge_deploy_size: large  # Recommended when 4 small lbrs are required
 
