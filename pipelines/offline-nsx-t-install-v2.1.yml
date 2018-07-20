@@ -1,0 +1,299 @@
+groups:
+- jobs: [install-nsx-t, add-nsx-t-routers, config-nsx-t-extras]
+  name: full-install
+- jobs: [standalone-install-nsx-t]
+  name: base-install
+- jobs: [standalone-add-nsx-t-routers]
+  name: add-routers
+- jobs: [standalone-config-nsx-t-extras]
+  name: config-nsx-t-extras
+jobs:
+- name: install-nsx-t
+  plan:
+  - aggregate:
+    - {get: nsx-t-gen-pipeline-tarball}
+    - {get: nsxedgegen-nsx-t-gen-worker-v2.1-docker-tarball}
+    - {get: nsxt-ansible-tarball}
+    - {get: nsx-mgr-ova}
+    - {get: nsx-ctrl-ova}
+    - {get: nsx-edge-ova}
+    - {get: ovftool}
+  - config:
+      image_resource:
+        params: {unpack: true}
+        source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
+          endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/docker/nsxedgegen-nsx-t-gen-worker-v2.1-docker.(.*),
+          secret_access_key: ((final_s3_secret_access_key))}
+        type: s3
+      inputs:
+      - {name: nsx-mgr-ova}
+      - {name: nsxt-ansible-tarball}
+      - {name: nsx-t-gen-pipeline-tarball}
+      - {name: nsx-ctrl-ova}
+      - {name: nsx-edge-ova}
+      - {name: ovftool}
+      outputs:
+      - {name: nsx-t-gen-pipeline}
+      - {name: nsxt-ansible}
+      platform: linux
+      run:
+        args: [-ec, 'find . -name "version" -exec rm {} \; ;find . -name "url" -exec
+            rm {} \; ;for file in $(find . -name "*-1.0");do new_file=$(echo $file
+            | sed -e ''s/-1.0$//g'');mv ${file} ${new_file};done;ls -R;cd nsxt-ansible;
+            tar -zxf ../nsxt-ansible-tarball/*.tgz; cd ..;cd nsx-t-gen-pipeline; tar
+            -zxf ../nsx-t-gen-pipeline-tarball/*.tgz; cd ..;for token in $(env | grep
+            ''='' | grep "^[A-Z]*" | grep ''=null$'' | sed -e ''s/=.*//g'');do export
+            ${token}="";  done;echo Starting main task execution!!;nsx-t-gen-pipeline/tasks/install-nsx-t/task.sh']
+        path: /bin/bash
+    params: &id001 {COMPUTE_MANAGER_CONFIGS: ((compute_manager_configs)), DEFAULTGATEWAY: ((defaultgateway)),
+      DNSDOMAIN: ((dnsdomain)), DNSSERVER: ((dnsserver)), EDGE_DEFAULTGATEWAY: ((edge_defaultgateway)),
+      EDGE_DNSDOMAIN: ((edge_dnsdomain)), EDGE_DNSSERVER: ((edge_dnsserver)), EDGE_MGMT_PORTGROUP: ((edge_mgmt_portgroup)),
+      EDGE_NETMASK: ((edge_netmask)), EDGE_NTPSERVERS: ((edge_ntpservers)), EDGE_VCENTER_CLUSTER: ((edge_vcenter_cluster)),
+      EDGE_VCENTER_DATACENTER: ((edge_vcenter_datacenter)), EDGE_VCENTER_DATASTORE: ((edge_vcenter_datastore)),
+      EDGE_VCENTER_HOST: ((edge_vcenter_host)), EDGE_VCENTER_PWD: ((edge_vcenter_pwd)),
+      EDGE_VCENTER_USR: ((edge_vcenter_usr)), ENABLE_ANSIBLE_DEBUG: ((enable_ansible_debug)),
+      ESXI_HOSTS_CONFIG: ((esxi_hosts_config)), ESXI_HOSTS_ROOT_PWD: ((esxi_hosts_root_pwd)),
+      MGMT_PORTGROUP: ((mgmt_portgroup)), NETMASK: ((netmask)), NSX_T_CONTAINER_IP_BLOCK: null,
+      NSX_T_CONTAINER_IP_BLOCK_SPEC: ((nsx_t_container_ip_block_spec)), NSX_T_CONTROLLERS_CONFIG: ((nsx_t_controllers_config)),
+      NSX_T_CONTROLLER_CLUSTER_PWD: ((nsx_t_controller_cluster_pwd)), NSX_T_CONTROLLER_HOST_PREFIX: ((nsx_t_controller_host_prefix)),
+      NSX_T_CONTROLLER_IPS: ((nsx_t_controller_ips)), NSX_T_CONTROLLER_ROOT_PWD: ((nsx_t_controller_root_pwd)),
+      NSX_T_CONTROLLER_VM_NAME_PREFIX: ((nsx_t_controller_vm_name_prefix)), NSX_T_CSR_REQUEST_SPEC: ((nsx_t_csr_request_spec)),
+      NSX_T_EDGE_CLUSTER: ((nsx_t_edge_cluster)), NSX_T_EDGE_DEPLOY_SIZE: ((nsx_t_edge_deploy_size)),
+      NSX_T_EDGE_HOST_PREFIX: ((nsx_t_edge_host_prefix)), NSX_T_EDGE_IPS: ((nsx_t_edge_ips)),
+      NSX_T_EDGE_OVERLAY_INTERFACE: ((nsx_t_edge_overlay_interface)), NSX_T_EDGE_PORTGROUP_EXT: ((nsx_t_edge_portgroup_ext)),
+      NSX_T_EDGE_PORTGROUP_TRANSPORT: ((nsx_t_edge_portgroup_transport)), NSX_T_EDGE_ROOT_PWD: ((nsx_t_edge_root_pwd)),
+      NSX_T_EDGE_UPLINK_INTERFACE: ((nsx_t_edge_uplink_interface)), NSX_T_EDGE_VM_NAME_PREFIX: ((nsx_t_edge_vm_name_prefix)),
+      NSX_T_ESXI_VMNICS: ((nsx_t_esxi_vmnics)), NSX_T_EXTERNAL_IP_POOL: null, NSX_T_EXTERNAL_IP_POOL_SPEC: ((nsx_t_external_ip_pool_spec)),
+      NSX_T_HA_SWITCHING_PROFILE_SPEC: ((nsx_t_ha_switching_profile_spec)), NSX_T_HOSTSWITCH: null,
+      NSX_T_INSTALLER: ((nsx_t_installer)), NSX_T_KEEP_RESERVATION: ((nsx_t_keep_reservation)),
+      NSX_T_LBR_SPEC: ((nsx_t_lbr_spec)), NSX_T_MANAGER_ADMIN_PWD: ((nsx_t_manager_admin_pwd)),
+      NSX_T_MANAGER_ADMIN_USER: ((nsx_t_manager_admin_user)), NSX_T_MANAGER_FQDN: ((nsx_t_manager_host_name)),
+      NSX_T_MANAGER_HOST_NAME: ((nsx_t_manager_host_name)), NSX_T_MANAGER_IP: ((nsx_t_manager_ip)),
+      NSX_T_MANAGER_ROOT_PWD: ((nsx_t_manager_root_pwd)), NSX_T_MANAGER_VM_NAME: ((nsx_t_manager_vm_name)),
+      NSX_T_MGR_DEPLOY_SIZE: ((nsx_t_mgr_deploy_size)), NSX_T_NAT_RULES_SPEC: ((nsx_t_nat_rules_spec)),
+      NSX_T_OVERLAY_HOSTSWITCH: ((nsx_t_overlay_hostswitch)), NSX_T_OVERLAY_PROFILE_MTU: ((nsx_t_overlay_profile_mtu)),
+      NSX_T_OVERLAY_PROFILE_NAME: ((nsx_t_overlay_profile_name)), NSX_T_OVERLAY_PROFILE_VLAN: ((nsx_t_overlay_profile_vlan)),
+      NSX_T_OVERLAY_TRANSPORT_ZONE: ((nsx_t_overlay_transport_zone)), NSX_T_PAS_NCP_CLUSTER_TAG: ((nsx_t_pas_ncp_cluster_tag)),
+      NSX_T_SINGLE_UPLINK_PROFILE_MTU: ((nsx_t_single_uplink_profile_mtu)), NSX_T_SINGLE_UPLINK_PROFILE_NAME: ((nsx_t_single_uplink_profile_name)),
+      NSX_T_SINGLE_UPLINK_PROFILE_VLAN: ((nsx_t_single_uplink_profile_vlan)), NSX_T_SIZING_SPEC: null,
+      NSX_T_T0ROUTER: null, NSX_T_T0ROUTER_HA_MODE: null, NSX_T_T0ROUTER_SPEC: ((nsx_t_t0router_spec)),
+      NSX_T_T1ROUTER_LOGICAL_SWITCHES: null, NSX_T_T1ROUTER_LOGICAL_SWITCHES_SPEC: ((nsx_t_t1router_logical_switches_spec)),
+      NSX_T_TEP_POOL_CIDR: ((nsx_t_tep_pool_cidr)), NSX_T_TEP_POOL_END: ((nsx_t_tep_pool_end)),
+      NSX_T_TEP_POOL_GATEWAY: ((nsx_t_tep_pool_gateway)), NSX_T_TEP_POOL_NAME: ((nsx_t_tep_pool_name)),
+      NSX_T_TEP_POOL_NAMESERVER: null, NSX_T_TEP_POOL_START: ((nsx_t_tep_pool_start)),
+      NSX_T_TRANSPORT_VLAN: ((nsx_t_transport_vlan)), NSX_T_VLAN_HOSTSWITCH: ((nsx_t_vlan_hostswitch)),
+      NSX_T_VLAN_TRANSPORT_ZONE: ((nsx_t_vlan_transport_zone)), NTPSERVERS: ((ntpservers)),
+      RERUN_CONFIGURE_CONTROLLERS: ((rerun_configure_controllers)), VCENTER_CLUSTER: ((vcenter_cluster)),
+      VCENTER_DATACENTER: ((vcenter_datacenter)), VCENTER_DATASTORE: ((vcenter_datastore)),
+      VCENTER_HOST: ((vcenter_host)), VCENTER_MANAGER: ((vcenter_manager)), VCENTER_PWD: ((vcenter_pwd)),
+      VCENTER_RP: ((vcenter_rp)), VCENTER_USR: ((vcenter_usr))}
+    task: offlined-install-nsx-t
+- name: add-nsx-t-routers
+  plan:
+  - aggregate:
+    - {get: nsx-t-gen-pipeline-tarball}
+    - {get: nsxedgegen-nsx-t-gen-worker-v2.1-docker-tarball}
+    - get: nsxt-ansible-tarball
+      params:
+        globs: []
+      passed: [install-nsx-t]
+      trigger: true
+  - config:
+      image_resource:
+        params: {unpack: true}
+        source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
+          endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/docker/nsxedgegen-nsx-t-gen-worker-v2.1-docker.(.*),
+          secret_access_key: ((final_s3_secret_access_key))}
+        type: s3
+      inputs:
+      - {name: nsx-t-gen-pipeline-tarball}
+      - {name: nsxt-ansible-tarball}
+      outputs:
+      - {name: nsx-t-gen-pipeline}
+      - {name: nsxt-ansible}
+      platform: linux
+      run:
+        args: [-ec, 'find . -name "version" -exec rm {} \; ;find . -name "url" -exec
+            rm {} \; ;for file in $(find . -name "*-1.0");do new_file=$(echo $file
+            | sed -e ''s/-1.0$//g'');mv ${file} ${new_file};done;ls -R;cd nsxt-ansible;
+            tar -zxf ../nsxt-ansible-tarball/*.tgz; cd ..;cd nsx-t-gen-pipeline; tar
+            -zxf ../nsx-t-gen-pipeline-tarball/*.tgz; cd ..;for token in $(env | grep
+            ''='' | grep "^[A-Z]*" | grep ''=null$'' | sed -e ''s/=.*//g'');do export
+            ${token}="";  done;echo Starting main task execution!!;nsx-t-gen-pipeline/tasks/add-nsx-t-routers/task.sh']
+        path: /bin/bash
+    params: *id001
+    task: offlined-add-nsx-t-routers
+- name: config-nsx-t-extras
+  plan:
+  - aggregate:
+    - {get: nsx-t-gen-pipeline-tarball}
+    - {get: nsxedgegen-nsx-t-gen-worker-v2.1-docker-tarball}
+    - get: nsxt-ansible-tarball
+      params:
+        globs: []
+      passed: [add-nsx-t-routers]
+      trigger: true
+  - config:
+      image_resource:
+        params: {unpack: true}
+        source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
+          endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/docker/nsxedgegen-nsx-t-gen-worker-v2.1-docker.(.*),
+          secret_access_key: ((final_s3_secret_access_key))}
+        type: s3
+      inputs:
+      - {name: nsx-t-gen-pipeline-tarball}
+      - {name: nsxt-ansible-tarball}
+      outputs:
+      - {name: nsx-t-gen-pipeline}
+      platform: linux
+      run:
+        args: [-ec, 'find . -name "version" -exec rm {} \; ;find . -name "url" -exec
+            rm {} \; ;for file in $(find . -name "*-1.0");do new_file=$(echo $file
+            | sed -e ''s/-1.0$//g'');mv ${file} ${new_file};done;ls -R;cd nsx-t-gen-pipeline;
+            tar -zxf ../nsx-t-gen-pipeline-tarball/*.tgz; cd ..;for token in $(env
+            | grep ''='' | grep "^[A-Z]*" | grep ''=null$'' | sed -e ''s/=.*//g'');do
+            export ${token}="";  done;echo Starting main task execution!!;nsx-t-gen-pipeline/tasks/config-nsx-t-extras/task.sh']
+        path: /bin/bash
+    params: *id001
+    task: offlined-config-nsx-t-extras
+- name: standalone-install-nsx-t
+  plan:
+  - aggregate:
+    - {get: nsx-t-gen-pipeline-tarball}
+    - {get: nsxedgegen-nsx-t-gen-worker-v2.1-docker-tarball}
+    - {get: nsxt-ansible-tarball}
+    - {get: nsx-mgr-ova}
+    - {get: nsx-ctrl-ova}
+    - {get: nsx-edge-ova}
+    - {get: ovftool}
+  - config:
+      image_resource:
+        params: {unpack: true}
+        source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
+          endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/docker/nsxedgegen-nsx-t-gen-worker-v2.1-docker.(.*),
+          secret_access_key: ((final_s3_secret_access_key))}
+        type: s3
+      inputs:
+      - {name: nsx-mgr-ova}
+      - {name: nsxt-ansible-tarball}
+      - {name: nsx-t-gen-pipeline-tarball}
+      - {name: nsx-ctrl-ova}
+      - {name: nsx-edge-ova}
+      - {name: ovftool}
+      outputs:
+      - {name: nsx-t-gen-pipeline}
+      - {name: nsxt-ansible}
+      platform: linux
+      run:
+        args: [-ec, 'find . -name "version" -exec rm {} \; ;find . -name "url" -exec
+            rm {} \; ;for file in $(find . -name "*-1.0");do new_file=$(echo $file
+            | sed -e ''s/-1.0$//g'');mv ${file} ${new_file};done;ls -R;cd nsxt-ansible;
+            tar -zxf ../nsxt-ansible-tarball/*.tgz; cd ..;cd nsx-t-gen-pipeline; tar
+            -zxf ../nsx-t-gen-pipeline-tarball/*.tgz; cd ..;for token in $(env | grep
+            ''='' | grep "^[A-Z]*" | grep ''=null$'' | sed -e ''s/=.*//g'');do export
+            ${token}="";  done;echo Starting main task execution!!;nsx-t-gen-pipeline/tasks/install-nsx-t/task.sh']
+        path: /bin/bash
+    params: *id001
+    task: offlined-install-nsx-t
+- name: standalone-add-nsx-t-routers
+  plan:
+  - aggregate:
+    - {get: nsx-t-gen-pipeline-tarball}
+    - {get: nsxedgegen-nsx-t-gen-worker-v2.1-docker-tarball}
+    - get: nsxt-ansible-tarball
+      params:
+        globs: []
+  - config:
+      image_resource:
+        params: {unpack: true}
+        source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
+          endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/docker/nsxedgegen-nsx-t-gen-worker-v2.1-docker.(.*),
+          secret_access_key: ((final_s3_secret_access_key))}
+        type: s3
+      inputs:
+      - {name: nsx-t-gen-pipeline-tarball}
+      - {name: nsxt-ansible-tarball}
+      outputs:
+      - {name: nsx-t-gen-pipeline}
+      - {name: nsxt-ansible}
+      platform: linux
+      run:
+        args: [-ec, 'find . -name "version" -exec rm {} \; ;find . -name "url" -exec
+            rm {} \; ;for file in $(find . -name "*-1.0");do new_file=$(echo $file
+            | sed -e ''s/-1.0$//g'');mv ${file} ${new_file};done;ls -R;cd nsxt-ansible;
+            tar -zxf ../nsxt-ansible-tarball/*.tgz; cd ..;cd nsx-t-gen-pipeline; tar
+            -zxf ../nsx-t-gen-pipeline-tarball/*.tgz; cd ..;for token in $(env | grep
+            ''='' | grep "^[A-Z]*" | grep ''=null$'' | sed -e ''s/=.*//g'');do export
+            ${token}="";  done;echo Starting main task execution!!;nsx-t-gen-pipeline/tasks/add-nsx-t-routers/task.sh']
+        path: /bin/bash
+    params: *id001
+    task: offlined-add-nsx-t-routers
+- name: standalone-config-nsx-t-extras
+  plan:
+  - aggregate:
+    - {get: nsx-t-gen-pipeline-tarball}
+    - {get: nsxedgegen-nsx-t-gen-worker-v2.1-docker-tarball}
+    - get: nsxt-ansible-tarball
+      params:
+        globs: []
+  - config:
+      image_resource:
+        params: {unpack: true}
+        source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
+          endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/docker/nsxedgegen-nsx-t-gen-worker-v2.1-docker.(.*),
+          secret_access_key: ((final_s3_secret_access_key))}
+        type: s3
+      inputs:
+      - {name: nsx-t-gen-pipeline-tarball}
+      - {name: nsxt-ansible-tarball}
+      outputs:
+      - {name: nsx-t-gen-pipeline}
+      platform: linux
+      run:
+        args: [-ec, 'find . -name "version" -exec rm {} \; ;find . -name "url" -exec
+            rm {} \; ;for file in $(find . -name "*-1.0");do new_file=$(echo $file
+            | sed -e ''s/-1.0$//g'');mv ${file} ${new_file};done;ls -R;cd nsx-t-gen-pipeline;
+            tar -zxf ../nsx-t-gen-pipeline-tarball/*.tgz; cd ..;for token in $(env
+            | grep ''='' | grep "^[A-Z]*" | grep ''=null$'' | sed -e ''s/=.*//g'');do
+            export ${token}="";  done;echo Starting main task execution!!;nsx-t-gen-pipeline/tasks/config-nsx-t-extras/task.sh']
+        path: /bin/bash
+    params: *id001
+    task: offlined-config-nsx-t-extras
+nsx_t_gen_params: *id001
+resource_types: []
+resources:
+- name: nsx-t-gen-pipeline-tarball
+  source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
+    endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/git/nsx-t-gen-pipeline-tar(.*).tgz,
+    secret_access_key: ((final_s3_secret_access_key))}
+  type: s3
+- name: nsxt-ansible-tarball
+  source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
+    endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/git/nsxt-ansible-tar(.*).tgz,
+    secret_access_key: ((final_s3_secret_access_key))}
+  type: s3
+- name: nsx-mgr-ova
+  source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
+    endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/file/nsx-mgr-ova-*-(.*),
+    secret_access_key: ((final_s3_secret_access_key))}
+  type: s3
+- name: nsx-ctrl-ova
+  source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
+    endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/file/nsx-ctrl-ova-*-(.*),
+    secret_access_key: ((final_s3_secret_access_key))}
+  type: s3
+- name: nsx-edge-ova
+  source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
+    endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/file/nsx-edge-ova-*-(.*),
+    secret_access_key: ((final_s3_secret_access_key))}
+  type: s3
+- name: ovftool
+  source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
+    endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/file/ovftool-*-(.*),
+    secret_access_key: ((final_s3_secret_access_key))}
+  type: s3
+- name: nsxedgegen-nsx-t-gen-worker-v2.1-docker-tarball
+  source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
+    endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/docker/nsxedgegen-nsx-t-gen-worker-v2.1-docker.(.*),
+    secret_access_key: ((final_s3_secret_access_key))}
+  type: s3
