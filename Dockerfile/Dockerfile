@@ -1,7 +1,8 @@
+# Meant for support nsx-t v2.1
 FROM ubuntu:17.10
 COPY ./ ./
 
-#RUN apt-get update && apt-get install -y vim curl wget default-jdk maven gradle golang git jq python ruby-dev python-pip python-dev libffi-dev libssl-dev libxml2-dev libxslt1-dev zlib1g-dev sshpass 
+#RUN apt-get update && apt-get install -y vim curl wget default-jdk maven gradle golang git jq python ruby-dev python-pip python-dev libffi-dev libssl-dev libxml2-dev libxslt1-dev zlib1g-dev sshpass
 
 RUN apt-get update \
 	&& apt-get install -y \
@@ -51,7 +52,7 @@ RUN pip install \
 					cryptography \
 					enum34 \
 					pyasn1==0.4.1 \
-	&& pip uninstall -y enum 
+	&& pip uninstall -y enum
 
 # Add ansible support
 RUN apt-get update \
@@ -78,4 +79,4 @@ RUN pip install nsx_python_sdk-*.whl \
         vapi_common_client-*.whl
 
 # Overwrite the pyopenssl 0.15.1 with 17.5.0 as ansible breaks otherwise
-RUN pip install -U pyopenssl==17.5.0 
+RUN pip install -U pyopenssl==17.5.0
