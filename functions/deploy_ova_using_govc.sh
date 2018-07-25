@@ -2,8 +2,8 @@
 
 set -eu
 
-export GOVC_TLS_CA_CERTS=/tmp/vcenter-ca.pem
-echo "$GOVC_CA_CERT" > "$GOVC_TLS_CA_CERTS"
+#export GOVC_TLS_CA_CERTS=/tmp/vcenter-ca.pem
+#echo "$GOVC_CA_CERT" > "$GOVC_TLS_CA_CERTS"
 
 # function create_ova_payload() {
 #   type_of_ova=$1

@@ -15,7 +15,6 @@ export NSX_T_EDGE_OVA=$(ls $ROOT_DIR/nsx-edge-ova)
 
 source $FUNCTIONS_DIR/copy_ovas.sh
 source $FUNCTIONS_DIR/create_ansible_cfg.sh
-source $FUNCTIONS_DIR/create_answerfile.sh
 source $FUNCTIONS_DIR/create_hosts.sh
 source $FUNCTIONS_DIR/create_extra_yaml_args.sh
 source $FUNCTIONS_DIR/check_null_variables.sh
@@ -75,12 +74,11 @@ if [ "$ENABLE_ANSIBLE_DEBUG" == "true" ]; then
 fi
 
 create_hosts
-create_answerfile
 create_ansible_cfg
 create_extra_yaml_args
 create_customize_ova_params
 
-cp hosts answerfile.yml ansible.cfg extra_yaml_args.yml customize_ova_vars.yml nsxt-ansible/.
+cp hosts ansible.cfg extra_yaml_args.yml customize_ova_vars.yml nsxt-ansible/.
 cd nsxt-ansible
 
 echo ""

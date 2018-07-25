@@ -231,12 +231,6 @@ deployVcPassword="$VCENTER_PWD"
 compute_manager="$VCENTER_MANAGER"
 cm_cluster="$VCENTER_CLUSTER"
 
-# compute_vcenter_host="$COMPUTE_VCENTER_HOST"
-# compute_vcenter_user="$COMPUTE_VCENTER_USR"
-# compute_vcenter_password="$COMPUTE_VCENTER_PWD"
-# compute_vcenter_cluster="$COMPUTE_VCENTER_CLUSTER"
-# compute_vcenter_manager="$COMPUTE_VCENTER_MANAGER"
-
 edge_vcenter_host="$EDGE_VCENTER_HOST"
 edge_vcenter_user="$EDGE_VCENTER_USR"
 edge_vcenter_password="$EDGE_VCENTER_PWD"
@@ -279,9 +273,6 @@ edge_single_uplink_profile_mtu=$NSX_T_SINGLE_UPLINK_PROFILE_MTU
 edge_single_uplink_profile_vlan=$NSX_T_SINGLE_UPLINK_PROFILE_VLAN
 edge_interface=$NSX_T_EDGE_OVERLAY_INTERFACE
 edge_uplink_interface=$NSX_T_EDGE_UPLINK_INTERFACE
-
-esxi_uplink_vmnics_arr="${esxi_host_uplink_vmnics}"
-edge_uplink_vmnics_arr="${edge_host_uplink_vmnics}"
 
 esxi_overlay_profile_name=$NSX_T_OVERLAY_PROFILE_NAME
 esxi_overlay_profile_mtu=$NSX_T_OVERLAY_PROFILE_MTU
