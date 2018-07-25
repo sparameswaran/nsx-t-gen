@@ -19,6 +19,7 @@ source $FUNCTIONS_DIR/create_answerfile.sh
 source $FUNCTIONS_DIR/create_hosts.sh
 source $FUNCTIONS_DIR/create_extra_yaml_args.sh
 source $FUNCTIONS_DIR/check_null_variables.sh
+source $FUNCTIONS_DIR/deploy_ova_using_json.sh
 
 # Default installer name to be used for tags
 if [ "$NSX_T_INSTALLER" == "" ]; then
@@ -110,7 +111,8 @@ fi
 
 # Deploy the Mgr ova if its not up
 if [ "$nsx_mgr_up_status" != "true" ]; then
-	ansible-playbook $DEBUG -i hosts deploy_mgr.yml -e @extra_yaml_args.yml
+	#ansible-playbook $DEBUG -i hosts deploy_mgr.yml -e @extra_yaml_args.yml
+	handle_ova "mgr" "${OVA_ISO_PATH}/${NSX_T_MANAGER_OVA}"
 	STATUS=$?
 
 	if [[ $STATUS != 0 ]]; then
@@ -128,7 +130,8 @@ fi
 
 # Deploy the Controller ova if its not up
 if [ "$nsx_controller_up_status" != "true" ]; then
-	ansible-playbook $DEBUG -i hosts deploy_ctrl.yml -e @extra_yaml_args.yml
+	#ansible-playbook $DEBUG -i hosts deploy_ctrl.yml -e @extra_yaml_args.yml
+	handle_ova "ctrl" "${OVA_ISO_PATH}/${NSX_T_CONTROLLER_OVA}"
 	STATUS=$?
 
 	if [[ $STATUS != 0 ]]; then
@@ -146,8 +149,8 @@ fi
 
 # Deploy the Edge ova if its not up
 if [ "$nsx_edge_up_status" != "true" ]; then
-
-	ansible-playbook $DEBUG -i hosts deploy_edge.yml -e @extra_yaml_args.yml
+	#ansible-playbook $DEBUG -i hosts deploy_edge.yml -e @extra_yaml_args.yml
+	handle_ova "edge" "${OVA_ISO_PATH}/${NSX_T_EDGE_OVA}"
 	STATUS=$?
 
 	if [[ $STATUS != 0 ]]; then

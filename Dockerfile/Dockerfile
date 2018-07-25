@@ -9,6 +9,7 @@ RUN apt-get update \
 			vim \
 			curl \
 			wget \
+			golang \
 			git \
 			jq \
 			python \
@@ -80,3 +81,9 @@ RUN pip install nsx_python_sdk-*.whl \
 
 # Overwrite the pyopenssl 0.15.1 with 17.5.0 as ansible breaks otherwise
 RUN pip install -U pyopenssl==17.5.0
+
+# Include govc, build using golang-1.8
+RUN mkdir -p /root/go/src /root/go/bin /root/go/pkg
+ENV GOPATH "/root/go"
+ENV PATH "$PATH:$GOPATH/bin"
+RUN go get -u github.com/vmware/govmomi/govc
