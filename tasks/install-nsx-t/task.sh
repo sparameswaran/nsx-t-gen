@@ -19,7 +19,7 @@ source $FUNCTIONS_DIR/create_answerfile.sh
 source $FUNCTIONS_DIR/create_hosts.sh
 source $FUNCTIONS_DIR/create_extra_yaml_args.sh
 source $FUNCTIONS_DIR/check_null_variables.sh
-source $FUNCTIONS_DIR/deploy_ova_using_json.sh
+source $FUNCTIONS_DIR/deploy_ova_using_govc.sh
 
 # Default installer name to be used for tags
 if [ "$NSX_T_INSTALLER" == "" ]; then
