@@ -846,7 +846,7 @@ def add_lbr_pool(virtual_server_defn):
               'display_name': member_name,
               'backup_member': False
             }
-    if server_pool_member.get('port') is None or '-' in server_pool_member['port']:
+    if server_pool_member.get('port') is None or '-' in str(server_pool_member['port']):
         server_pool_member.pop('port', None)
         uses_port_range = True
 

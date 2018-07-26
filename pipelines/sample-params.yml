@@ -433,7 +433,7 @@ nsx_t_nat_rules_spec: |
   # Sample entry for allowing outbound from PAS Ops Mgr to external - egress
   - t0_router: DefaultT0Router
     nat_type: snat
-    source_network: 192.168.10.5         # Internal IP of PAS opsmanager
+    source_network: 192.168.10.2         # Internal IP of PAS opsmanager
     translated_network: 10.13.12.2      # External IP address for PAS opsmanager
     rule_priority: 1024                  # Higher priority
   # Sample entry for PAS Infra network SNAT - egress
@@ -566,3 +566,11 @@ nsx_t_lbr_spec: |
       members:
       - ip: 192.168.24.41        # Internal ip of Diego Brain where ssh proxy runs
         port: 2222
+    - name: sampleTcpRouter      # Sample for TCP Router that uses a port range
+      vip: 10.13.12.152
+      port: 10000-10500          # Uses a port range rather than a fixed port
+      members:
+      - ip: 192.168.24.42        # Internal ip of TcpRouter instance 1
+        port: 10000-10500
+      - ip: 192.168.24.43        # Internal ip of TcpRouter instance 2
+        port: 10000-10500
