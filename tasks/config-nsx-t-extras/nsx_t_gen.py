@@ -741,7 +741,7 @@ def add_t0_route_nat_rules():
 
     if resp and resp.status_code >= 400:
       print 'Problem with submitting NAT Rules!!'
-      print 'Associated Error: {}'.format(resp.json()['related_error'])
+      print 'Associated Error: {}'.format(resp.json())
       exit(1)
 
   if changes_detected:
@@ -846,7 +846,7 @@ def add_lbr_pool(virtual_server_defn):
               'display_name': member_name,
               'backup_member': False
             }
-    if '-' in member['port']:
+    if server_pool_member.get('port') is None or '-' in server_pool_member['port']:
         server_pool_member.pop('port', None)
         uses_port_range = True
 
@@ -868,7 +868,7 @@ def add_lbr_pool(virtual_server_defn):
         return resp['id']
     else:
         print 'Problem in creating Server Pool for virtual server: {}'.format(virtual_server_name)
-        print 'Associated Error: {}'.format(resp['related_error'])
+        print 'Associated Error: {}'.format(resp)
         exit(1)
 
   # Update existing server pool
@@ -883,7 +883,7 @@ def add_lbr_pool(virtual_server_defn):
       return existing_pool['id']
   else:
       print 'Problem in updating Server Pool for virtual server: {}'.format(virtual_server_name)
-      print 'Associated Error: {}'.format(resp.json()['related_error'])
+      print 'Associated Error: {}'.format(resp.json())
       exit(1)
 
 
@@ -923,7 +923,7 @@ def add_lbr_virtual_server(virtual_server_defn):
         return resp['id']
     else:
         print 'Problem in creating Virtual Server: {}'.format(virtual_server_name)
-        print 'Associated Error: {}'.format(resp['related_error'])
+        print 'Associated Error: {}'.format(resp)
         exit(1)
 
   # Update existing virtual server
@@ -938,7 +938,7 @@ def add_lbr_virtual_server(virtual_server_defn):
       return existing_virtual_server['id']
   else:
       print 'Problem in updating Virtual Server: {}'.format(virtual_server_name)
-      print 'Associated Error: {}'.format(resp.json()['related_error'])
+      print 'Associated Error: {}'.format(resp.json())
       exit(1)
 
 def add_loadbalancers():
@@ -989,7 +989,7 @@ def add_loadbalancers():
           lbr_id = resp['id']
       else:
           print 'Problem in creating Loadbalancer: {}'.format(lbr['name'])
-          print 'Associated Error: {}'.format(resp['related_error'])
+          print 'Associated Error: {}'.format(resp)
           exit(1)
 
     else:
@@ -1007,7 +1007,7 @@ def add_loadbalancers():
           print ''
       else:
           print 'Problem in updating Loadbalancer: {}'.format(lbr['name'])
-          print 'Associated Error: {}'.format(resp.json()['related_error'])
+          print 'Associated Error: {}'.format(resp.json())
           exit(1)
 
       print ''
