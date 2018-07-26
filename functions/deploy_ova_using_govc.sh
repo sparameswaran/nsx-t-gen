@@ -31,7 +31,7 @@ function deploy_ova {
 
   if [ "$GOVC_DEBUG" != "" ]; then
     echo "Using VM options for ova upload"
-    cat $ova_options
+    cat $ova_options |grep -v passw
   fi
 
   govc import.ova -options=$ova_options "$path_to_ova"

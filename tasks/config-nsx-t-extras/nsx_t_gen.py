@@ -723,6 +723,8 @@ def add_t0_route_nat_rules():
       rule_payload['match_source_network'] = nat_rule['source_network']
 
     existing_nat_rule = check_for_existing_rule(existing_nat_rules, rule_payload )
+
+    resp = None
     if None == existing_nat_rule:
       changes_detected = True
       print('Adding new Nat rule: {}'.format(rule_payload))
@@ -736,6 +738,11 @@ def add_t0_route_nat_rules():
         print('Updating just the priority of existing nat rule: {}'.format(rule_payload))
         update_api_endpint = '%s%s%s' % (api_endpoint, '/', existing_nat_rule['id'])
         resp = client.put(update_api_endpint, rule_payload )
+
+    if resp and resp.status_code >= 400:
+      print 'Problem with submitting NAT Rules!!'
+      print 'Associated Error: {}'.format(resp.json()['related_error'])
+      exit(1)
 
   if changes_detected:
     print('Done adding/updating nat rules for T0Routers!!\n')
@@ -827,9 +834,10 @@ def add_lbr_pool(virtual_server_defn):
         'type': 'LbSnatAutoMap'
     }, 'algorithm': 'ROUND_ROBIN' }
 
+  uses_port_range = False
   for member in virtual_server_defn['members']:
     member_name = ( '%s-%s-%d' % (virtual_server_name, 'member', index))
-    member = {
+    server_pool_member = {
               'max_concurrent_connections': 10000,
               'port': member['port'],
               'weight': 1,
@@ -838,26 +846,46 @@ def add_lbr_pool(virtual_server_defn):
               'display_name': member_name,
               'backup_member': False
             }
-    members.append(member)
+    if '-' in member['port']:
+        server_pool_member.pop('port', None)
+        uses_port_range = True
+
+    members.append(server_pool_member)
     index += 1
+
   pool_payload['members'] = members
+
+  if uses_port_range:
+    pool_payload.pop('active_monitor_ids', None)
 
   print 'Payload for Server Pool: {}'.format(pool_payload)
 
   if existing_pool is None:
     resp = client.post(pool_api_endpoint, pool_payload ).json()
-    print 'Created Server Pool: {}'.format(virtual_server_name)
-    print ''
-    return resp['id']
+    if resp.get('error_code') is None:
+        print 'Created Server Pool for virtual server: {}'.format(virtual_server_name)
+        print ''
+        return resp['id']
+    else:
+        print 'Problem in creating Server Pool for virtual server: {}'.format(virtual_server_name)
+        print 'Associated Error: {}'.format(resp['related_error'])
+        exit(1)
 
   # Update existing server pool
   pool_payload['_revision'] = existing_pool['_revision']
   pool_payload['id'] = existing_pool['id']
   pool_update_api_endpoint = '%s/%s' % (pool_api_endpoint, existing_pool['id'])
   resp = client.put( pool_update_api_endpoint, pool_payload, check=False )
-  print 'Updated Server Pool: {}'.format(virtual_server_name)
-  print ''
-  return existing_pool['id']
+  # This is just requests.models.Response, not dict
+  if resp.status_code < 400:
+      print 'Updated Server Pool for virtual server: {}'.format(virtual_server_name)
+      print ''
+      return existing_pool['id']
+  else:
+      print 'Problem in updating Server Pool for virtual server: {}'.format(virtual_server_name)
+      print 'Associated Error: {}'.format(resp.json()['related_error'])
+      exit(1)
+
 
 def add_lbr_virtual_server(virtual_server_defn):
   virtual_server_name = virtual_server_defn['name']
@@ -888,8 +916,15 @@ def add_lbr_virtual_server(virtual_server_defn):
 
   if existing_virtual_server is None:
     resp = client.post(virtual_server_api_endpoint, vs_payload ).json()
-    print 'Created Virtual Server: {}'.format(virtual_server_name)
-    return resp['id']
+
+    if resp.get('error_code') is None:
+        print 'Created Virtual Server: {}'.format(virtual_server_name)
+        print ''
+        return resp['id']
+    else:
+        print 'Problem in creating Virtual Server: {}'.format(virtual_server_name)
+        print 'Associated Error: {}'.format(resp['related_error'])
+        exit(1)
 
   # Update existing virtual server
   vs_payload['_revision'] = existing_virtual_server['_revision']
@@ -897,9 +932,14 @@ def add_lbr_virtual_server(virtual_server_defn):
   vs_update_api_endpoint = '%s/%s' % (virtual_server_api_endpoint, existing_virtual_server['id'])
 
   resp = client.put(vs_update_api_endpoint, vs_payload, check=False )
-  print 'Updated Virtual Server: {}'.format(virtual_server_name)
-  print ''
-  return existing_virtual_server['id']
+  if resp.status_code < 400:
+      print 'Updated Virtual Server: {}'.format(virtual_server_name)
+      print ''
+      return existing_virtual_server['id']
+  else:
+      print 'Problem in updating Virtual Server: {}'.format(virtual_server_name)
+      print 'Associated Error: {}'.format(resp.json()['related_error'])
+      exit(1)
 
 def add_loadbalancers():
 
@@ -942,9 +982,16 @@ def add_loadbalancers():
     existing_lbr = check_for_existing_lbr(lbr['name'])
     if existing_lbr is None:
       resp = client.post(lbr_api_endpoint, lbr_service_payload ).json()
-      lbr_id = resp['id']
-      print 'Created LBR: {}'.format(lbr['name'])
-      print ''
+
+      if resp.get('error_code') is None:
+          print 'Created Loadbalancer: {}'.format(lbr['name'])
+          print ''
+          lbr_id = resp['id']
+      else:
+          print 'Problem in creating Loadbalancer: {}'.format(lbr['name'])
+          print 'Associated Error: {}'.format(resp['related_error'])
+          exit(1)
+
     else:
       # Update existing LBR
       lbr_id = existing_lbr['id']
@@ -954,7 +1001,15 @@ def add_loadbalancers():
 
       lbr_update_api_endpoint = '%s/%s' % (lbr_api_endpoint, lbr_id)
       resp = client.put(lbr_update_api_endpoint, lbr_service_payload, check=False )
-      print 'Updated LBR: {}'.format(lbr['name'])
+
+      if resp.status_code < 400:
+          print 'Updated Loadbalancer: {}'.format(lbr['name'])
+          print ''
+      else:
+          print 'Problem in updating Loadbalancer: {}'.format(lbr['name'])
+          print 'Associated Error: {}'.format(resp.json()['related_error'])
+          exit(1)
+
       print ''
 
 def main():
