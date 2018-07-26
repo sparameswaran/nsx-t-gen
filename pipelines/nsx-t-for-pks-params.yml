@@ -237,7 +237,7 @@ nsx_t_transport_vlan: 0
 nsx_t_vlan_transport_zone: vlan-tz
 nsx_t_overlay_transport_zone: overlay-tz
 
-nsx_t_pas_ncp_cluster_tag: pas1
+nsx_t_pas_ncp_cluster_tag: pks1
 
 nsx_t_edge_cluster: 'Edge Cluster'
 
@@ -319,9 +319,9 @@ nsx_t_ha_switching_profile_spec: |
   ha_switching_profiles:
   - name: HASwitchingProfile
     tags:
-      ncp/cluster: 'pas1'  # Should match the top level ncp/cluster tag value
+      ncp/cluster: 'pks1'  # Should match the top level ncp/cluster tag value
       ncp/ha: 'true'       # Required for HA
-      testtag: 'testpas1'
+      testtag: 'testpks1'
 
 
 # Make sure the ncp/cluster tag matches the one defined on the T0 Router
@@ -349,11 +349,11 @@ nsx_t_container_ip_block_spec: |
 nsx_t_external_ip_pool_spec: |
   external_ip_pools:
   - name: snat-vip-pool-for-pks
-    cidr: 10.300.0.0/24 # Should be a 0/24 or some valid cidr, matching the external exposed uplink
-    gateway: 10.300.0.1
-    start: 10.300.0.10 # Should not include gateway
-    end: 10.300.0.200  # Should not include gateway
-    nameserver: 10.100.0.2
+    cidr: 10.13.12.0/24 # Should be a 0/24 or some valid cidr, matching the external exposed uplink
+    gateway: 10.13.12.1 # EDIT this so its subnet is routed via the T0 Router (for static routes)
+    start: 10.13.12.70 # Should not include gateway
+    end: 10.13.12.105  # Should not include gateway
+    nameserver: 10.13.12.2
     dns_domain: corp.local.io
     tags:
       ncp/external: 'true'        # Required for external facing ips
@@ -378,7 +378,7 @@ nsx_t_nat_rules_spec: |
     translated_network: 10.13.12.6       # SNAT External Address for PKS networks
     rule_priority: 8001                  # Lower priority
 
-  # Sample entry for PKS PKS-Clusters network - outbound/egress
+  # Sample entry for PKS PKS-Services network - outbound/egress
   - t0_router: DefaultT0Router
     nat_type: snat
     source_network: 172.23.2.0/24      # PKS Clusters network cidr
