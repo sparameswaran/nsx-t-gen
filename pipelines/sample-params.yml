@@ -566,3 +566,11 @@ nsx_t_lbr_spec: |
       members:
       - ip: 192.168.24.41        # Internal ip of Diego Brain where ssh proxy runs
         port: 2222
+    - name: sampleTcpRouter      # Sample for TCP Router that uses a port range
+      vip: 10.13.12.152
+      port: 10000-10500          # Uses a port range rather than a fixed port
+      members:
+      - ip: 192.168.24.42        # Internal ip of TcpRouter instance 1
+        port: 10000-10500
+      - ip: 192.168.24.43        # Internal ip of TcpRouter instance 2
+        port: 10000-10500
