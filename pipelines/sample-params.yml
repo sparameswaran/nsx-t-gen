@@ -427,14 +427,14 @@ nsx_t_nat_rules_spec: |
   # Sample entry for allowing inbound to PAS Ops manager - ingress
   - t0_router: DefaultT0Router
     nat_type: dnat
-    destination_network: 10.13.12.2   # External IP address for PAS opsmanager
+    destination_network: 10.13.12.2      # External IP address for PAS opsmanager
     translated_network: 192.168.10.5     # Internal IP of PAS Ops manager
     rule_priority: 1024                  # Higher priority
   # Sample entry for allowing outbound from PAS Ops Mgr to external - egress
   - t0_router: DefaultT0Router
     nat_type: snat
-    source_network: 192.168.10.2         # Internal IP of PAS opsmanager
-    translated_network: 10.13.12.2      # External IP address for PAS opsmanager
+    source_network: 192.168.10.5         # Internal IP of PAS opsmanager
+    translated_network: 10.13.12.2       # External IP address for PAS opsmanager
     rule_priority: 1024                  # Higher priority
   # Sample entry for PAS Infra network SNAT - egress
   - t0_router: DefaultT0Router
