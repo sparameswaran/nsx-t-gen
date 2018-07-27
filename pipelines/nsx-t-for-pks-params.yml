@@ -1,5 +1,6 @@
 enable_ansible_debug: false # set value to true for verbose output from ansible
 nsx_t_installer: nsx-t-gen  # Set to name of installer or env or any value so resources can be identified
+nsx_t_version: 2.1
 
 # vCenter details to deploy the Mgmt OVAs (Mgr, Edge, Controller)
 vcenter_host: vcsa-01.corp.local.io       # EDIT - this is for deployment of the ovas for the mgmt plane
