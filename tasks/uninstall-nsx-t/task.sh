@@ -60,13 +60,22 @@ echo "Now removing the NSX-T related vibs from the Esxi Hosts"
 ansible-playbook -i $ESXI_HOSTS_FILE $ROOT_DIR/uninstall-nsx-vibs.yml
 STATUS=$?
 
-echo "NSX-T vibs removed from the Esxi hosts"
+echo "NSX-T Vibs removed from the Esxi hosts"
 echo "Related Esxi Hosts:"
-echo "-------------------"
-cat $ESXI_HOSTS_FILE | grep ansible_ssh_host | awk '{print $2}'
+
+# esxi_hosts file gets crated like:
+# esxi_hosts:
+#   hosts:
+#     sc2-host-corp.local.io: { ansible_ssh_host: sc2-host-corp.local.io, ansible_ssh_user: root, ansible_ssh_pass: asdfn3! }
+
+echo "--------------------------------------"
+cat $ESXI_HOSTS_FILE | grep ansible |  awk '{print $1}' | sed -e 's/://g'
+echo "--------------------------------------"
+
 echo ""
-echo "The Esxi hosts should be rebooted for nsx-t vib removal to be effective!"
+echo "WARNING!! The Esxi hosts should be rebooted for nsx-t vib removal to be effective!"
+echo "Please reboot all the listed Esxi Hosts in a rolling fashion to pick the changes!!"
 echo ""
-echo "NSX-T Wipe Complete!!"
+echo "NSX-T ${NSX_T_VERSION} Uninstall Complete!!"
 
 exit $STATUS
