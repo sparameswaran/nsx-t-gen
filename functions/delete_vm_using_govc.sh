@@ -36,8 +36,9 @@ function destroy_vms_not_matching_nsx() {
   # Shutdown and clean all non-nsx related vms in the management plane
   for vm_path  in $(govc find . -type m | grep -ve "$nsx_vm_name_pattern" || true)
   do
-    echo govc vm.power -off "$vm_path"
-    echo govc vm.destroy "$vm_path"
+    echo "Powering off and destroying vm: $vm_path"
+    govc vm.power -off "$vm_path"
+    govc vm.destroy "$vm_path"
   done
 
   # Shutdown and clean all non-nsx related vms in the compute clusters plane
@@ -74,8 +75,9 @@ function destroy_vms_not_matching_nsx() {
 
         for vm_path in $(govc find . -type m | grep -ve "$nsx_vm_name_pattern" || true)
         do
-          echo govc vm.power -off "$vm_path"
-          echo govc vm.destroy "$vm_path"
+          echo "Powering off and destroying vm: $vm_path"
+          govc vm.power -off "$vm_path"
+          govc vm.destroy "$vm_path"
         done
         inner_index=$(expr $inner_index + 1)
       done
@@ -93,6 +95,7 @@ function destroy_vm_matching_name {
 
   vm_path=$(govc find . -type m | grep "$vm_name" || true)
   if [ "$vm_path" != "" ]; then
+    echo "Powering off and destroying vm: $vm_path"
     govc vm.power -off "$vm_path"
     govc vm.destroy "$vm_path"
   fi
