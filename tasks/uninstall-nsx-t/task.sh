@@ -12,6 +12,8 @@ source $FUNCTIONS_DIR/check_null_variables.sh
 source $FUNCTIONS_DIR/delete_vm_using_govc.sh
 
 # First wipe out all non-nsx vms deployed on the management plane or compute clusters
+echo "Need to delete the non-NSX Vms that are running in the computer cluster or Management cluster, before proceeding wtih clean of NSX Mgmt Plane!!"
+echo "Now deleting the non NSX vms"
 destroy_vms_not_matching_nsx
 
 export ESXI_HOSTS_FILE="$ROOT_DIR/esxi_hosts"
@@ -25,13 +27,18 @@ if [ "$status" == "0" ]; then
   # Also, additionally create the esxi hosts file so we can do vib cleanup (in case things are sticking around)
   python $PYTHON_LIB_DIR/nsx_t_wipe.py $ESXI_HOSTS_FILE
   STATUS=$?
+
+  if [ "$STATUS" != "0" ]; then
+    echo "Problem in running cleanup of NSX components!!"
+    echo "The deletion of the NSX VMs  up as well as removal of vibs from Esxi hosts needs to be done manually!!"
+    exit $STATUS
+  fi
+  echo "The resources used within NSX Management plane have been cleaned up!!"
+else
+  echo "NSX Manager VM not responding, so cannot delete any related resources within the NSX Management plane"
 fi
 
-if [ "$STATUS" != "0" ]; then
-  echo "Problem in running cleanup of NSX components!!"
-  STATUS=$?
-  exit $STATUS
-fi
+echo "Now deleting the NSX vms"
 
 delete_vm_using_govc "edge"
 delete_vm_using_govc "ctrl"
@@ -49,6 +56,7 @@ cat > $ROOT_DIR/ansible.cfg << EOF
 host_key_checking = false
 EOF
 
+echo "Now removing the NSX-T related vibs from the Esxi Hosts"
 ansible-playbook -i $ESXI_HOSTS_FILE $ROOT_DIR/uninstall-nsx-vibs.yml
 STATUS=$?
 
