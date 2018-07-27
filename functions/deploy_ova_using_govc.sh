@@ -38,25 +38,14 @@ function deploy_ova {
     govc import.ova -options=$ova_options "$path_to_ova"
   else
     set +e
-<<<<<<< HEAD
     found_rp=$(govc find . -name "${resource_pool}" 2>&1 | grep Resources | grep "${resource_pool}$" || true )
-=======
-    found_rp=$(govc find . "${resource_pool}" 2>&1 | grep Resources | grep "${resource_pool}" )
->>>>>>> master
     if [ "$found_rp" == "" ]; then
       govc pool.create "$GOVC_CLUSTER/Resources/$resource_pool"
       GOVC_RESOURCE_POOL="$GOVC_CLUSTER/Resources/$resource_pool"
     fi
-<<<<<<< HEAD
     set -e
     govc import.ova -pool="$GOVC_RESOURCE_POOL" -options=$ova_options "$path_to_ova"
   fi
-=======
-    govc import.ova -pool="$GOVC_RESOURCE_POOL" -options=$ova_options "$path_to_ova"
-    set -e
-  fi
-
->>>>>>> master
 }
 
 function deploy_mgr_ova() {
