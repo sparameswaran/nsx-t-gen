@@ -114,8 +114,6 @@ function delete_mgr_vm() {
 }
 
 function delete_edge_vm() {
-
-
   default_additional_options="GOVC_URL=$VCENTER_HOST \
                               GOVC_DATACENTER=$VCENTER_DATACENTER \
                               GOVC_INSECURE=true \
@@ -148,12 +146,9 @@ function delete_edge_vm() {
     destroy_vm_matching_name "${NSX_T_EDGE_VM_NAME_PREFIX}-0${count}" "$edge_additional_options"
     (( count++ ))
   done
-
 }
 
 function delete_ctrl_vm() {
-  path_to_vm=$1
-
   default_additional_options="GOVC_URL=$VCENTER_HOST \
                               GOVC_DATACENTER=$VCENTER_DATACENTER \
                               GOVC_INSECURE=true \

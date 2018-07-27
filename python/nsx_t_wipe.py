@@ -271,7 +271,6 @@ def delete_edge_clusters():
     for instance in edge_clusters_resp.json()['results']:
         instance_api_endpoint = '%s/%s' % (api_endpoint, instance['id'])
         resp = client.delete(instance_api_endpoint)
-        print 'Deleted Edge Cluster: {}'.format(resp)
     print ' Deleted Edge Clusters!'
 
 def uninstall_nsx_from_hosts():

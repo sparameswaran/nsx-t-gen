@@ -1,0 +1,8 @@
+---
+- name: Execute uninitall nsx vib from Esxi host
+  hosts:
+  - all
+  user: root
+  tasks:
+     - name: Execute uninstall NSX-T v2.1 vibs script
+       script: ./uninstall-nsx-t-vibs.sh
