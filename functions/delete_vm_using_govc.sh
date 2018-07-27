@@ -34,11 +34,11 @@ function destroy_vms_not_matching_nsx() {
   export $default_options
 
   # Shutdown and clean all non-nsx related vms in the management plane
-  vm_path=$(govc find . -type m | grep -ve "$nsx_vm_name_pattern" || true)
-  if [ "$vm_path" != "" ]; then
+  for vm_path  in $(govc find . -type m | grep -ve "$nsx_vm_name_pattern" || true)
+  do
     echo govc vm.power -off "$vm_path"
     echo govc vm.destroy "$vm_path"
-  fi
+  done
 
   # Shutdown and clean all non-nsx related vms in the compute clusters plane
   if [ "$COMPUTE_MANAGER_CONFIGS" != "" -a "$COMPUTE_MANAGER_CONFIGS" != "null" ]; then
@@ -66,11 +66,11 @@ function destroy_vms_not_matching_nsx() {
         # Setup govc env variables coming via the above options
         export $custom_options
 
-        vm_path=$(govc find . -type m | grep -ve "$nsx_vm_name_pattern" || true)
-        if [ "$vm_path" != "" ]; then
+        for vm_path in $(govc find . -type m | grep -ve "$nsx_vm_name_pattern" || true)
+        do
           echo govc vm.power -off "$vm_path"
           echo govc vm.destroy "$vm_path"
-        fi
+        done
       done
     done
   fi
