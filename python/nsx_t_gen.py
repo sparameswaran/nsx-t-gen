@@ -56,15 +56,6 @@ global_id_map = { }
 
 def init():
 
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('-config',
-    	action='store_true',
-    	help='kickoff extras config')
-    parser.add_argument('-wipe',
-    	action='store_true',
-    	help='wipe env')
-
     nsx_mgr_ip          = os.getenv('NSX_T_MANAGER_IP')
     nsx_mgr_user        = os.getenv('NSX_T_MANAGER_ADMIN_USER', 'admin')
     nsx_mgr_pwd         = os.getenv('NSX_T_MANAGER_ROOT_PWD')
@@ -75,9 +66,7 @@ def init():
                           'admin_passwd' : nsx_mgr_pwd
                         }
     global_id_map['DEFAULT_TRANSPORT_ZONE_NAME'] = transport_zone_name
-
     client.set_context(nsx_mgr_context)
-    return parser.parse_args()
 
 def print_global_ip_map():
   print '-----------------------------------------------'
@@ -773,7 +762,7 @@ def add_t0_route_nat_rules():
 
     if resp and resp.status_code >= 400:
       print 'Problem with submitting NAT Rules!!'
-      print 'Associated Error: {}'.format(resp.json()['related_error'])
+      print 'Associated Error: {}'.format(resp.json())
       exit(1)
 
   if changes_detected:
@@ -878,7 +867,7 @@ def add_lbr_pool(virtual_server_defn):
               'display_name': member_name,
               'backup_member': False
             }
-    if '-' in member['port']:
+    if server_pool_member.get('port') is None or '-' in str(server_pool_member['port']):
         server_pool_member.pop('port', None)
         uses_port_range = True
 
@@ -900,7 +889,7 @@ def add_lbr_pool(virtual_server_defn):
         return resp['id']
     else:
         print 'Problem in creating Server Pool for virtual server: {}'.format(virtual_server_name)
-        print 'Associated Error: {}'.format(resp['related_error'])
+        print 'Associated Error: {}'.format(resp)
         exit(1)
 
   # Update existing server pool
@@ -915,7 +904,7 @@ def add_lbr_pool(virtual_server_defn):
       return existing_pool['id']
   else:
       print 'Problem in updating Server Pool for virtual server: {}'.format(virtual_server_name)
-      print 'Associated Error: {}'.format(resp.json()['related_error'])
+      print 'Associated Error: {}'.format(resp.json())
       exit(1)
 
 
@@ -955,7 +944,7 @@ def add_lbr_virtual_server(virtual_server_defn):
         return resp['id']
     else:
         print 'Problem in creating Virtual Server: {}'.format(virtual_server_name)
-        print 'Associated Error: {}'.format(resp['related_error'])
+        print 'Associated Error: {}'.format(resp)
         exit(1)
 
   # Update existing virtual server
@@ -970,7 +959,7 @@ def add_lbr_virtual_server(virtual_server_defn):
       return existing_virtual_server['id']
   else:
       print 'Problem in updating Virtual Server: {}'.format(virtual_server_name)
-      print 'Associated Error: {}'.format(resp.json()['related_error'])
+      print 'Associated Error: {}'.format(resp.json())
       exit(1)
 
 def add_loadbalancers():
@@ -1021,7 +1010,7 @@ def add_loadbalancers():
           lbr_id = resp['id']
       else:
           print 'Problem in creating Loadbalancer: {}'.format(lbr['name'])
-          print 'Associated Error: {}'.format(resp['related_error'])
+          print 'Associated Error: {}'.format(resp)
           exit(1)
 
     else:
@@ -1039,14 +1028,14 @@ def add_loadbalancers():
           print ''
       else:
           print 'Problem in updating Loadbalancer: {}'.format(lbr['name'])
-          print 'Associated Error: {}'.format(resp.json()['related_error'])
+          print 'Associated Error: {}'.format(resp.json())
           exit(1)
 
       print ''
 
 def main():
 
-    args = init()
+    init()
     load_edge_clusters()
     load_transport_zones()
     load_logical_routers()
@@ -1054,52 +1043,7 @@ def main():
     load_loadbalancer_app_profiles()
     load_loadbalancer_persistence_profiles()
 
-    config_only = args.config
-    wipe_only = args.wipe
-
-	if wipe_only:
-		handle_wipe_env()
-	else:
-		handle_nsxt_extras_config()
-
-def handle_wipe_env():
-
-    api_endpoint = TRANSPORT_ZONES_ENDPOINT
-
-    resp=client.get(api_endpoint)
-    
-
-def handle_nsxt_extension_removal():
-    vcenter_context = { }
-    compute_managers_config_raw = os.getenv('COMPUTE_MANAGER_CONFIGS')
-    if compute_managers_config_raw is None or compute_managers_config_raw == '':
-        return
-
-    compute_managers_config = yaml.load(compute_managers_config_raw)['compute_managers']
-
-  # compute_managers:
-  # - vcenter_name: vcenter-01
-  #   vcenter_host: vcenter-01.corp.local
-  #   vcenter_usr: administrator@vsphere.local
-  #   vcenter_pwd: VMWare1!
-  #   # Multiple clusters under same vcenter can be specified
-  #   clusters:
-  #   - vcenter_cluster: Cluster1
-  #     overlay_profile_mtu: 1600 # Min 1600
-  #     overlay_profile_vlan: EDIT_ME # VLAN ID for the TEP/Overlay network
-  #     # Specify an unused vmnic on esxi host to be used for nsx-t
-  #     # can be multiple vmnics separated by comma
-  #     uplink_vmnics: vmnic1 # vmnic1,vmnic2...
-
-    for vcenter in compute_managers_config:
-        vcenter_context = {
-                            'address'      : vcenter['vcenter_host'],
-                            'admin_user'   : vcenter['vcenter_usr'],
-                            'admin_passwd' : vcenter['vcenter_pwd']
-                        }
-
-        mobclient.set_context(vcenter_context)
-        mobclient.remove_nsxt_extension_from_vcenter()
+	handle_nsxt_extras_config()
 
 def handle_nsxt_extras_config():
   #print_global_ip_map()

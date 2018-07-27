@@ -31,21 +31,21 @@ function deploy_ova {
 
   if [ "$GOVC_DEBUG" != "" ]; then
     echo "Using VM options for ova upload"
-    cat $ova_options |grep -v passw
+    cat $ova_options | awk '/passw/ {getline; next} {print}'
   fi
 
-  govc import.ova -options=$ova_options "$path_to_ova"
-
-  # Got issues with path in latest govc
-  # if [ "$VCENTER_RP" == "" -o -z "$VCENTER_RP" ]; then
-  #   govc import.ova -options=$ova_options "$path_to_ova"
-  # else
-  #   if [ "$(govc folder.info "$VCENTER_RP" 2>&1 | grep "$VCENTER_RP" | awk '{print $2}')" != "$VCENTER_RP" ]; then
-  #     govc folder.create "$VCENTER_RP"
-  #   fi
-  #   govc import.ova -folder="$VCENTER_RP" -options=$ova_options "$path_to_ova"
-  # fi
-
+  if [ "$resource_pool" == "" -o -z "$resource_pool" ]; then
+    govc import.ova -options=$ova_options "$path_to_ova"
+  else
+    set +e
+    found_rp=$(govc find . "${resource_pool}" 2>&1 | grep Resources | grep "${resource_pool}" )
+    if [ "$found_rp" == "" ]; then
+      govc pool.create "$GOVC_CLUSTER/Resources/$resource_pool"
+      GOVC_RESOURCE_POOL="$GOVC_CLUSTER/Resources/$resource_pool"
+    fi
+    set -e
+    govc import.ova -pool="$GOVC_RESOURCE_POOL" -options=$ova_options "$path_to_ova"
+  fi
 }
 
 function deploy_mgr_ova() {
