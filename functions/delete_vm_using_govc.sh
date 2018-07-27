@@ -50,8 +50,7 @@ function destroy_vms_not_matching_nsx() {
     while [ $index -lt $total_count ]
     do
       compute_vcenter=$( echo $compute_manager_json_config | jq --argjson index $index '.compute_managers[$index]' )
-	    echo Compute vcenter is $compute_vcenter
-      compute_vcenter_host=$(echo $compute_vcenter | jq -r '.vcenter_host' )
+	    compute_vcenter_host=$(echo $compute_vcenter | jq -r '.vcenter_host' )
       #compute_vcenter_dc=$(echo $compute_vcenter | jq -r '.vcenter_datacenter' )
       compute_vcenter_usr=$(echo $compute_vcenter | jq -r '.vcenter_usr' )
       compute_vcenter_pwd=$(echo $compute_vcenter | jq -r '.vcenter_pwd' )
