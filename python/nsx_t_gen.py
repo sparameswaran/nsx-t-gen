@@ -1042,8 +1042,7 @@ def main():
     load_loadbalancer_monitors()
     load_loadbalancer_app_profiles()
     load_loadbalancer_persistence_profiles()
-
-	handle_nsxt_extras_config()
+    handle_nsxt_extras_config()
 
 def handle_nsxt_extras_config():
   #print_global_ip_map()

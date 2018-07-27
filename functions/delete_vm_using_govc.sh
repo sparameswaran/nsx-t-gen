@@ -45,16 +45,23 @@ function destroy_vms_not_matching_nsx() {
 
     compute_manager_json_config=$(echo "$COMPUTE_MANAGER_CONFIGS"  | python $PYTHON_LIB_DIR/yaml2json.py)
 
-    for compute_vcenter in $( echo $compute_manager_json_config | jq '.compute_managers[]' )
+    total_count=$(echo $compute_manager_json_config | jq '.compute_managers | length')
+    index=0
+    while [ $index -lt $total_count ]
     do
+      compute_vcenter=$( echo $compute_manager_json_config | jq --argjson index $index '.compute_managers[$index]' )
+	    echo Compute vcenter is $compute_vcenter
       compute_vcenter_host=$(echo $compute_vcenter | jq -r '.vcenter_host' )
       #compute_vcenter_dc=$(echo $compute_vcenter | jq -r '.vcenter_datacenter' )
       compute_vcenter_usr=$(echo $compute_vcenter | jq -r '.vcenter_usr' )
       compute_vcenter_pwd=$(echo $compute_vcenter | jq -r '.vcenter_pwd' )
 
-      for compute_cluster in $( echo $compute_vcenter | jq '.clusters[]' )
+      inner_total=$(echo $compute_vcenter | jq '.clusters | length' )
+      inner_index=0
+      while [ $inner_index -lt $inner_total ]
       do
-        compute_vcenter_cluster=$(echo $compute_vcenter | jq -r '.vcenter_cluster' )
+        compute_cluster=$( echo $compute_vcenter | jq --argjson inner_index $inner_index '.clusters[$inner_index]' )
+        compute_vcenter_cluster=$(echo $compute_cluster | jq -r '.vcenter_cluster' )
 
         custom_options="GOVC_URL=$compute_vcenter_host \
                         GOVC_DATACENTER=$VCENTER_DATACENTER \
@@ -71,7 +78,9 @@ function destroy_vms_not_matching_nsx() {
           echo govc vm.power -off "$vm_path"
           echo govc vm.destroy "$vm_path"
         done
+        inner_index=$(expr $inner_index + 1)
       done
+      index=$(expr $index + 1)
     done
   fi
 }

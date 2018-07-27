@@ -18,7 +18,7 @@
 
 __author__ = 'Sabha Parameswaran'
 
-import os
+import sys, os
 import json
 import yaml
 from pprint import pprint
@@ -101,12 +101,11 @@ def create_esxi_hosts():
                                                 'ansible_ssh_pass': esxi_root_pwd
                                             }
     esxi_host_file_map = { 'esxi_hosts' : { 'hosts' : output_esxi_host_map } }
-    write_config(esxi_host_file_map, 'esxi_hosts', useNoAliasDumper=True)
+    write_config(esxi_host_file_map, esxi_hosts_file)
 
-def handle_wipe_env():
+def wipe_env():
 
     # Before we can wipe the env. we need to remove the hosts as transport nodes
-
     # we need to disable auto-install of nsx, remove the auto-addition as transport node
     disable_auto_install_for_compute_fabric()
 
@@ -209,7 +208,7 @@ def delete_routers():
     print 'Starting deletion of Routers!'
     router_resp = client.get(api_endpoint)
     for instance in router_resp.json()['results']:
-        instance_api_endpoint = '%s/%s' % (api_endpoint, instance['id'])
+        instance_api_endpoint = '%s/%s?force=true' % (api_endpoint, instance['id'])
         client.delete(instance_api_endpoint)
     print ' Deleted Routers!'
 
@@ -218,7 +217,7 @@ def delete_router_ports():
     print 'Starting deletion of Router Ports!'
     router_ports_resp = client.get(api_endpoint)
     for instance in router_ports_resp.json()['results']:
-        instance_api_endpoint = '%s/%s' % (api_endpoint, instance['id'])
+        instance_api_endpoint = '%s/%s?force=true' % (api_endpoint, instance['id'])
         client.delete(instance_api_endpoint)
     print ' Deleted Router Ports!'
 
@@ -227,7 +226,7 @@ def delete_logical_switch_ports():
     print 'Starting deletion of Logical Switch Ports!'
     logical_switch_ports_resp = client.get(api_endpoint)
     for instance in logical_switch_ports_resp.json()['results']:
-        instance_api_endpoint = '%s/%s' % (api_endpoint, instance['id'])
+        instance_api_endpoint = '%s/%s?force=true' % (api_endpoint, instance['id'])
         client.delete(instance_api_endpoint)
     print ' Deleted Logical Switch Ports!'
 
@@ -236,7 +235,7 @@ def delete_logical_switches():
     print 'Starting deletion of Logical Switches!'
     logical_switches_resp = client.get(api_endpoint)
     for instance in logical_switches_resp.json()['results']:
-        instance_api_endpoint = '%s/%s' % (api_endpoint, instance['id'])
+        instance_api_endpoint = '%s/%s?force=true' % (api_endpoint, instance['id'])
         client.delete(instance_api_endpoint)
     print ' Deleted Logical Switches!'
 
@@ -307,31 +306,25 @@ def uninstall_nsx_from_hosts():
 
     return uninstall_failed
 
-def write_config(content, destination, useNoAliasDumper=True):
-	dumper = NoAliasDumper if useNoAliasDumper else None
+def write_config(content, destination):
 	try:
 		with open(destination, 'w') as output_file:
-			if useNoAliasDumper:
-				yaml.dump(content, output_file,  Dumper=dumper)
-			else:
-				yaml.dump(content, output_file)
+			yaml.dump(content, output_file)
 
 	except IOError as e:
 		print('Error : {}'.format(e))
 		print >> sys.stderr, 'Problem with writing out a yaml file.'
 		sys.exit(1)
 
-class NoAliasDumper(yaml.Dumper):
-	def ignore_aliases(self, data):
-		return True
-
 def main():
     global esxi_hosts_file
 
     esxi_hosts_file = sys.argv[1]
+
     init()
     identify_edges_and_hosts()
-    handle_wipe_env()
+    create_esxi_hosts()
+    wipe_env()
 
 if __name__ == '__main__':
   main()

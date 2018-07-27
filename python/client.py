@@ -81,7 +81,7 @@ def post(url, payload, check=True):
 def delete(url, check=True):
   context = get_context()
   url = context.get('url') + url
-  overwrite_header = { 'X-Allow-Overwrite': True }
+  overwrite_header = { 'X-Allow-Overwrite': "true" }
   response = requests.delete(url, auth=auth(context), headers=overwrite_header, verify=False)
   check_response(response, check=check)
   return response

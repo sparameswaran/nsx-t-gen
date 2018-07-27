@@ -1,3 +1,4 @@
+#!/bin/bash
 
 export ROOT_DIR=`pwd`
 
@@ -13,7 +14,7 @@ source $FUNCTIONS_DIR/delete_vm_using_govc.sh
 # First wipe out all non-nsx vms deployed on the management plane or compute clusters
 destroy_vms_not_matching_nsx
 
-export ESXI_HOSTS_FILE="$SCRIPT_DIR/esxi_hosts"
+export ESXI_HOSTS_FILE="$ROOT_DIR/esxi_hosts"
 
 # Make sure the NSX Mgr is up
 timeout 15 bash -c "(echo > /dev/tcp/${NSX_T_MANAGER_IP}/22) >/dev/null 2>&1"
@@ -36,13 +37,19 @@ delete_vm_using_govc "edge"
 delete_vm_using_govc "ctrl"
 delete_vm_using_govc "mgr"
 
+cp $FUNCTIONS_DIR/uninstall-nsx-vibs.yml $ROOT_DIR/
 if [ "$NSX_T_VERSION" == "2.2" ]; then
-  cp uninstall-nsx-t-v2.2-vibs.sh ./uninstall-nsx-t-vibs.sh
+  cp $FUNCTIONS_DIR/uninstall-nsx-t-v2.2-vibs.sh $ROOT_DIR//uninstall-nsx-t-vibs.sh
 else # [ "$NSX_T_VERSION" == "2.1" ]; then
-  cp uninstall-nsx-t-v2.1-vibs.sh ./uninstall-nsx-t-vibs.sh
-el
+  cp $FUNCTIONS_DIR/uninstall-nsx-t-v2.1-vibs.sh $ROOT_DIR//uninstall-nsx-t-vibs.sh
+fi
 
-ansible-playbook -i $ESXI_HOSTS_FILE ./uninstall-nsx-t-vibs.sh
+cat > $ROOT_DIR/ansible.cfg << EOF
+[defaults]
+host_key_checking = false
+EOF
+
+ansible-playbook -i $ESXI_HOSTS_FILE $ROOT_DIR/uninstall-nsx-vibs.yml
 STATUS=$?
 
 echo "NSX-T vibs removed from the Esxi hosts"
