@@ -2,6 +2,7 @@
 # Use reference instead of repeating the nsx-t params
 nsx_t_gen_params: &nsx-t-gen-params
   NSX_T_INSTALLER: ((nsx_t_installer))
+  NSX_T_VERSION: ((nsx_t_version))
   VCENTER_HOST: ((vcenter_host))
   VCENTER_USR: ((vcenter_usr))
   VCENTER_PWD: ((vcenter_pwd))
@@ -105,9 +106,9 @@ groups:
   jobs:
   - standalone-config-nsx-t-extras
 
-# - name: cleanup
-#   jobs:
-#   - uninstall-nsx-t
+- name: wipe-env
+  jobs:
+  - uninstall-nsx-t
 
 resource_types:
 - name: file-url
@@ -248,4 +249,15 @@ jobs:
 
   - task: config-nsx-t-extras
     file: nsx-t-gen-pipeline/tasks/config-nsx-t-extras/task.yml
+    params: *nsx-t-gen-params
+
+- name: uninstall-nsx-t
+  plan:
+  - aggregate:
+    - get: nsx-t-gen-pipeline
+    - get: nsxt-ansible
+      params: {globs: []}
+
+  - task: uninstall-nsx-t
+    file: nsx-t-gen-pipeline/tasks/uninstall-nsx-t/task.yml
     params: *nsx-t-gen-params
