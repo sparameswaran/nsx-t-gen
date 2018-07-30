@@ -42,8 +42,10 @@ if [ "$status" == "0" ]; then
   # Start wiping the NSX Configurations from NSX Mgr,
   # cleaning up the routers, switches, transport nodes and fabric nodes
   # Additionally create the esxi hosts file so we can do vib cleanup (in case things are sticking around)
+  set +e
   python $PYTHON_LIB_DIR/nsx_t_wipe.py $ESXI_HOSTS_FILE
   STATUS=$?
+  set -e
 
   if [ "$STATUS" != "0" ]; then
     echo "Problem in running cleanup of NSX components!!"
