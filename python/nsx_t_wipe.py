@@ -290,11 +290,11 @@ def delete_node_from_transport_and_fabric(type_of_entity, entity_map):
         print 'Deleting {} from Transport and Fabric nodes: {}'.format(type_of_entity, entity_map[entity_id])
         transport_node_delete_url = '%s/%s' % (transport_nodes_api_endpoint, entity_id)
         transport_nodes_resp = client.delete(transport_node_delete_url)
-        print '  Delete response from Transport nodes: {}'.format(transport_nodes_resp)
+        #print '  Delete response from Transport nodes: {}'.format(transport_nodes_resp)
 
         fabric_node_delete_url = '%s/%s' % (fabric_nodes_api_endpoint, entity_id)
         fabric_node_delete_resp = client.delete(fabric_node_delete_url)
-        print '  Delete response from Fabric nodes: {}'.format(fabric_node_delete_resp)
+        #print '  Delete response from Fabric nodes: {}'.format(fabric_node_delete_resp)
     print ''
 
 def check_and_report_uninstall_status():
@@ -306,26 +306,27 @@ def check_and_report_uninstall_status():
     fabric_nodes_api_endpoint = FABRIC_NODES_ENDPOINT
 
     # Check periodically for uninstall status
+    print 'Check status of uninstalls!'.format(RETRY_INTERVAL)
     while (retries < MAX_RETRY_CHECK and len(esxi_hosts_to_check) > 0 ):
-        print 'Sleep for {} seconds before checking status of uninstalls!'.format(RETRY_INTERVAL)
+        print '  Sleeping for {} seconds before checking status of uninstalls!\n'.format(RETRY_INTERVAL)
         time.sleep(RETRY_INTERVAL)
         for esxi_host_id in esxi_host_map.keys():
             if esxi_hosts_to_check.get(esxi_host_id) is None:
                 continue
 
-            print 'Checking uninstall status of Esxi Host: {}'.format(esxi_host_map[esxi_host_id])
+            print '  Checking uninstall status of Esxi Host: {}'.format(esxi_host_map[esxi_host_id])
             fabric_node_status_url = '%s/%s/status' % (fabric_nodes_api_endpoint, esxi_host_id)
             fabric_node_status_resp = client.get(fabric_node_status_url)
             if fabric_node_status_resp.status_code == 200:
                 uninstall_status = fabric_node_status_resp.json()['host_node_deployment_status']
-                print '  Uninstall status: {}'.format(uninstall_status)
+                print '    Uninstall status: {}'.format(uninstall_status)
 
                 # If the uninstall failed, dont bother to check again, add it to the failed list
                 if uninstall_status == 'UNINSTALL_FAILED':
                     fabric_node_state_url = '%s/%s/state' % (fabric_nodes_api_endpoint, esxi_host_id)
                     fabric_node_state_resp = client.get(fabric_node_state_url)
                     failure_message = fabric_node_state_resp.json()['details'][0]['failure_message']
-                    print '  Failure message: ' + failure_message
+                    print '    Failure message: ' + failure_message
                     failed_uninstalls[esxi_hosts_to_check[esxi_host_id]] = failure_message
                     del esxi_hosts_to_check[esxi_host_id]
                 elif uninstall_status == 'UNINSTALL_SUCCESSFUL':
@@ -336,9 +337,9 @@ def check_and_report_uninstall_status():
                 del esxi_hosts_to_check[esxi_host_id]
         retries += 1
 
-    print ' Completed uninstall of NSX Components from Fabric!'
+    print ' Completed uninstall of NSX Components from Fabric!\n'
     if len(failed_uninstalls) > 0:
-        print '\nWARNING!! Following nodes need to be cleaned up with additional steps!'
+        print 'WARNING!! Following nodes need to be cleaned up with additional steps!'
         print '----------------------------------------------------'
         print '\n'.join(host_name.encode('ascii') for host_name in failed_uninstalls.keys())
         print '----------------------------------------------------'

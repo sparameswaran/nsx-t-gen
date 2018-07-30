@@ -41,6 +41,7 @@ ovftool_image: VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle
 esxi_hosts_root_pwd: rootPasswd  # EDIT - Root password for the esxi hosts
 
 # Specify FQDN, ip (and passwd if they are different) for each of the esxi hosts that should be used for nsx-t
+# Listing the individual hosts that needs to be used
 esxi_hosts_config: |
   esxi_hosts:
   - name: esxi-host1.corp.local.io
@@ -55,15 +56,8 @@ esxi_hosts_config: |
 # Sample empty config:
 # esxi_hosts_config: # Provide space after colon
 
-# WARNING !! compute_vcenter_* deprecated
-# Use compute_manager_configs to specify multiple vcenter & multiple clusters
-# compute_vcenter_manager:   # EDIT - Name for vCenter; If filled, then comment off the esxi_hosts_config
-# compute_vcenter_host:      # EDIT - Use Compute vCenter Esxi hosts as transport node
-# compute_vcenter_usr:       # EDIT -  Use Compute vCenter Esxi hosts as transport node
-# compute_vcenter_pwd:       # EDIT - Use Compute vCenter Esxi hosts as transport node
-# compute_vcenter_cluster:   # EDIT - Use Compute vCenter Esxi hosts as transport node
-
 # Handle multiple vcenter and compute clusters for Esxi Hosts
+# This would override esxi_hosts_config
 compute_manager_configs: |
   compute_managers:
   - vcenter_name: vcenter-01
