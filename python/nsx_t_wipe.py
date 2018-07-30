@@ -18,16 +18,19 @@
 
 __author__ = 'Sabha Parameswaran'
 
-import sys, os
+import copy, sys, os
 import json
 import yaml
 from pprint import pprint
-
+import time
 import client
 import mobclient
 
 DEBUG=True
 esxi_hosts_file = 'esxi_hosts'
+
+RETRY_INTERVAL               = 30
+MAX_RETRY_CHECK              = 4
 
 API_VERSION                  = '/api/v1'
 
@@ -62,8 +65,6 @@ def init():
                       'admin_passwd' : nsx_mgr_pwd
                     }
     client.set_context(nsx_mgr_context)
-
-
 
 def identify_edges_and_hosts():
     fabric_nodes_api_endpoint = FABRIC_NODES_ENDPOINT
@@ -122,7 +123,7 @@ def wipe_env():
     delete_edge_clusters()
 
     # finally remove the host from transport node list
-    uninstall_nsx_from_hosts()
+    return uninstall_nsx_from_hosts()
 
 def disable_auto_install_for_compute_fabric():
     compute_fabric_collection_api_endpoint = COMPUTE_COLLECTION_FABRIC_TEMPLATES_ENDPOINT
@@ -274,41 +275,84 @@ def delete_edge_clusters():
     print ' Deleted Edge Clusters!'
 
 def uninstall_nsx_from_hosts():
+
+    print '\nStarting uninstall of NSX Components from Fabric!!\n'
+    delete_node_from_transport_and_fabric('Edge Node', edge_transport_node_map)
+    delete_node_from_transport_and_fabric('Esxi Host', esxi_host_map)
+
+    return check_and_report_uninstall_status()
+
+def delete_node_from_transport_and_fabric(type_of_entity, entity_map):
     transport_nodes_api_endpoint = TRANSPORT_NODES_ENDPOINT
     fabric_nodes_api_endpoint = FABRIC_NODES_ENDPOINT
 
-    uninstall_failed = False
-    print '\nStarting uninstall of NSX Components from Fabric!!\n'
-    for edge_node in edge_transport_node_map.keys():
-        print 'Deleting Edge from Transport and Fabric nodes: {}'.format(edge_transport_node_map[edge_node])
-        transport_node_delete_url = '%s/%s' % (transport_nodes_api_endpoint, edge_node)
-        transport_nodes_resp = client.delete(transport_node_delete_url)
-        print '  Deleted response from Transport nodes: {}'.format(transport_nodes_resp)
-
-        fabric_node_delete_url = '%s/%s' % (fabric_nodes_api_endpoint, edge_node)
-        fabric_node_delete_resp = client.delete(fabric_node_delete_url)
-        print '  Deleted response from Fabric nodes: {}'.format(fabric_node_delete_resp)
-
-    for esxi_host in esxi_host_map.keys():
-        print 'Deleting Host from Transport and Fabric nodes: {}'.format(esxi_host_map[esxi_host])
-        transport_node_delete_url = '%s/%s' % (transport_nodes_api_endpoint, esxi_host)
+    for entity_id in entity_map.keys():
+        print 'Deleting {} from Transport and Fabric nodes: {}'.format(type_of_entity, entity_map[entity_id])
+        transport_node_delete_url = '%s/%s' % (transport_nodes_api_endpoint, entity_id)
         transport_nodes_resp = client.delete(transport_node_delete_url)
         print '  Delete response from Transport nodes: {}'.format(transport_nodes_resp)
 
-        fabric_node_delete_url = '%s/%s' % (fabric_nodes_api_endpoint, esxi_host)
+        fabric_node_delete_url = '%s/%s' % (fabric_nodes_api_endpoint, entity_id)
         fabric_node_delete_resp = client.delete(fabric_node_delete_url)
         print '  Delete response from Fabric nodes: {}'.format(fabric_node_delete_resp)
+    print ''
 
-        if fabric_node_delete_resp.status_code >= 400:
-            uninstall_failed = True
-    print ' Uninstalled NSX Components from Fabric!'
+def check_and_report_uninstall_status():
+
+    retries = 0
+    failed_uninstalls = {}
+    uninstall_failed  = False
+    esxi_hosts_to_check = copy.copy(esxi_host_map)
+    fabric_nodes_api_endpoint = FABRIC_NODES_ENDPOINT
+
+    # Check periodically for uninstall status
+    while (retries < MAX_RETRY_CHECK and len(esxi_hosts_to_check) > 0 ):
+        print 'Sleep for {} seconds before checking status of uninstalls!'.format(RETRY_INTERVAL)
+        time.sleep(RETRY_INTERVAL)
+        for esxi_host_id in esxi_host_map.keys():
+            if esxi_hosts_to_check.get(esxi_host_id) is None:
+                continue
+
+            print 'Checking uninstall status of Esxi Host: {}'.format(esxi_host_map[esxi_host_id])
+            fabric_node_status_url = '%s/%s/status' % (fabric_nodes_api_endpoint, esxi_host_id)
+            fabric_node_status_resp = client.get(fabric_node_status_url)
+            if fabric_node_status_resp.status_code == 200:
+                uninstall_status = fabric_node_status_resp.json()['host_node_deployment_status']
+                print '  Uninstall status: {}'.format(uninstall_status)
+
+                # If the uninstall failed, dont bother to check again, add it to the failed list
+                if uninstall_status == 'UNINSTALL_FAILED':
+                    fabric_node_state_url = '%s/%s/state' % (fabric_nodes_api_endpoint, esxi_host_id)
+                    fabric_node_state_resp = client.get(fabric_node_state_url)
+                    failure_message = fabric_node_state_resp.json()['details'][0]['failure_message']
+                    print '  Failure message: ' + failure_message
+                    failed_uninstalls[esxi_hosts_to_check[esxi_host_id]] = failure_message
+                    del esxi_hosts_to_check[esxi_host_id]
+                elif uninstall_status == 'UNINSTALL_SUCCESSFUL':
+                    # uninstall succeeded, dont bother to check again
+                    del esxi_hosts_to_check[esxi_host_id]
+            else:
+                # Node is not there anymore, delete it from the list
+                del esxi_hosts_to_check[esxi_host_id]
+        retries += 1
+
+    print ' Completed uninstall of NSX Components from Fabric!'
+    if len(failed_uninstalls) > 0:
+        print '\nWARNING!! Following nodes need to be cleaned up with additional steps!'
+        print '----------------------------------------------------'
+        print '\n'.join(host_name.encode('ascii') for host_name in failed_uninstalls.keys())
+        print '----------------------------------------------------'
+        print '\nScripts (executed next) would remove the NSX vibs from these hosts,'
+        print ' but the host themselves would have to be rebooted in rolling fashion!!'
+        print ''
+        uninstall_failed = True
 
     return uninstall_failed
 
 def write_config(content, destination):
 	try:
 		with open(destination, 'w') as output_file:
-			yaml.dump(content, output_file)
+			yaml.safe_dump(content, output_file)
 
 	except IOError as e:
 		print('Error : {}'.format(e))
@@ -323,7 +367,12 @@ def main():
     init()
     identify_edges_and_hosts()
     create_esxi_hosts()
-    wipe_env()
+
+    uninstall_failed_status = wipe_env()
+    if uninstall_failed_status:
+        sys.exit(1)
+    else:
+        sys.exit(0)
 
 if __name__ == '__main__':
   main()

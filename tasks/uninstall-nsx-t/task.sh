@@ -12,7 +12,7 @@ source $FUNCTIONS_DIR/check_null_variables.sh
 source $FUNCTIONS_DIR/delete_vm_using_govc.sh
 
 # First wipe out all non-nsx vms deployed on the management plane or compute clusters
-echo "Need to delete the non-NSX Vms that are running in the computer cluster or Management cluster, before proceeding wtih clean of NSX Mgmt Plane!!"
+echo "Need to delete the non-NSX Vms that are running in the Compute cluster or Management cluster, before proceeding wtih clean of NSX Mgmt Plane!!"
 echo "Deleting the non NSX related vms"
 destroy_vms_not_matching_nsx
 
@@ -47,8 +47,8 @@ if [ "$status" == "0" ]; then
 
   if [ "$STATUS" != "0" ]; then
     echo "Problem in running cleanup of NSX components!!"
-    echo "The deletion of the NSX VMs  up as well as removal of vibs from Esxi hosts needs to be done manually!!"
-    exit $STATUS
+    echo "The deletion of the NSX vibs from Esxi hosts would be done by this wipe task!!"
+    #exit $STATUS
   fi
   echo "The resources used within NSX Management plane have been cleaned up!!"
   echo ""
@@ -58,7 +58,7 @@ else
   echo ""
 fi
 
-echo "Going to delete the NSX vms in 30 seconds!!!!"
+echo "Going to delete the NSX vms in 60 seconds!!!!"
 echo ""
 echo "Cancel the task if you want to manually check and then delete the VMs"
 echo "If cancelled, the deletion of the NSX VMs as well as removal of vibs from Esxi hosts needs to be done manually!!"
@@ -71,11 +71,11 @@ echo "-----------------------------------------"
 echo ""
 if [ -e $ESXI_HOSTS_FILE ]; then
   echo "Related Esxi hosts:"
-  cat $ESXI_HOSTS_FILE | grep ansible |  awk '{print $1}' | sed -e 's/://g'
+  cat $ESXI_HOSTS_FILE | grep ansible |  awk '{print $1}' | grep -v 'ansible_ssh' | sed -e 's/://g'
   echo ""
 fi
 
-sleep 30
+sleep 60
 
 echo "Proceeding with NSX-T Management Plane VM deletion!"
 echo ""
@@ -102,7 +102,7 @@ if [ -e "$ESXI_HOSTS_FILE" ]; then
 
   echo "Related Esxi Hosts:"
   echo "--------------------------------------"
-  cat $ESXI_HOSTS_FILE | grep ansible |  awk '{print $1}' | sed -e 's/://g'
+  cat $ESXI_HOSTS_FILE | grep ansible |  awk '{print $1}' | grep -v 'ansible_ssh' | sed -e 's/://g'
   echo "--------------------------------------"
 fi
 
