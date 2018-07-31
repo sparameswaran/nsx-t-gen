@@ -1,0 +1,94 @@
+# EDIT the parameters
+#
+# Minio offline bucket params
+iaas: vsphere
+final_s3_endpoint: http://<MINIO_HOST>:<MINIO_PORT>/
+final_s3_bucket: canned-pks
+final_s3_access_key_id: <minio_access_id>
+final_s3_secret_access_key: <minio_secret_access_key>
+offline_run_id: “”
+
+nsx_t_installer: cannedpks
+
+# vCenter details
+vcenter_host: vcenter.mycompany.com
+vcenter_usr: administrator@vsphere.local
+vcenter_pwd: mypassword
+vcenter_datacenter: Datacenter
+vcenter_cluster: Cluster
+vcenter_datastore: a-xio
+vcenter_rp: ""
+mgmt_portgroup: 'VM Network'
+ntpservers: 1.1.1.1
+dnsserver: 1.1.1.1
+dnsdomain: mycompany.com
+defaultgateway: 1.1.1.1
+netmask: 255.255.255.0
+esxi_hosts_root_pwd: rootpwd
+
+# NSX-T config
+nsx_t_esxi_vmnics: vmnic4   # Esxi Host unused vmnic to be used for nsx
+nsx_t_manager_admin_pwd: managerpwd
+nsx_t_controller_root_pwd: controllerpwd
+nsx_t_edge_root_pwd: edgepwd
+
+# IPs for Mgr, ctrl, edge
+nsx_t_manager_ip: 1.1.1.1
+nsx_t_controller_ips: '1.1.1.1,1.1.1.2,1.1.1.3'
+nsx_t_edge_ips: '1.1.1.1,1.1.1.2'
+
+# NSX Edge Portgroup Details
+nsx_t_edge_portgroup_ext: vlan-3508
+nsx_t_edge_portgroup_transport: vlan-3510
+nsx_t_overlay_profile_vlan: '3510'
+
+# NSX T0 Router Details
+nsx_t_t0router_ips_cidr: '24'
+nsx_t_t0router_vip: 1.1.1.1/24
+nsx_t_t0router_ip_edge1: 1.1.1.2/24
+nsx_t_t0router_ip_edge2: 1.1.1.3/24
+nsx_t_t0router_gateway: 1.1.1.1
+
+# External IP Pool
+nsx_t_external_ip_pool_cidr: 1.1.1.0/24
+nsx_t_external_ip_pool_start: 1.1.1.1
+nsx_t_external_ip_pool_end: 1.1.1.10
+nsx_t_nat_rules_opsman_ip: 1.1.1.1
+nsx_t_nat_rules_snat_ip: 1.1.1.1
+
+
+# CSR fields for NSX-T Maanger
+csr_request_org_name: Company
+csr_request_org_unit: CustomerXYZ
+csr_request_country: US
+csr_request_state: CA
+csr_request_city: SF
+
+# Pivnet tokens and tile versions
+pivnet_token: asdfjalsdfk2342l
+opsman_major_minor_version: ^2.1.6.*$
+pks_major_minor_version: ^1.1.*$
+
+# Ops Mgr details
+opsman_admin_usr: admin
+opsman_admin_password: admin123
+om_ssh_pwd: admin123
+om_decryption_pwd: admin123
+om_resource_pool: pks-rp1
+bosh_vm_storage: vsan
+
+# AZs and Clusters
+az_1_cluster: Cluster1
+az_2_cluster: Cluster2
+az_3_cluster: Cluster3
+
+# PKS Tile vcenter cluster
+pks_vcenter_cluster_list: Cluster1,Cluster2,Cluster3
+
+# PKS Controller user & password
+pks_api_admin_usr: pksadmin
+pks_api_admin_pwd: pksadmin123
+
+# PKS Controller external ip
+pks_api_ip: 1.1.1.1      # PKS
+
