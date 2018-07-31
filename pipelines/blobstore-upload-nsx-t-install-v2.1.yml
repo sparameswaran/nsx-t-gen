@@ -409,36 +409,36 @@ resources:
   type: docker-image
 - name: output-git-nsx-t-gen-pipeline
   source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
-    endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/git/nsx-t-gen-pipeline-tar(.*).tgz,
+    endpoint: ((final_s3_endpoint)), regexp: ((offline_run_id))/resources/git/nsx-t-gen-pipeline-tar(.*).tgz,
     secret_access_key: ((final_s3_secret_access_key))}
   type: s3
 - name: output-git-nsxt-ansible
   source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
-    endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/git/nsxt-ansible-tar(.*).tgz,
+    endpoint: ((final_s3_endpoint)), regexp: ((offline_run_id))/resources/git/nsxt-ansible-tar(.*).tgz,
     secret_access_key: ((final_s3_secret_access_key))}
   type: s3
 - name: output-file-nsx-mgr-ova
   source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
-    endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/file/nsx-mgr-ova-*-(.*),
+    endpoint: ((final_s3_endpoint)), regexp: ((offline_run_id))/resources/file/nsx-mgr-ova-*-(.*),
     secret_access_key: ((final_s3_secret_access_key))}
   type: s3
 - name: output-file-nsx-ctrl-ova
   source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
-    endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/file/nsx-ctrl-ova-*-(.*),
+    endpoint: ((final_s3_endpoint)), regexp: ((offline_run_id))/resources/file/nsx-ctrl-ova-*-(.*),
     secret_access_key: ((final_s3_secret_access_key))}
   type: s3
 - name: output-file-nsx-edge-ova
   source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
-    endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/file/nsx-edge-ova-*-(.*),
+    endpoint: ((final_s3_endpoint)), regexp: ((offline_run_id))/resources/file/nsx-edge-ova-*-(.*),
     secret_access_key: ((final_s3_secret_access_key))}
   type: s3
 - name: output-file-ovftool
   source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
-    endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/file/ovftool-*-(.*),
+    endpoint: ((final_s3_endpoint)), regexp: ((offline_run_id))/resources/file/ovftool-*-(.*),
     secret_access_key: ((final_s3_secret_access_key))}
   type: s3
 - name: output-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker
   source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
-    endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/docker/nsxedgegen-nsx-t-gen-worker-v2.1-docker.(.*),
+    endpoint: ((final_s3_endpoint)), regexp: ((offline_run_id))/resources/docker/nsxedgegen-nsx-t-gen-worker-v2.1-docker.(.*),
     secret_access_key: ((final_s3_secret_access_key))}
   type: s3

@@ -2,6 +2,15 @@ enable_ansible_debug: false # set value to true for verbose output from ansible
 nsx_t_installer: nsx-t-gen  # Set to name of installer or env or any value so resources can be identified
 nsx_t_version: 2.1
 
+  # Additional parameters if using the pipeline in offline mode using the offline-nsx-t-install-*.yml
+# Uncomment and fill the values
+# offline_run_id: ""                                                                 # EDIT ME
+# offline_gen_s3_endpoint: &my_s3_endpoint http://10.85.24.5:9000/                   # EDIT ME
+# offline_gen_s3_bucket: &my_s3_bucket offline-bucket                                # EDIT ME
+# offline_gen_s3_access_key_id: &my_s3_access_key_id my_access_id                    # EDIT ME
+# offline_gen_s3_secret_access_key: &my_s3_secret_access_key my_secret_access_key    # EDIT ME
+
+
 # vCenter details to deploy the Mgmt OVAs (Mgr, Edge, Controller)
 vcenter_host: vcsa-01.corp.local.io       # EDIT - this is for deployment of the ovas for the mgmt plane
 vcenter_usr: administrator@vsphere.local  # EDIT - this is for deployment of the ovas for the mgmt plane
