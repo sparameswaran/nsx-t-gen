@@ -1,5 +1,5 @@
 # nsx-t-gen
-Concourse pipeline to install NSX-T v2.1
+Concourse pipeline to install NSX-T v2.2 (branch nsxt-2.2)
 
 The concourse pipeline uses [ansible scripts](https://github.com/yasensim/nsxt-ansible) created by Yasen Simeonov and [forked](https://github.com/sparameswaran/nsxt-ansible) by the author of this pipeline.
 
@@ -45,7 +45,7 @@ sudo ufw default allow routed
 * Ovftool would fail to deploy the Edge VMs in the absence of `VM Network` or standard switch (non NSX-T) with `Host did not have any virtual network defined` error message. So, ensure presence of either one.
 Refer to [Adding *VM Network*](./docs/add-vm-network.md) for detailed instructions.
 * Docker hub connectivity to pull docker image for the concourse pipeline
-* NSX-T 2.1 ova images and ovftool install bits for linux
+* NSX-T 2.2 ova images and ovftool install bits for linux
 * Web server to serve the NSX-T ova images and ovftool
 ```
 # Sample nginx server to host bits
@@ -65,27 +65,27 @@ This is only applicable if the docker image `nsxedgegen/nsx-t-gen-worker:latest`
 ```
  docker build -t nsx-t-gen-worker Dockerfile
  # To test image:  docker run --rm -it nsx-t-gen-worker bash
- docker tag  nsx-t-gen-worker nsxedgegen/nsx-t-gen-worker:latest
- docker push nsxedgegen/nsx-t-gen-worker:latest
+ docker tag  nsx-t-gen-worker nsxedgegen/nsx-t-gen-worker:v2.2
+ docker push nsxedgegen/nsx-t-gen-worker:v2.2
 ```
 
 
-## VMware NSX-T 2.1.* bits
+## VMware NSX-T 2.2.* bits
 
-Download and make the following bits available on a webserver so it can be used by pipeline to install the NSX-T 2.1 bits:
+Download and make the following bits available on a webserver so it can be used by pipeline to install the NSX-T 2.2 bits:
 
 ```
-# Download NSX-T 2.1 bits from
-# https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-210&productId=673
+# Download NSX-T 2.2 bits from
+# https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-220&productId=673
 
 #nsx-mgr-ova
-nsx-unified-appliance-2.1.0.0.0.7380167.ova   
+nsx-unified-appliance-2.2.0.0.0.8680778.ova  
 
 #nsx-ctrl-ova
-nsx-controller-2.1.0.0.0.7395493.ova  
+nsx-controller-2.2.0.0.0.8680774.ova
 
 #nsx-edge-ova
-nsx-edge-2.1.0.0.0.7395502.ova  
+nsx-edge-2.2.0.0.0.8680783.ova  
 
 # Download VMware ovftool from https://my.vmware.com/group/vmware/details?productId=614&downloadGroup=OVFTOOL420#
 VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle  

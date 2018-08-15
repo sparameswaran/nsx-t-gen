@@ -7,8 +7,8 @@
   * Recommend planning ahead of time and creating the edges all in the beginning rather than adding them later.
   * If its really required, recommend manually installing any additional edges using direct deployment of OVAs while ensuring the names are following previously installed edge instance name convention (like nsx-t-edge-0?), then update the parameters to specify the additional edge ips (assuming they use the same edge naming convention) and let the controller (as part of the base-install or just full-install) to do a rejoin of the edges followed by other jobs/tasks. Only recommended for advanced users who are ready to drill down/debug.
 * Downloading the bits
-  * Download NSX-T 2.1 bits from
-    https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-210&productId=673
+  * Download NSX-T 2.2 bits from
+    https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-220&productId=673
     Check https://my.vmware.com for link to new installs
   * Download [VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle v4.2](https://my.vmware.com/group/vmware/details?productId=614&downloadGroup=OVFTOOL420#)
 
@@ -24,6 +24,22 @@
 * Unable to reach the webserver hosting the ova bits
   * Check for proxy interfering with the concourse containers.
   If using docker-compose, use the sample [docker-compose](./docker-compose.yml) template to add DNS and proxy settings. Add the webserver to the no_proxy list.
+
+  Ensure you are using docker-compose version `1.18+` and docker compose file version is `3`
+
+  Additionally ensure the ``/etc/systemd/system/docker.service.d/http-proxy.conf` specifies the HTTP_PROXY and HTTPS_PROXY env variables so docker can go out via the proxy.
+  ```
+  [Service]
+  Environment="HTTP_PROXY=http://proxy.corp.local"   # EDIT the proxy
+  Environment="HTTPS_PROXY=http://proxy.corp.local"  # EDIT the proxy
+  Environment="NO_PROXY=localhost,127.0.0.1,<local-vm-ip>"
+  ```
+  Stop the docker service, reload the daemons and then start back the docker service
+  ```
+  systemctl stop docker
+  systemctl daemon-reload # to reload the docker service config
+  systemctl start docker
+  ```
   * Disable ubuntu firewall (ufw) or relax iptables rules if there was usage of both docker concourse and docker-compose.
     Change ufw
   	```
@@ -36,6 +52,9 @@
 	sudo iptables -P FORWARD ACCEPT
 	sudo iptables -P OUTPUT ACCEPT
 	```
+
+* If running out of disk space with docker compose, use `docker volume prune` command to clean up unused volumes.
+
 * Pipeline exits after reporting problem with ovas or ovftool
   * Verify the file names and paths are correct. If the download of the ovas by the pipeline at start was too fast, then it means errors with the files downloaded as each of the ova is upwards of 500 MB.
 * Running out of memory resources on vcenter

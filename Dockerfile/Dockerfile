@@ -76,7 +76,7 @@ RUN pip install nsx_python_sdk-*.whl \
 RUN pip install -U pyopenssl==17.5.0
 
 # Include govc, build using golang-1.8
-RUN mkdir -p /root/go/src /root/go/bin /root/go/pkg
-ENV GOPATH "/root/go"
-ENV PATH "$PATH:$GOPATH/bin"
-RUN go get -u github.com/vmware/govmomi/govc
+ENV GOPATH="/root/go" PATH="$PATH:/root/go/bin"
+RUN mkdir -p /root/go/src /root/go/bin /root/go/pkg \
+       && go get -u github.com/vmware/govmomi/govc \
+       && cp /root/go/bin/* /usr/bin/

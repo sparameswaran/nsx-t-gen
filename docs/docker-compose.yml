@@ -31,12 +31,13 @@ services:
     - CONCOURSE_NO_REALLY_I_DONT_WANT_ANY_AUTH
     - CONCOURSE_GARDEN_DNS_PROXY_ENABLE=true
     - CONCOURSE_WORKER_GARDEN_DNS_PROXY_ENABLE=true
+    - CONCOURSE_BAGGAGECLAIM_DRIVER=overlay
 
 # Edit dns server for CONCOURSE_GARDEN_DNS_SERVER
 # Edit the no_proxy to your env to allow direct access
 # like the webserver hosting the ova bits.
 # Ensure there are no quotes or spaces in the values
-    
+
   concourse-worker:
     image: concourse/concourse
     command: worker
@@ -51,6 +52,7 @@ services:
     - CONCOURSE_GARDEN_DNS_PROXY_ENABLE=true
     - CONCOURSE_WORKER_GARDEN_DNS_PROXY_ENABLE=true
     - CONCOURSE_GARDEN_DNS_SERVER=<REQUIRED> # EDIT ME
+    - CONCOURSE_BAGGAGECLAIM_DRIVER=overlay
     # Fill details below if env uses a web proxy
     # Ensure there are no quotes or spaces in the values
     - http_proxy_url=<REQUIRED> # EDIT ME - sample: http://192.168.10.5:3128/
@@ -59,4 +61,3 @@ services:
     - HTTP_PROXY=<REQUIRED> # EDIT ME - sample: http://192.168.10.5:3128/
     - HTTPS_PROXY=<REQUIRED> # EDIT ME - sample: http://192.168.10.5:3128/
     - NO_PROXY=<REQUIRED> # EDIT ME - sample: localhost,127.0.0.1,WEBSERVER-IP,8.8.8.8,10.193.99.2
-

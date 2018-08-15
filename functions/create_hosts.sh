@@ -162,6 +162,19 @@ function create_esxi_hosts {
   if [ "$ESXI_HOSTS_CONFIG" == "null" -o "$ESXI_HOSTS_CONFIG" == "" ]; then
     return
   fi
+
+  if [ "$COMPUTE_MANAGER_CONFIGS" != "null" -a "$COMPUTE_MANAGER_CONFIGS" != "" ]; then
+    echo "$COMPUTE_MANAGER_CONFIGS" > /tmp/compute_mgr_config.yml
+    is_valid_yml=$(cat /tmp/compute_mgr_config.yml  | shyaml get-values compute_managers || true)
+    if [ "$is_valid_yml" != "" ]; then
+      # Dont go with individual esxi hosts, use the compute_manager_configs
+      echo "Both esxi_hosts_config and compute_manager_configs defined!"
+      echo "Going with compute_manager_configs defn instead of individual Esxi Hosts!!"
+      return
+    fi
+  fi
+
+
   echo "$ESXI_HOSTS_CONFIG" > /tmp/esxi_hosts_config.yml
 
   is_valid_yml=$(cat /tmp/esxi_hosts_config.yml  | shyaml get-values esxi_hosts || true)

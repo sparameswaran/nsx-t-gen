@@ -4,7 +4,7 @@ groups:
 - jobs: [kickoff-nsx-t-gen-pipeline-upload-to-blobstore, kickoff-nsxt-ansible-upload-to-blobstore,
     kickoff-nsx-mgr-ova-upload-to-blobstore, kickoff-nsx-ctrl-ova-upload-to-blobstore,
     kickoff-nsx-edge-ova-upload-to-blobstore, kickoff-ovftool-upload-to-blobstore,
-    kickoff-nsxedgegen-nsx-t-gen-worker-v2.1-docker-upload-to-blobstore]
+    kickoff-nsxedgegen-nsx-t-gen-worker-v2.2-docker-upload-to-blobstore]
   name: individual-kickoff
 jobs:
 - name: parallel-kickoff
@@ -16,7 +16,7 @@ jobs:
     - {get: input-file-nsx-ctrl-ova}
     - {get: input-file-nsx-edge-ova}
     - {get: input-file-ovftool}
-    - get: input-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker
+    - get: input-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker
       params: {rootfs: true}
   - aggregate:
     - config:
@@ -137,42 +137,42 @@ jobs:
           source: {repository: ubuntu}
           type: docker-image
         inputs:
-        - {name: input-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker}
+        - {name: input-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker}
         outputs:
-        - {name: output-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker}
+        - {name: output-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker}
         platform: linux
         run:
-          args: [-ec, 'echo "Exporting nsxedgegen-nsx-t-gen-worker-v2.1-docker docker
+          args: [-ec, 'echo "Exporting nsxedgegen-nsx-t-gen-worker-v2.2-docker docker
               image";
 
               mkdir export-directory;
 
               cd export-directory;
 
-              cp ../input-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker/metadata.json
+              cp ../input-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker/metadata.json
               .;
 
               mkdir rootfs && cd rootfs;
 
-              cp ../../input-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker/rootfs.tar
+              cp ../../input-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker/rootfs.tar
               ..;
 
               tar -xf ../rootfs.tar --exclude="dev/*";
 
-              echo "Packaging nsxedgegen-nsx-t-gen-worker-v2.1-docker docker image";
+              echo "Packaging nsxedgegen-nsx-t-gen-worker-v2.2-docker docker image";
 
               cd ..;
 
               rm rootfs.tar;
 
-              tar -czf   "../output-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker/nsxedgegen-nsx-t-gen-worker-v2.1-docker-v2.1-docker.tgz"
+              tar -czf   "../output-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker/nsxedgegen-nsx-t-gen-worker-v2.2-docker-v2.2-docker.tgz"
               .;
 
-              ls -l ../output-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker/;
+              ls -l ../output-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker/;
 
               ']
           path: /bin/bash
-      task: prepare-nsxedgegen-nsx-t-gen-worker-v2.1-docker-docker-image-to-export
+      task: prepare-nsxedgegen-nsx-t-gen-worker-v2.2-docker-docker-image-to-export
   - aggregate:
     - params: {file: output-git-nsx-t-gen-pipeline/nsx-t-gen-pipeline-tarball.tgz}
       put: output-git-nsx-t-gen-pipeline
@@ -186,8 +186,8 @@ jobs:
       put: output-file-nsx-edge-ova
     - params: {file: output-file-ovftool/ovftool*-1.0*}
       put: output-file-ovftool
-    - params: {file: output-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker/nsxedgegen-nsx-t-gen-worker-v2.1-docker*.tgz}
-      put: output-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker
+    - params: {file: output-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker/nsxedgegen-nsx-t-gen-worker-v2.2-docker*.tgz}
+      put: output-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker
 - name: kickoff-nsx-t-gen-pipeline-upload-to-blobstore
   plan:
   - get: input-git-nsx-t-gen-pipeline
@@ -331,53 +331,53 @@ jobs:
     task: prepare-ovftool-bit-to-export
   - params: {file: output-file-ovftool/ovftool*-1.0*}
     put: output-file-ovftool
-- name: kickoff-nsxedgegen-nsx-t-gen-worker-v2.1-docker-upload-to-blobstore
+- name: kickoff-nsxedgegen-nsx-t-gen-worker-v2.2-docker-upload-to-blobstore
   plan:
-  - get: input-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker
+  - get: input-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker
     params: {rootfs: true}
   - config:
       image_resource:
         source: {repository: ubuntu}
         type: docker-image
       inputs:
-      - {name: input-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker}
+      - {name: input-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker}
       outputs:
-      - {name: output-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker}
+      - {name: output-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker}
       platform: linux
       run:
-        args: [-ec, 'echo "Exporting nsxedgegen-nsx-t-gen-worker-v2.1-docker docker
+        args: [-ec, 'echo "Exporting nsxedgegen-nsx-t-gen-worker-v2.2-docker docker
             image";
 
             mkdir export-directory;
 
             cd export-directory;
 
-            cp ../input-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker/metadata.json
+            cp ../input-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker/metadata.json
             .;
 
             mkdir rootfs && cd rootfs;
 
-            cp ../../input-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker/rootfs.tar
+            cp ../../input-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker/rootfs.tar
             ..;
 
             tar -xf ../rootfs.tar --exclude="dev/*";
 
-            echo "Packaging nsxedgegen-nsx-t-gen-worker-v2.1-docker docker image";
+            echo "Packaging nsxedgegen-nsx-t-gen-worker-v2.2-docker docker image";
 
             cd ..;
 
             rm rootfs.tar;
 
-            tar -czf   "../output-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker/nsxedgegen-nsx-t-gen-worker-v2.1-docker-v2.1-docker.tgz"
+            tar -czf   "../output-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker/nsxedgegen-nsx-t-gen-worker-v2.2-docker-v2.2-docker.tgz"
             .;
 
-            ls -l ../output-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker/;
+            ls -l ../output-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker/;
 
             ']
         path: /bin/bash
-    task: prepare-nsxedgegen-nsx-t-gen-worker-v2.1-docker-docker-image-to-export
-  - params: {file: output-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker/nsxedgegen-nsx-t-gen-worker-v2.1-docker*}
-    put: output-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker
+    task: prepare-nsxedgegen-nsx-t-gen-worker-v2.2-docker-docker-image-to-export
+  - params: {file: output-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker/nsxedgegen-nsx-t-gen-worker-v2.2-docker*}
+    put: output-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker
 resource_types:
 - name: file-url
   source: {repository: pivotalservices/concourse-curl-resource, tag: latest}
@@ -385,12 +385,12 @@ resource_types:
 resources:
 - name: input-git-nsx-t-gen-pipeline
   source:
-    branch: nsxt-2.1
+    branch: nsxt-2.2
     params: {disable_git_lfs: true}
     uri: https://github.com/sparameswaran/nsx-t-gen.git
   type: git
 - name: input-git-nsxt-ansible
-  source: {branch: nsxt-2.1, uri: 'https://github.com/sparameswaran/nsxt-ansible'}
+  source: {branch: master, uri: 'https://github.com/sparameswaran/nsxt-ansible'}
   type: git
 - name: input-file-nsx-mgr-ova
   source: {filename: ((nsx_mgr_ova)), skip_ssl_verification: true, url: ((nsx_image_webserver))/((nsx_mgr_ova))}
@@ -404,8 +404,8 @@ resources:
 - name: input-file-ovftool
   source: {filename: ((ovftool_image)), skip_ssl_verification: true, url: ((nsx_image_webserver))/((ovftool_image))}
   type: file-url
-- name: input-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker
-  source: {repository: nsxedgegen/nsx-t-gen-worker, tag: v2.1}
+- name: input-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker
+  source: {repository: nsxedgegen/nsx-t-gen-worker, tag: v2.2}
   type: docker-image
 - name: output-git-nsx-t-gen-pipeline
   source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
@@ -437,8 +437,8 @@ resources:
     endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/file/ovftool-*-(.*),
     secret_access_key: ((final_s3_secret_access_key))}
   type: s3
-- name: output-docker-nsxedgegen-nsx-t-gen-worker-v2.1-docker
+- name: output-docker-nsxedgegen-nsx-t-gen-worker-v2.2-docker
   source: {access_key_id: ((final_s3_access_key_id)), bucket: ((final_s3_bucket)),
-    endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/docker/nsxedgegen-nsx-t-gen-worker-v2.1-docker.(.*),
+    endpoint: ((final_s3_endpoint)), regexp: install-nsx-t-run-1/resources/docker/nsxedgegen-nsx-t-gen-worker-v2.2-docker.(.*),
     secret_access_key: ((final_s3_secret_access_key))}
   type: s3
