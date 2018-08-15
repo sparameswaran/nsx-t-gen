@@ -24,6 +24,22 @@
 * Unable to reach the webserver hosting the ova bits
   * Check for proxy interfering with the concourse containers.
   If using docker-compose, use the sample [docker-compose](./docker-compose.yml) template to add DNS and proxy settings. Add the webserver to the no_proxy list.
+
+  Ensure you are using docker-compose version `1.18+` and docker compose file version is `3`
+
+  Additionally ensure the ``/etc/systemd/system/docker.service.d/http-proxy.conf` specifies the HTTP_PROXY and HTTPS_PROXY env variables so docker can go out via the proxy.
+  ```
+  [Service]
+  Environment="HTTP_PROXY=http://proxy.corp.local"   # EDIT the proxy
+  Environment="HTTPS_PROXY=http://proxy.corp.local"  # EDIT the proxy
+  Environment="NO_PROXY=localhost,127.0.0.1,<local-vm-ip>"
+  ```
+  Stop the docker service, reload the daemons and then start back the docker service
+  ```
+  systemctl stop docker
+  systemctl daemon-reload # to reload the docker service config
+  systemctl start docker
+  ```
   * Disable ubuntu firewall (ufw) or relax iptables rules if there was usage of both docker concourse and docker-compose.
     Change ufw
   	```
@@ -36,6 +52,9 @@
 	sudo iptables -P FORWARD ACCEPT
 	sudo iptables -P OUTPUT ACCEPT
 	```
+
+* If running out of disk space with docker compose, use `docker volume prune` command to clean up unused volumes.
+
 * Pipeline exits after reporting problem with ovas or ovftool
   * Verify the file names and paths are correct. If the download of the ovas by the pipeline at start was too fast, then it means errors with the files downloaded as each of the ova is upwards of 500 MB.
 * Running out of memory resources on vcenter
