@@ -31,7 +31,7 @@ Not handled by pipeline:
 ## Warning
 This is purely a trial work-in-progress and not officially supported by anyone. Use caution while using it at your own Risk!!.
 
-Also, NSX-T cannot co-reside on the same ESXi Host & Cluster as one already running NSX-V. So, ensure you are either using a different set of vCenter, Clusters and hosts or atleast the cluster that does not have NSX-V. Also, the ESXi hosts should be atleast 6.5. Please refer to NSX-T Documentation for detailed set of requirements for NSX-T.
+Also, NSX-T cannot co-reside on the same ESXi Host & Cluster as one already running NSX-V. So, ensure you are either using a different set of vCenter, Clusters and hosts or atleast the cluster that does not have NSX-V. Also, the ESXi hosts should be atleast 6.7. Please refer to NSX-T Documentation for detailed set of requirements for NSX-T.
 
 ## Pre-reqs
 * Concourse setup
