@@ -390,7 +390,7 @@ resources:
     uri: https://github.com/sparameswaran/nsx-t-gen.git
   type: git
 - name: input-git-nsxt-ansible
-  source: {branch: nsxt-2.1, uri: 'https://github.com/sparameswaran/nsxt-ansible'}
+  source: {branch: master, uri: 'https://github.com/sparameswaran/nsxt-ansible'}
   type: git
 - name: input-file-nsx-mgr-ova
   source: {filename: ((nsx_mgr_ova)), skip_ssl_verification: true, url: ((nsx_image_webserver))/((nsx_mgr_ova))}
