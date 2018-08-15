@@ -1,4 +1,4 @@
-# Meant for support nsx-t v2.1
+# Meant for support nsx-t v2.2
 FROM ubuntu:17.10
 COPY ./ ./
 
@@ -62,18 +62,11 @@ RUN apt-get update \
   && apt-get update \
   && apt-get install -y ansible
 
-
-# Add ovftool
-#COPY ./VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle .
-#RUN chmod +x ./VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle
-#RUN ./VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle  --eulas-agreed
-
-
 # Add nsx-t python sdk and runtime libraries
-COPY ./nsx_python_sdk-*.whl .
-COPY ./vapi_runtime-*.whl .
-COPY ./vapi_common-*.whl .
-COPY ./vapi_common_client-*.whl .
+COPY ./nsx_python_sdk-2.2.0.0.0.8680797-py2.py3-none-any.whl .
+COPY ./vapi_runtime-2.9.0-py2.py3-none-any.whl .
+COPY ./vapi_common-2.9.0-py2.py3-none-any.whl .
+COPY ./vapi_common_client-2.9.0-py2.py3-none-any.whl .
 RUN pip install nsx_python_sdk-*.whl \
         vapi_runtime-*.whl \
         vapi_common-*.whl \
