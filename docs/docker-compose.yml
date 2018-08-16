@@ -5,6 +5,11 @@
 version: '3'
 
 services:
+  # purely for testing proxy settings of docker using ubuntu docker image
+  #ubuntu:
+  #  image: ubuntu:17.10
+  #  command: sleep 600000
+
   concourse-db:
     image: postgres
     environment:
