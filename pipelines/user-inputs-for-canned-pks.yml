@@ -50,12 +50,12 @@ nsx_t_t0router_ip_edge2: 1.1.1.3/24
 nsx_t_t0router_gateway: 1.1.1.1
 
 # External IP Pool
-nsx_t_external_ip_pool_cidr: 1.1.1.0/24
-nsx_t_external_ip_pool_start: 1.1.1.1
-nsx_t_external_ip_pool_end: 1.1.1.10
-nsx_t_nat_rules_opsman_ip: 1.1.1.1
-nsx_t_nat_rules_snat_ip: 1.1.1.1
-
+nsx_t_external_ip_pool_cidr: 10.1.1.0/24
+nsx_t_external_ip_pool_gateway: 10.1.1.1
+nsx_t_external_ip_pool_start: 10.1.1.5                  # Starting external ip -> Should not include gateway
+nsx_t_external_ip_pool_end: 10.1.1.10                   # Ending external ip -> Should not include gateway
+nsx_t_nat_rules_opsman_ip: 10.1.1.5                     # Ops mgr external ip
+nsx_t_nat_rules_snat_translated_ip_for_all: 10.1.1.10   # All internal private ips translated to an external ip over SNAT
 
 # CSR fields for NSX-T Maanger
 csr_request_org_name: Company
@@ -91,4 +91,3 @@ pks_api_admin_pwd: pksadmin123
 
 # PKS Controller external ip
 pks_api_ip: 1.1.1.1      # PKS
-
