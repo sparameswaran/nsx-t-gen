@@ -1,12 +1,11 @@
-# These need to be filled in only for offline version of nsx-t-gen install
 # Minio offline bucket params
 iaas: vsphere
 final_s3_endpoint: ((final_s3_endpoint))        # EDIT the minio address/port
 final_s3_bucket: ((final_s3_bucket))
 final_s3_access_key_id: ((final_s3_access_key_id))
 final_s3_secret_access_key: ((final_s3_secret_access_key))
-offline_run_id: ""
-
+offline_run_id: ((offline_run_id))
+nsx_t_installer: ((nsx_t_installer))
 
 enable_ansible_debug: false # set value to true for verbose output from ansible
 nsx_t_installer: ((nsx_t_installer))  # Set to name of installer or env or any value so resources can be identified
@@ -64,6 +63,7 @@ compute_manager_configs: |
       overlay_profile_vlan: ((nsx_t_overlay_profile_vlan)) # VLAN ID for the TEP/Overlay network
       uplink_vmnics: ((nsx_t_esxi_vmnics))
 
+nsx_t_controllers_config:
 
 # Using a separate vCenter to add Edges
 # Edge Specific vCenter settings
@@ -249,7 +249,7 @@ nsx_t_external_ip_pool_spec: |
   external_ip_pools:
   - name: snat-vip-pool-for-pks
     cidr: ((nsx_t_external_ip_pool_cidr)) # Should be a 0/24 or some valid cidr, matching the external exposed uplink
-    gateway: ((defaultgateway))
+    gateway: ((nsx_t_external_ip_pool_gateway))
     start: ((nsx_t_external_ip_pool_start)) # Should not include gateway
     end: ((nsx_t_external_ip_pool_end))  # Should not include gateway
     nameserver: ((dnsserver))
@@ -274,14 +274,14 @@ nsx_t_nat_rules_spec: |
   - t0_router: DefaultT0Router
     nat_type: snat
     source_network: 172.23.1.0/24      # PKS Infra network cidr
-    translated_network: ((nsx_t_nat_rules_snat_ip))       # SNAT External Address for PKS networks
+    translated_network: ((nsx_t_nat_rules_snat_translated_ip_for_all))       # SNAT External Address for PKS networks
     rule_priority: 8001                  # Lower priority
 
   # Sample entry for PKS PKS-Clusters network - outbound/egress
   - t0_router: DefaultT0Router
     nat_type: snat
     source_network: 172.23.2.0/24      # PKS Clusters network cidr
-    translated_network: ((nsx_t_nat_rules_snat_ip))       # SNAT External Address for PKS networks
+    translated_network: ((nsx_t_nat_rules_snat_translated_ip_for_all))       # SNAT External Address for PKS networks
     rule_priority: 8001                  # Lower priority
 
   # Sample entry for allowing inbound to PKS Ops manager - ingress
