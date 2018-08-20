@@ -68,19 +68,32 @@ nsx_t_controllers_config:
 # Using a separate vCenter to add Edges
 # Edge Specific vCenter settings
 # If Edges are going to use the same vCenter as Mgr, then dont set any of the following properties
-edge_vcenter_host: ((vcenter_host))        # EDIT - If filled, then Edges would use this separate vcenter
-edge_vcenter_usr: ((vcenter_usr))         # EDIT -  Use Edge specific vCenter
-edge_vcenter_pwd: ((vcenter_pwd))         # EDIT -  Use Edge specific vCenter
-edge_vcenter_datacenter: ((vcenter_datacenter))  # EDIT -  Use Edge specific vCenter
-edge_vcenter_datastore: ((vcenter_datastore))   # EDIT -  Use Edge specific vCenter
-edge_vcenter_cluster: ((vcenter_cluster))     # EDIT -  Use Edge specific vCenter
-edge_vcenter_rp: ((vcenter_rp))          # EDIT -  Use Edge specific vCenter
-edge_ntpservers: ((ntpservers))          # EDIT -  Use Edge specific vCenter
-edge_mgmt_portgroup: ((mgmt_portgroup))       # EDIT -  Use Edge specific vCenter
-edge_dnsserver: ((dnsserver))            # EDIT -  Use Edge specific vCenter
-edge_dnsdomain: ((dnsdomain))           # EDIT -  Use Edge specific vCenter
-edge_defaultgateway: ((defaultgateway))      # EDIT -  Use Edge specific vCenter
-edge_netmask: ((netmask))             # EDIT -  Use Edge specific vCenter
+# edge_vcenter_host: ((vcenter_host))        # EDIT - If filled, then Edges would use this separate vcenter
+# edge_vcenter_usr: ((vcenter_usr))         # EDIT -  Use Edge specific vCenter
+# edge_vcenter_pwd: ((vcenter_pwd))         # EDIT -  Use Edge specific vCenter
+# edge_vcenter_datacenter: ((vcenter_datacenter))  # EDIT -  Use Edge specific vCenter
+# edge_vcenter_datastore: ((vcenter_datastore))   # EDIT -  Use Edge specific vCenter
+# edge_vcenter_cluster: ((vcenter_cluster))     # EDIT -  Use Edge specific vCenter
+# edge_vcenter_rp: ((vcenter_rp))          # EDIT -  Use Edge specific vCenter
+# edge_ntpservers: ((ntpservers))          # EDIT -  Use Edge specific vCenter
+# edge_mgmt_portgroup: ((mgmt_portgroup))       # EDIT -  Use Edge specific vCenter
+# edge_dnsserver: ((dnsserver))            # EDIT -  Use Edge specific vCenter
+# edge_dnsdomain: ((dnsdomain))           # EDIT -  Use Edge specific vCenter
+# edge_defaultgateway: ((defaultgateway))      # EDIT -  Use Edge specific vCenter
+# edge_netmask: ((netmask))             # EDIT -  Use Edge specific vCenter
+edge_vcenter_host:
+edge_vcenter_usr:
+edge_vcenter_pwd:
+edge_vcenter_datacenter:
+edge_vcenter_datastore:
+edge_vcenter_cluster:
+edge_vcenter_rp:
+edge_ntpservers:
+edge_mgmt_portgroup:
+edge_dnsserver:
+edge_dnsdomain:
+edge_defaultgateway:
+edge_netmask:
 
 # Edit fololowing parameters
 nsx_t_manager_host_name: nsx-t-mgr.((dnsdomain)) # Set as FQDN, will be used also as certificate common name
