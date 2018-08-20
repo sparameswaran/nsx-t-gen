@@ -318,7 +318,7 @@ EOF
   echo "/tmp/nsx-edge-0${count}-ova-options.json"
 }
 
-function handle_custom_nsx_edge_ova_payload {
+function handle_custom_nsx_edge_ova_options {
 
   nsx_edge_ova_file_path=$1
   instance_ip=$2
