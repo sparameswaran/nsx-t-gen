@@ -29,7 +29,7 @@
 
   Check with docker documentation on specifying proxies: https://docs.docker.com/network/proxy/
 
-  Ensure the ``/etc/systemd/system/docker.service.d/http-proxy.conf` specifies the HTTP_PROXY and HTTPS_PROXY env variables so docker can go out via the proxy.
+  Ensure the `/etc/systemd/system/docker.service.d/http-proxy.conf` specifies the HTTP_PROXY and HTTPS_PROXY env variables so docker can go out via the proxy.
   ```
   [Service]
   Environment="HTTP_PROXY=http://proxy.corp.local"   # EDIT the proxy
@@ -61,7 +61,7 @@
 
 * If running out of disk space with docker compose, use `docker volume prune` command to clean up unused volumes.
 
-* If things are still not reachable to outside (like reaching the github repos or webserver), try to add an additional docker image to run alongside concourse like a ubuntu image for debug purpose and then try to do a curl to outside after updating apt-get and installing curl.
+* If things are still not reachable to outside (like reaching the github repos or webserver), try to add an additional docker image to run alongside concourse like an vanilla ubuntu image for debug purpose and shell into it, then try to run a curl to outside after updating apt-get and installing curl.
 
 Sample entry for adding ubuntu docker container image to docker-compose.yml.
 ```
