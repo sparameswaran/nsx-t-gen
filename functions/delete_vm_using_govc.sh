@@ -34,11 +34,12 @@ function destroy_vms_not_matching_nsx() {
   export $default_options
 
   # Shutdown and clean all non-nsx related vms in the management plane
-  for vm_path  in $(govc find . -type m | grep -ve "$nsx_vm_name_pattern" || true)
+  for vm_path  in $(govc find . -type m | grep -v stemcell | grep -ve "$nsx_vm_name_pattern" | sed -e 's/ /::/g' || true)
   do
-    echo "Powering off and destroying vm: $vm_path"
-    govc vm.power -off "$vm_path"
-    govc vm.destroy "$vm_path"
+    actual_vm_path=$(echo $vm_path | sed -e 's/::/ /g' )
+    echo "Please shutdown following vms: $actual_vm_path if they are using NSX-T logical switches proceeding with wipe!!"
+    #govc vm.power -off "$actual_vm_path"
+    #govc vm.destroy "$actual_vm_path"
   done
 
   # Shutdown and clean all non-nsx related vms in the compute clusters plane
@@ -73,17 +74,21 @@ function destroy_vms_not_matching_nsx() {
         # Setup govc env variables coming via the above options
         export $custom_options
 
-        for vm_path in $(govc find . -type m | grep -ve "$nsx_vm_name_pattern" || true)
+        for vm_path in $(govc find . -type m | grep -v stemcell | grep -ve "$nsx_vm_name_pattern" | sed -e 's/ /::/g' || true)
         do
-          echo "Powering off and destroying vm: $vm_path"
-          govc vm.power -off "$vm_path"
-          govc vm.destroy "$vm_path"
+          actual_vm_path=$(echo $vm_path | sed -e 's/::/ /g' )
+          echo "Please shutdown following vms: $actual_vm_path if they are using NSX-T logical switches proceeding with wipe!!"
+          #govc vm.power -off "$actual_vm_path"
+          #govc vm.destroy "$actual_vm_path"
         done
         inner_index=$(expr $inner_index + 1)
       done
       index=$(expr $index + 1)
     done
   fi
+
+  echo "Sleeping for 60 seconds, please cancel the rest of the task if necessary!!"
+  sleep 60
 }
 
 function destroy_vm_matching_name {
@@ -93,11 +98,12 @@ function destroy_vm_matching_name {
   # Setup govc env variables coming via $additional_options
   export $additional_options
 
-  vm_path=$(govc find . -type m | grep "$vm_name" || true)
-  if [ "$vm_path" != "" ]; then
-    echo "Powering off and destroying vm: $vm_path"
-    govc vm.power -off "$vm_path"
-    govc vm.destroy "$vm_path"
+  vm_path=$(govc find . -type m | grep "$vm_name" | sed -e 's/ /::/g' || true)
+  actual_vm_path=$(echo $vm_path | sed -e 's/::/ /g' )
+  if [ "$actual_vm_path" != "" ]; then
+    echo "Powering off and destroying vm: $actual_vm_path"
+    govc vm.power -off "$actual_vm_path"
+    govc vm.destroy "$actual_vm_path"
   fi
 }
 
