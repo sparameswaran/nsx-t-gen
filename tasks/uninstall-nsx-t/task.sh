@@ -13,17 +13,14 @@ source $FUNCTIONS_DIR/delete_vm_using_govc.sh
 
 # First wipe out all non-nsx vms deployed on the management plane or compute clusters
 echo "Need to delete the non-NSX Vms that are running in the Compute cluster or Management cluster, before proceeding wtih clean of NSX Mgmt Plane!!"
-echo "Deleting the non NSX related vms"
+echo "Will proceed to highlighting the non NSX related vms that need to be deleted before issuing full wipe!!"
+echo "Will provide a 60 second window to cancel the task if you want to do a manual cleanup"
 destroy_vms_not_matching_nsx
 
 export ESXI_HOSTS_FILE="$ROOT_DIR/esxi_hosts"
 
 cp $FUNCTIONS_DIR/uninstall-nsx-vibs.yml $ROOT_DIR/
-if [ "$NSX_T_VERSION" == "2.2" ]; then
-  cp $FUNCTIONS_DIR/uninstall-nsx-t-v2.2-vibs.sh $ROOT_DIR/uninstall-nsx-t-vibs.sh
-else # [ "$NSX_T_VERSION" == "2.1" ]; then
-  cp $FUNCTIONS_DIR/uninstall-nsx-t-v2.1-vibs.sh $ROOT_DIR/uninstall-nsx-t-vibs.sh
-fi
+cp $FUNCTIONS_DIR/uninstall-nsx-t-v2.1-vibs.sh $ROOT_DIR/uninstall-nsx-t-vibs.sh
 
 cat > $ROOT_DIR/ansible.cfg << EOF
 [defaults]
@@ -91,10 +88,17 @@ STATUS=0
 if [ -e "$ESXI_HOSTS_FILE" ]; then
   sleep 5
   echo "Now removing the NSX-T related vibs from the Esxi Hosts"
-  ansible-playbook -i $ESXI_HOSTS_FILE $ROOT_DIR/uninstall-nsx-vibs.yml
+  set +e
+  ansible-playbook -i $ESXI_HOSTS_FILE $ROOT_DIR/uninstall-nsx-vibs.yml || true
   STATUS=$?
+  set -e
 
-  echo "NSX-T Vibs removed from the Esxi hosts"
+  if [ "$STATUS" == "0" ]; then
+    echo "NSX-T Vibs removed from the Esxi host using ansible script"
+  else
+    echo "Check for error details and based on existence of NSX-T Vibs on the Esxi host, proceed with manual cleanup and shutdown!"
+    echo "If there are no NSX-T Vibs, then no shutdown required for this host"
+  fi
   echo ""
 
   # esxi_hosts file looks like:
@@ -109,9 +113,8 @@ if [ -e "$ESXI_HOSTS_FILE" ]; then
 fi
 
 echo ""
-echo "WARNING!! The Esxi hosts should be rebooted for nsx-t vib removal to be effective!"
+echo "WARNING!! Only applicable to those Esxi hosts that got their nsx-t vibs removed via the ansible script"
+echo "Those Esxi Hosts should be rebooted for nsx-t vib removal to be effective!"
 echo "Please reboot all the listed Esxi Hosts in a rolling fashion to pick the changes!!"
 echo ""
 echo "NSX-T ${NSX_T_VERSION} Uninstall Completed!!"
-
-exit $STATUS
