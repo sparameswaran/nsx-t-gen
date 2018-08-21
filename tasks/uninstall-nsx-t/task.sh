@@ -13,7 +13,8 @@ source $FUNCTIONS_DIR/delete_vm_using_govc.sh
 
 # First wipe out all non-nsx vms deployed on the management plane or compute clusters
 echo "Need to delete the non-NSX Vms that are running in the Compute cluster or Management cluster, before proceeding wtih clean of NSX Mgmt Plane!!"
-echo "Deleting the non NSX related vms"
+echo "Will proceed to highlighting the non NSX related vms that need to be deleted before issuing full wipe!!"
+echo "Will provide a 60 second window to cancel the task if you want to do a manual cleanup"
 destroy_vms_not_matching_nsx
 
 export ESXI_HOSTS_FILE="$ROOT_DIR/esxi_hosts"
