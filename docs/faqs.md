@@ -22,8 +22,30 @@
 	# Edit nginx config and start
 	```
 * Unable to reach the webserver hosting the ova bits
-  * Check for proxy interfering with the concourse containers.
+  * Check for a web proxy interfering with the concourse containers.
   If using docker-compose, use the sample [docker-compose](./docker-compose.yml) template to add DNS and proxy settings. Add the webserver to the no_proxy list.
+
+  Ensure you are using docker-compose version `1.18+` and docker compose file version is `3`
+
+  Check with docker documentation on specifying proxies: https://docs.docker.com/network/proxy/
+
+  Ensure the `/etc/systemd/system/docker.service.d/http-proxy.conf` specifies the HTTP_PROXY and HTTPS_PROXY env variables so docker can go out via the proxy.
+  ```
+  [Service]
+  Environment="HTTP_PROXY=http://proxy.corp.local"   # EDIT the proxy
+  Environment="HTTPS_PROXY=http://proxy.corp.local"  # EDIT the proxy
+  Environment="NO_PROXY=localhost,127.0.0.1,<local-vm-ip>"
+  ```
+
+  Stop the docker service, reload the daemons and then start back the docker service
+  ```
+  systemctl stop docker
+  systemctl daemon-reload # to reload the docker service config
+  systemctl start docker
+  ```
+
+  Or use the ~/.docker/config.json approach to specify the proxy.
+
   * Disable ubuntu firewall (ufw) or relax iptables rules if there was usage of both docker concourse and docker-compose.
     Change ufw
   	```
@@ -36,6 +58,31 @@
 	sudo iptables -P FORWARD ACCEPT
 	sudo iptables -P OUTPUT ACCEPT
 	```
+
+* If running out of disk space with docker compose, use `docker volume prune` command to clean up unused volumes.
+
+* If things are still not reachable to outside (like reaching the github repos or webserver), try to add an additional docker image to run alongside concourse like an vanilla ubuntu image for debug purpose and shell into it, then try to run a curl to outside after updating apt-get and installing curl.
+
+Sample entry for adding ubuntu docker container image to docker-compose.yml.
+```
+services:
+  # new ubuntu docker image
+  ubuntu:
+    image: ubuntu:17.10
+    command: sleep 600000
+
+  concourse-web:
+    .....  
+```
+Find the docker container for the ubuntu image using `docker ps`
+Then shell into it using `docker exec -it <container-id> /bin/bash`
+Run following and see fi it can connect to outside via the proxy:
+```
+apt-get update -y && apt-get install -y curl
+curl www.google.com
+```
+If the above curl command works but concourse is still not able to go out, then check the various `CONCOURSE_*` env variables specified for the proxy and garden and dns settings.
+
 * Pipeline exits after reporting problem with ovas or ovftool
   * Verify the file names and paths are correct. If the download of the ovas by the pipeline at start was too fast, then it means errors with the files downloaded as each of the ova is upwards of 500 MB.
 * Running out of memory resources on vcenter
@@ -110,3 +157,6 @@
     * Add or edit any additional ip blocks or pools, nats, lbrs
     * Register parameters with the pipeline
     * Rerun add-routers followed by config-nsx-t-extras job group
+
+* Static Routing for NSX-T T0 Router
+  Please refer to the [Static Routing Setup](./static-routing-setup.md) for details on the static routing.

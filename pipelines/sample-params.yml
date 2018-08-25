@@ -376,12 +376,14 @@ nsx_t_container_ip_block_spec: |
 # Add additional exernal ip pools as needed
 # Change the cidr, gateway, nameserver, dns_domain as needed
 # The cidr, gateway, start/end ips should be reachable via static or bgp routing through T0 router
+# Leave some ips reserved for Ops mgr, pks controller, lbr vips for goRouter, SSH Proxy etc.
+# Refer to the `docs/static-routing-setup.md`
 nsx_t_external_ip_pool_spec: |
   external_ip_pools:
   - name: snat-vip-pool-for-pas
     cidr: 10.100.0.0/24  # Should be a 0/24 or some valid cidr, matching the external exposed uplink
     gateway: 10.100.0.1
-    start: 10.100.0.10 # Should not include gateway
+    start: 10.100.0.10 # Should not include gateway; reserve some for Ops Mgr, LB Vips for GoRouter, SSH Proxy
     end: 10.100.0.200  # Should not include gateway
     nameserver: 10.100.0.2
     dns_domain: corp.local.io
@@ -401,7 +403,7 @@ nsx_t_external_ip_pool_spec: |
   - name: snat-vip-pool-for-pks
     cidr: 10.300.0.0/24 # Should be a 0/24 or some valid cidr, matching the external exposed uplink
     gateway: 10.300.0.1
-    start: 10.300.0.10 # Should not include gateway
+    start: 10.300.0.10 # Should not include gateway; reserve some for PKS Controller, Harbor
     end: 10.300.0.200  # Should not include gateway
     nameserver: 10.100.0.2
     dns_domain: corp.local.io

@@ -26,7 +26,8 @@ Not handled by pipeline:
 
 * BGP or Static Route setup (outside of NSX-T) for T0 Routers
 
-
+## Note
+To install `NSX-T v2.2`, use the `nsxt-2.2` branch of pipeline templates of this repo. At some point, the `master` branch would transition over to v2.2
 
 ## Warning
 This is purely a trial work-in-progress and not officially supported by anyone. Use caution while using it at your own Risk!!.

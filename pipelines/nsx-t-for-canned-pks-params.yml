@@ -58,7 +58,7 @@ compute_manager_configs: |
     vcenter_pwd: ((vcenter_pwd))
     clusters:
     # Multiple clusters under same vcenter can be specified
-    - vcenter_cluster: ((vcenter_cluster))
+    - vcenter_cluster: ((esxihost_vcenter_cluster))
       overlay_profile_mtu: 1600 # Min 1600
       overlay_profile_vlan: ((nsx_t_overlay_profile_vlan)) # VLAN ID for the TEP/Overlay network
       uplink_vmnics: ((nsx_t_esxi_vmnics))
@@ -119,7 +119,7 @@ nsx_t_edge_portgroup_transport: ((nsx_t_edge_portgroup_transport))  # For TEP/ov
 
 # If ova deployment succeeded but controller membership failed or edges didnt get to join for any reason
 # enable rerun of the configure controllers
-rerun_configure_controllers: false  # set it to true if you want to rerun the configure controllers
+rerun_configure_controllers: true  # set it to true if you want to rerun the configure controllers
                                     # (as part of base ova install job) even as ova deployment succeeded
 
 # Edge network interfaces
@@ -143,7 +143,7 @@ nsx_t_tep_pool_end: 192.168.213.200
 # leading to memory constraints
 # if nsx_t_keep_reservation to true  - would keep reservation ON, recommended for production setups.
 # if nsx_t_keep_reservation to false - would turn reservation OFF, recommended for POCs, smaller setups.
-nsx_t_keep_reservation: true # for Prod setup
+nsx_t_keep_reservation: true # true for Prod setup
 
 nsx_t_mgr_deploy_size: small   # Recommended for real barebones demo, smallest setup
 #nsx_t_edge_deploy_size: medium # Recommended for POCs, smaller setup (# of lbrs very limited)
