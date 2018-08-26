@@ -17,9 +17,9 @@ vcenter_usr: ((vcenter_usr))   # EDIT - this is for deployment of the ovas for t
 vcenter_pwd: ((vcenter_pwd))               # EDIT - this is for deployment of the ovas for the mgmt plane
 vcenter_datacenter: ((vcenter_datacenter))            # EDIT
 vcenter_datastore: ((vcenter_datastore))              # EDIT
-vcenter_cluster: ((vcenter_cluster))                  # EDIT
+vcenter_cluster: ((nsx_t_mgmt_vcenter_cluster))                  # EDIT
 vcenter_manager: ((vcenter_host))                # EDIT
-vcenter_rp: ((vcenter_rp))                              # EDIT - can be blank - resource pool where mgmt plane vms would get deployed
+vcenter_rp: ((nsx_t_vcenter_rp))                              # EDIT - can be blank - resource pool where mgmt plane vms would get deployed
 
 # OVA general network settings
 ntpservers: ((ntpservers))                   # EDIT
@@ -58,7 +58,7 @@ compute_manager_configs: |
     vcenter_pwd: ((vcenter_pwd))
     clusters:
     # Multiple clusters under same vcenter can be specified
-    - vcenter_cluster: ((esxihost_vcenter_cluster))
+    - vcenter_cluster: ((compute_vcenter_cluster))
       overlay_profile_mtu: 1600 # Min 1600
       overlay_profile_vlan: ((nsx_t_overlay_profile_vlan)) # VLAN ID for the TEP/Overlay network
       uplink_vmnics: ((nsx_t_esxi_vmnics))
@@ -74,7 +74,7 @@ nsx_t_controllers_config:
 # edge_vcenter_datacenter: ((vcenter_datacenter))  # EDIT -  Use Edge specific vCenter
 # edge_vcenter_datastore: ((vcenter_datastore))   # EDIT -  Use Edge specific vCenter
 # edge_vcenter_cluster: ((vcenter_cluster))     # EDIT -  Use Edge specific vCenter
-# edge_vcenter_rp: ((vcenter_rp))          # EDIT -  Use Edge specific vCenter
+# edge_vcenter_rp: ((nsx_t_vcenter_rp))          # EDIT -  Use Edge specific vCenter
 # edge_ntpservers: ((ntpservers))          # EDIT -  Use Edge specific vCenter
 # edge_mgmt_portgroup: ((mgmt_portgroup))       # EDIT -  Use Edge specific vCenter
 # edge_dnsserver: ((dnsserver))            # EDIT -  Use Edge specific vCenter

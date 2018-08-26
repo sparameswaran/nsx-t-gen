@@ -57,7 +57,7 @@ esxi_hosts_config:
 # This would override esxi_hosts_config
 compute_manager_configs: |
   compute_managers:
-  - vcenter_name: vcenter-01
+  - vcenter_name: vcenter-01.corp.local
     vcenter_host: vcenter-01.corp.local
     vcenter_usr: administrator@vsphere.local
     vcenter_pwd: VMWare1!
