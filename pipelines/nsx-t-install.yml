@@ -23,6 +23,7 @@ nsx_t_gen_params: &nsx-t-gen-params
   EDGE_VCENTER_HOST: ((edge_vcenter_host))
   EDGE_VCENTER_USR: ((edge_vcenter_usr))
   EDGE_VCENTER_PWD: ((edge_vcenter_pwd))
+  EDGE_VCENTER_RP: ((edge_vcenter_rp))
   EDGE_VCENTER_DATACENTER: ((edge_vcenter_datacenter))
   EDGE_VCENTER_DATASTORE: ((edge_vcenter_datastore))
   EDGE_VCENTER_CLUSTER: ((edge_vcenter_cluster))
