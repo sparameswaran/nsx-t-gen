@@ -7,11 +7,13 @@ export ROOT_DIR=`pwd`
 export TASKS_DIR=$(dirname $BASH_SOURCE)
 export PIPELINE_DIR=$(cd $TASKS_DIR/../../ && pwd)
 export FUNCTIONS_DIR=$(cd $PIPELINE_DIR/functions && pwd)
+export PYTHON_LIB_DIR=$(cd $PIPELINE_DIR/python && pwd)
 
 source $FUNCTIONS_DIR/create_ansible_cfg.sh
 source $FUNCTIONS_DIR/create_answerfile.sh
 source $FUNCTIONS_DIR/create_hosts.sh
 source $FUNCTIONS_DIR/create_extra_yaml_args.sh
+source $FUNCTIONS_DIR/check_null_variables.sh
 
 DEBUG=""
 if [ "$ENABLE_ANSIBLE_DEBUG" == "true" ]; then
@@ -23,7 +25,7 @@ nsx_mgr_up_status=$(curl -s -o /dev/null -I -w "%{http_code}" -k  https://${NSX_
 
 # Deploy the ovas if its not up
 if [ $nsx_mgr_up_status -ne 200 ]; then
-  echo "NSX Mgr not up yet, please deploy the ovas before configuring routers!!" 
+  echo "NSX Mgr not up yet, please deploy the ovas before configuring routers!!"
   exit -1
 fi
 
@@ -43,14 +45,18 @@ NO_OF_CONTROLLERS=$(curl -k -u "admin:$NSX_T_MANAGER_ADMIN_PWD" \
                     https://${NSX_T_MANAGER_IP}/api/v1/cluster/nodes \
                     | jq '.results[].controller_role.type' | wc -l )
 if [ "$NO_OF_CONTROLLERS" -lt 2 ]; then
-  echo "NSX Mgr and controller not configured yet, please cleanup incomplete vms and rerun base install before configuring routers!!" 
+  echo "NSX Mgr and controller not configured yet, please cleanup incomplete vms and rerun base install before configuring routers!!"
   exit -1
 fi
 
 ansible-playbook $DEBUG -i hosts configureNsx.yml -e @extra_yaml_args.yml
 STATUS=$?
 
-
 echo ""
+
+if [ "$STATUS" == "0" ]; then
+  python $PYTHON_LIB_DIR/nsx_t_status.py
+  STATUS=$?
+fi
 
 exit $STATUS

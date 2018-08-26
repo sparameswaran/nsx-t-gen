@@ -17,9 +17,9 @@ vcenter_usr: ((vcenter_usr))   # EDIT - this is for deployment of the ovas for t
 vcenter_pwd: ((vcenter_pwd))               # EDIT - this is for deployment of the ovas for the mgmt plane
 vcenter_datacenter: ((vcenter_datacenter))            # EDIT
 vcenter_datastore: ((vcenter_datastore))              # EDIT
-vcenter_cluster: ((vcenter_cluster))                  # EDIT
+vcenter_cluster: ((nsx_t_mgmt_vcenter_cluster))                  # EDIT
 vcenter_manager: ((vcenter_host))                # EDIT
-vcenter_rp: ((vcenter_rp))                              # EDIT - can be blank - resource pool where mgmt plane vms would get deployed
+vcenter_rp: ((nsx_t_vcenter_rp))                              # EDIT - can be blank - resource pool where mgmt plane vms would get deployed
 
 # OVA general network settings
 ntpservers: ((ntpservers))                   # EDIT
@@ -58,7 +58,7 @@ compute_manager_configs: |
     vcenter_pwd: ((vcenter_pwd))
     clusters:
     # Multiple clusters under same vcenter can be specified
-    - vcenter_cluster: ((vcenter_cluster))
+    - vcenter_cluster: ((compute_vcenter_cluster))
       overlay_profile_mtu: 1600 # Min 1600
       overlay_profile_vlan: ((nsx_t_overlay_profile_vlan)) # VLAN ID for the TEP/Overlay network
       uplink_vmnics: ((nsx_t_esxi_vmnics))
@@ -74,7 +74,7 @@ nsx_t_controllers_config:
 # edge_vcenter_datacenter: ((vcenter_datacenter))  # EDIT -  Use Edge specific vCenter
 # edge_vcenter_datastore: ((vcenter_datastore))   # EDIT -  Use Edge specific vCenter
 # edge_vcenter_cluster: ((vcenter_cluster))     # EDIT -  Use Edge specific vCenter
-# edge_vcenter_rp: ((vcenter_rp))          # EDIT -  Use Edge specific vCenter
+# edge_vcenter_rp: ((nsx_t_vcenter_rp))          # EDIT -  Use Edge specific vCenter
 # edge_ntpservers: ((ntpservers))          # EDIT -  Use Edge specific vCenter
 # edge_mgmt_portgroup: ((mgmt_portgroup))       # EDIT -  Use Edge specific vCenter
 # edge_dnsserver: ((dnsserver))            # EDIT -  Use Edge specific vCenter
@@ -119,7 +119,7 @@ nsx_t_edge_portgroup_transport: ((nsx_t_edge_portgroup_transport))  # For TEP/ov
 
 # If ova deployment succeeded but controller membership failed or edges didnt get to join for any reason
 # enable rerun of the configure controllers
-rerun_configure_controllers: false  # set it to true if you want to rerun the configure controllers
+rerun_configure_controllers: true  # set it to true if you want to rerun the configure controllers
                                     # (as part of base ova install job) even as ova deployment succeeded
 
 # Edge network interfaces
@@ -143,7 +143,7 @@ nsx_t_tep_pool_end: 192.168.213.200
 # leading to memory constraints
 # if nsx_t_keep_reservation to true  - would keep reservation ON, recommended for production setups.
 # if nsx_t_keep_reservation to false - would turn reservation OFF, recommended for POCs, smaller setups.
-nsx_t_keep_reservation: true # for Prod setup
+nsx_t_keep_reservation: true # true for Prod setup
 
 nsx_t_mgr_deploy_size: small   # Recommended for real barebones demo, smallest setup
 #nsx_t_edge_deploy_size: medium # Recommended for POCs, smaller setup (# of lbrs very limited)

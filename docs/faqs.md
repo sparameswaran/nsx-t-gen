@@ -157,3 +157,6 @@ If the above curl command works but concourse is still not able to go out, then 
     * Add or edit any additional ip blocks or pools, nats, lbrs
     * Register parameters with the pipeline
     * Rerun add-routers followed by config-nsx-t-extras job group
+
+* Static Routing for NSX-T T0 Router
+  Please refer to the [Static Routing Setup](./static-routing-setup.md) for details on the static routing.
