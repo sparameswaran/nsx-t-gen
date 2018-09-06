@@ -67,7 +67,7 @@ jobs:
       NSX_T_EDGE_UPLINK_INTERFACE: ((nsx_t_edge_uplink_interface)), NSX_T_EDGE_VM_NAME_PREFIX: ((nsx_t_edge_vm_name_prefix)),
       NSX_T_ESXI_VMNICS: ((nsx_t_esxi_vmnics)), NSX_T_EXTERNAL_IP_POOL: null, NSX_T_EXTERNAL_IP_POOL_SPEC: ((nsx_t_external_ip_pool_spec)),
       NSX_T_HA_SWITCHING_PROFILE_SPEC: ((nsx_t_ha_switching_profile_spec)), NSX_T_HOSTSWITCH: null,
-      NSX_T_INSTALLER: ((nsx_t_installer)), NSX_T_VERSION: ((nsx_t_version)), NSX_T_KEEP_RESERVATION: ((nsx_t_keep_reservation)),
+      NSX_T_INSTALLER: ((nsx_t_installer)), NSX_T_KEEP_RESERVATION: ((nsx_t_keep_reservation)),
       NSX_T_LBR_SPEC: ((nsx_t_lbr_spec)), NSX_T_MANAGER_ADMIN_PWD: ((nsx_t_manager_admin_pwd)),
       NSX_T_MANAGER_ADMIN_USER: ((nsx_t_manager_admin_user)), NSX_T_MANAGER_FQDN: ((nsx_t_manager_host_name)),
       NSX_T_MANAGER_HOST_NAME: ((nsx_t_manager_host_name)), NSX_T_MANAGER_IP: ((nsx_t_manager_ip)),
