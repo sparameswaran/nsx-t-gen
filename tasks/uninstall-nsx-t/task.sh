@@ -95,6 +95,7 @@ if [ -e "$ESXI_HOSTS_FILE" ]; then
 
   if [ "$STATUS" == "0" ]; then
     echo "NSX-T Vibs removed from the Esxi host using ansible script"
+    echo "If the previous step reported a fatal error matching 'No VIB matching VIB search specification', then uninstall was clean and no manual reboot of hosts required!!"
   else
     echo "Check for error details and based on existence of NSX-T Vibs on the Esxi host, proceed with manual cleanup and shutdown!"
     echo "If there are no NSX-T Vibs, then no shutdown required for this host"
@@ -117,4 +118,7 @@ echo "WARNING!! Only applicable to those Esxi hosts that got their nsx-t vibs re
 echo "Those Esxi Hosts should be rebooted for nsx-t vib removal to be effective!"
 echo "Please reboot all the listed Esxi Hosts in a rolling fashion to pick the changes!!"
 echo ""
+echo "NOTE: No Reboot required if there were errors matching 'No VIB matching VIB search specification' during VIB removal"
+echo ""
+
 echo "NSX-T ${NSX_T_VERSION} Uninstall Completed!!"

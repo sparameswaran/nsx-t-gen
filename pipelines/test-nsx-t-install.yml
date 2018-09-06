@@ -1,0 +1,257 @@
+---
+# Use reference instead of repeating the nsx-t params
+nsx_t_gen_params: &nsx-t-gen-params
+  NSX_T_INSTALLER: ((nsx_t_installer))
+  VCENTER_HOST: ((vcenter_host))
+  VCENTER_USR: ((vcenter_usr))
+  VCENTER_PWD: ((vcenter_pwd))
+  VCENTER_DATACENTER: ((vcenter_datacenter))
+  VCENTER_DATASTORE: ((vcenter_datastore))
+  VCENTER_CLUSTER: ((vcenter_cluster))
+  VCENTER_MANAGER: ((vcenter_manager))
+  VCENTER_RP: ((vcenter_rp))
+  NTPSERVERS: ((ntpservers))
+  MGMT_PORTGROUP: ((mgmt_portgroup))
+  DNSSERVER: ((dnsserver))
+  DNSDOMAIN: ((dnsdomain))
+  DEFAULTGATEWAY: ((defaultgateway))
+  NETMASK: ((netmask))
+  ESXI_HOSTS_ROOT_PWD: ((esxi_hosts_root_pwd))
+  ESXI_HOSTS_CONFIG: ((esxi_hosts_config))
+  COMPUTE_MANAGER_CONFIGS: ((compute_manager_configs))
+  EDGE_VCENTER_HOST: ((edge_vcenter_host))
+  EDGE_VCENTER_USR: ((edge_vcenter_usr))
+  EDGE_VCENTER_PWD: ((edge_vcenter_pwd))
+  EDGE_VCENTER_DATACENTER: ((edge_vcenter_datacenter))
+  EDGE_VCENTER_DATASTORE: ((edge_vcenter_datastore))
+  EDGE_VCENTER_CLUSTER: ((edge_vcenter_cluster))
+  EDGE_NTPSERVERS: ((edge_ntpservers))
+  EDGE_MGMT_PORTGROUP: ((edge_mgmt_portgroup))
+  EDGE_DNSSERVER: ((edge_dnsserver))
+  EDGE_DNSDOMAIN: ((edge_dnsdomain))
+  EDGE_DEFAULTGATEWAY: ((edge_defaultgateway))
+  EDGE_NETMASK: ((edge_netmask))
+  NSX_T_MANAGER_FQDN: ((nsx_t_manager_host_name))
+  NSX_T_MANAGER_VM_NAME: ((nsx_t_manager_vm_name))
+  NSX_T_MANAGER_HOST_NAME: ((nsx_t_manager_host_name))
+  NSX_T_MANAGER_IP: ((nsx_t_manager_ip))
+  NSX_T_MANAGER_ADMIN_USER: ((nsx_t_manager_admin_user))
+  NSX_T_MANAGER_ADMIN_PWD: ((nsx_t_manager_admin_pwd))
+  NSX_T_MANAGER_ROOT_PWD: ((nsx_t_manager_root_pwd))
+  NSX_T_CONTROLLER_HOST_PREFIX: ((nsx_t_controller_host_prefix))
+  NSX_T_CONTROLLER_VM_NAME_PREFIX: ((nsx_t_controller_vm_name_prefix))
+  NSX_T_CONTROLLER_IPS: ((nsx_t_controller_ips))
+  NSX_T_CONTROLLER_ROOT_PWD: ((nsx_t_controller_root_pwd))
+  NSX_T_CONTROLLER_CLUSTER_PWD: ((nsx_t_controller_cluster_pwd))
+  NSX_T_CONTROLLERS_CONFIG: ((nsx_t_controllers_config))
+  NSX_T_EDGE_HOST_PREFIX: ((nsx_t_edge_host_prefix))
+  NSX_T_EDGE_VM_NAME_PREFIX: ((nsx_t_edge_vm_name_prefix))
+  NSX_T_EDGE_IPS: ((nsx_t_edge_ips))
+  NSX_T_EDGE_ROOT_PWD: ((nsx_t_edge_root_pwd))
+  NSX_T_EDGE_PORTGROUP_EXT: ((nsx_t_edge_portgroup_ext))
+  NSX_T_EDGE_PORTGROUP_TRANSPORT: ((nsx_t_edge_portgroup_transport))
+  NSX_T_KEEP_RESERVATION: ((nsx_t_keep_reservation))
+  NSX_T_MGR_DEPLOY_SIZE: ((nsx_t_mgr_deploy_size))
+  NSX_T_EDGE_DEPLOY_SIZE: ((nsx_t_edge_deploy_size))
+  NSX_T_TEP_POOL_NAME: ((nsx_t_tep_pool_name))
+  NSX_T_TEP_POOL_CIDR: ((nsx_t_tep_pool_cidr))
+  NSX_T_TEP_POOL_GATEWAY: ((nsx_t_tep_pool_gateway))
+  NSX_T_TEP_POOL_START: ((nsx_t_tep_pool_start))
+  NSX_T_TEP_POOL_END: ((nsx_t_tep_pool_end))
+  NSX_T_EDGE_OVERLAY_INTERFACE: ((nsx_t_edge_overlay_interface))
+  NSX_T_EDGE_UPLINK_INTERFACE: ((nsx_t_edge_uplink_interface))
+  NSX_T_OVERLAY_TRANSPORT_ZONE: ((nsx_t_overlay_transport_zone))
+  NSX_T_VLAN_TRANSPORT_ZONE: ((nsx_t_vlan_transport_zone))
+  NSX_T_SINGLE_UPLINK_PROFILE_NAME: ((nsx_t_single_uplink_profile_name))
+  NSX_T_SINGLE_UPLINK_PROFILE_MTU: ((nsx_t_single_uplink_profile_mtu))
+  NSX_T_SINGLE_UPLINK_PROFILE_VLAN: ((nsx_t_single_uplink_profile_vlan))
+  NSX_T_EDGE_CLUSTER: ((nsx_t_edge_cluster))
+  NSX_T_OVERLAY_PROFILE_NAME: ((nsx_t_overlay_profile_name))
+  NSX_T_OVERLAY_PROFILE_MTU: ((nsx_t_overlay_profile_mtu))
+  NSX_T_OVERLAY_PROFILE_VLAN: ((nsx_t_overlay_profile_vlan))
+  NSX_T_ESXI_VMNICS: ((nsx_t_esxi_vmnics))
+  NSX_T_OVERLAY_HOSTSWITCH: ((nsx_t_overlay_hostswitch))
+  NSX_T_VLAN_HOSTSWITCH: ((nsx_t_vlan_hostswitch))
+  NSX_T_TRANSPORT_VLAN: ((nsx_t_transport_vlan))
+  NSX_T_T0ROUTER_SPEC: ((nsx_t_t0router_spec))
+  NSX_T_PAS_NCP_CLUSTER_TAG: ((nsx_t_pas_ncp_cluster_tag))
+  NSX_T_T1ROUTER_LOGICAL_SWITCHES_SPEC: ((nsx_t_t1router_logical_switches_spec))
+  NSX_T_HA_SWITCHING_PROFILE_SPEC: ((nsx_t_ha_switching_profile_spec))
+  NSX_T_CONTAINER_IP_BLOCK_SPEC: ((nsx_t_container_ip_block_spec))
+  NSX_T_EXTERNAL_IP_POOL_SPEC: ((nsx_t_external_ip_pool_spec))
+  NSX_T_NAT_RULES_SPEC: ((nsx_t_nat_rules_spec))
+  NSX_T_CSR_REQUEST_SPEC: ((nsx_t_csr_request_spec))
+  NSX_T_LBR_SPEC: ((nsx_t_lbr_spec))
+  ENABLE_ANSIBLE_DEBUG: ((enable_ansible_debug))
+  RERUN_CONFIGURE_CONTROLLERS: ((rerun_configure_controllers))
+
+groups:
+
+- name: full-install
+  jobs:
+  - install-nsx-t
+  - add-nsx-t-routers
+  - config-nsx-t-extras
+
+- name: base-install
+  jobs:
+  - standalone-install-nsx-t
+
+- name: add-routers
+  jobs:
+  - standalone-add-nsx-t-routers
+
+- name: config-nsx-t-extras
+  jobs:
+  - standalone-config-nsx-t-extras
+
+# - name: cleanup
+#   jobs:
+#   - uninstall-nsx-t
+
+resource_types:
+- name: file-url
+  type: docker-image
+  source:
+    repository: pivotalservices/concourse-curl-resource
+    tag: latest
+
+
+resources:
+- name: nsx-t-gen-pipeline
+  type: git
+  source:
+    uri: https://github.com/sparameswaran/nsx-t-gen.git
+    branch: master
+    params:
+      disable_git_lfs: true
+
+# - name: nsx-t-gen-worker-v2_1-docker
+#   type: docker-image
+#   source:
+#     repository: nsxedgegen/nsx-t-gen-worker
+#     tag: v2.1
+
+- name: nsxt-ansible
+  type: git
+  source:
+    uri: https://github.com/sparameswaran/nsxt-ansible
+    branch: master
+
+# Download NSX-T 2.1 bits from
+# https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-210&productId=673
+
+- name: nsx-mgr-ova
+  type: file-url
+  source:
+    #username: username
+    #password: password
+    url: ((nsx_image_webserver))/((nsx_mgr_ova))
+    filename: ((nsx_mgr_ova))
+    skip_ssl_verification: true
+
+- name: nsx-ctrl-ova
+  type: file-url
+  source:
+    #username: username
+    #password: password
+    url: ((nsx_image_webserver))/((nsx_controller_ova))
+    filename: ((nsx_controller_ova))
+    skip_ssl_verification: true
+
+- name: nsx-edge-ova
+  type: file-url
+  source:
+    #username: username
+    #password: password
+    url: ((nsx_image_webserver))/((nsx_edge_ova))
+    filename: ((nsx_edge_ova))
+    skip_ssl_verification: true
+
+# Download from https://my.vmware.com/group/vmware/details?productId=614&downloadGroup=OVFTOOL420#
+- name: ovftool
+  type: file-url
+  source:
+    #username: username
+    #password: password
+    url: ((nsx_image_webserver))/((ovftool_image))
+    filename: ((ovftool_image))
+    skip_ssl_verification: true
+
+jobs:
+
+- name: install-nsx-t
+  plan:
+  - aggregate:
+    - get: nsx-t-gen-pipeline
+    - get: nsxt-ansible
+    - get: nsx-mgr-ova
+    - get: nsx-ctrl-ova
+    - get: nsx-edge-ova
+    - get: ovftool
+
+  - task: install-nsx-t
+    file: nsx-t-gen-pipeline/tasks/install-nsx-t/task.yml
+    params: *nsx-t-gen-params
+
+- name: add-nsx-t-routers
+  plan:
+  - aggregate:
+    - get: nsx-t-gen-pipeline
+    - get: nsxt-ansible
+      params: {globs: []}
+      passed: [install-nsx-t]
+      trigger: true
+
+  - task: add-nsx-t-routers
+    file: nsx-t-gen-pipeline/tasks/add-nsx-t-routers/task.yml
+    params: *nsx-t-gen-params
+
+- name: config-nsx-t-extras
+  plan:
+  - aggregate:
+    - get: nsx-t-gen-pipeline
+    - get: nsxt-ansible
+      params: {globs: []}
+      passed: [add-nsx-t-routers]
+      trigger: true
+
+  - task: config-nsx-t-extras
+    file: nsx-t-gen-pipeline/tasks/config-nsx-t-extras/task.yml
+    params: *nsx-t-gen-params
+
+- name: standalone-install-nsx-t
+  plan:
+  - aggregate:
+    - get: nsx-t-gen-pipeline
+    - get: nsxt-ansible
+    - get: nsx-mgr-ova
+    - get: nsx-ctrl-ova
+    - get: nsx-edge-ova
+    - get: ovftool
+
+  - task: install-nsx-t
+    file: nsx-t-gen-pipeline/tasks/install-nsx-t/task.yml
+    params: *nsx-t-gen-params
+
+- name: standalone-add-nsx-t-routers
+  plan:
+  - aggregate:
+    - get: nsx-t-gen-pipeline
+    - get: nsxt-ansible
+      params: {globs: []}
+
+  - task: add-nsx-t-routers
+    file: nsx-t-gen-pipeline/tasks/add-nsx-t-routers/task.yml
+    params: *nsx-t-gen-params
+
+- name: standalone-config-nsx-t-extras
+  plan:
+  - aggregate:
+    - get: nsx-t-gen-pipeline
+    - get: nsxt-ansible
+      params: {globs: []}
+
+  - task: config-nsx-t-extras
+    file: nsx-t-gen-pipeline/tasks/config-nsx-t-extras/task.yml
+    params: *nsx-t-gen-params
