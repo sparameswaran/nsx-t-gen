@@ -38,6 +38,7 @@ SWITCH_PORTS_ENDPOINT        = '%s%s' % (API_VERSION, '/logical-ports')
 SWITCHING_PROFILE_ENDPOINT   = '%s%s' % (API_VERSION, '/switching-profiles')
 CONTAINER_IP_BLOCKS_ENDPOINT = '%s%s' % (API_VERSION, '/pools/ip-blocks')
 EXTERNAL_IP_POOL_ENDPOINT    = '%s%s' % (API_VERSION, '/pools/ip-pools')
+NSGROUP_ENDPOINT             = '%s%s' % (API_VERSION, '/ns-groups')
 TRUST_MGMT_CSRS_ENDPOINT     = '%s%s' % (API_VERSION, '/trust-management/csrs')
 TRUST_MGMT_CRLS_ENDPOINT     = '%s%s' % (API_VERSION, '/trust-management/crls')
 TRUST_MGMT_SELF_SIGN_CERT    = '%s%s' % (API_VERSION, '/trust-management/csrs/')
@@ -853,28 +854,49 @@ def add_lbr_pool(virtual_server_defn):
     'snat_translation': {
         'port_overload': 1,
         'type': 'LbSnatAutoMap'
-    }, 'algorithm': 'ROUND_ROBIN' }
+    }, 'algorithm': 'LEAST_CONNECTION' }
 
   uses_port_range = False
-  for member in virtual_server_defn['members']:
-    member_name = ( '%s-%s-%d' % (virtual_server_name, 'member', index))
-    server_pool_member = {
-              'max_concurrent_connections': 10000,
-              'port': member['port'],
-              'weight': 1,
-              'admin_state': 'ENABLED',
-              'ip_address': member['ip'],
-              'display_name': member_name,
-              'backup_member': False
-            }
-    if server_pool_member.get('port') is None or '-' in str(server_pool_member['port']):
-        server_pool_member.pop('port', None)
-        uses_port_range = True
+  nsgroup_name = virtual_server_defn.get('nsgroup')
+  if nsgroup_name:
+      nsgroup = check_for_existing_nsgroup(nsgroup_name)
+      if not nsgroup:
+          nsgroup_id = create_network_security_group(nsgroup_name, None)
+      else:
+          nsgroup_id = nsgroup['id']
 
-    members.append(server_pool_member)
-    index += 1
+      member_group = {
+            'grouping_object' : {
+            'target_display_name' : nsgroup_name,
+            'is_valid' : True,
+            'target_type' : 'NSGroup',
+            'target_id' : nsgroup_id
+          },
+          'ip_revision_filter' : 'IPV4'
+      }
+      pool_payload['member_group'] = member_group
 
-  pool_payload['members'] = members
+  else:
+
+      for member in virtual_server_defn['members']:
+        member_name = ( '%s-%s-%d' % (virtual_server_name, 'member', index))
+        server_pool_member = {
+                  'max_concurrent_connections': 10000,
+                  'port': member['port'],
+                  'weight': 1,
+                  'admin_state': 'ENABLED',
+                  'ip_address': member['ip'],
+                  'display_name': member_name,
+                  'backup_member': False
+                }
+        if server_pool_member.get('port') is None or '-' in str(server_pool_member['port']):
+            server_pool_member.pop('port', None)
+            uses_port_range = True
+
+        members.append(server_pool_member)
+        index += 1
+
+      pool_payload['members'] = members
 
   if uses_port_range:
     pool_payload.pop('active_monitor_ids', None)
@@ -1033,6 +1055,62 @@ def add_loadbalancers():
 
       print ''
 
+def add_network_security_groups():
+    nsgroup_spec_defn = os.getenv('NSX_T_NSGROUP_SPEC', '').strip()
+    if nsgroup_spec_defn == '' or nsgroup_spec_defn == 'null':
+        print('No yaml payload set for the NSX_T_NSGROUP_SPEC, ignoring NS Groups section!')
+        return
+
+    nsgroup_defn = yaml.load(nsgroup_spec_defn)['nsgroups']
+    if nsgroup_defn is None or len(nsgroup_defn) <= 0:
+        print('No valid yaml passed in the NSX_T_NSGROUP_SPEC, nothing to add/update for NS Groups!')
+        return
+
+    for nsgroup in nsgroup_defn:
+        if not check_for_existing_nsgroup(nsgroup['name']):
+            create_network_security_group(nsgroup['name'], nsgroup['tags'])
+
+def check_for_existing_nsgroup(existing_nsg_name):
+  api_endpoint = NSGROUP_ENDPOINT
+  resp = client.get(api_endpoint).json()
+  if resp is None or resp['result_count'] == 0:
+    return None
+
+  for nsg_member in resp['results']:
+    if nsg_member['display_name'] == existing_nsg_name:
+      return nsg_member
+
+  return None
+
+def create_network_security_group(nsgroup_name, tag_map):
+    api_endpoint = NSGROUP_ENDPOINT
+    payload={
+        'resource_type' : 'NSGroup',
+        'display_name' : nsgroup_name,
+        'membership_criteria' : [ ],
+        'members' : [ ]
+    }
+
+    if tag_map:
+        tags = []
+        for key in tag_map:
+            entry = { 'scope': key, 'tag': tag_map[key] }
+            tags.append(entry)
+        payload['tags'] = tags
+
+    resp = client.post(api_endpoint, payload ).json()
+
+    if resp.get('error_code') is None:
+        print 'Created NS Group: {}'.format(nsgroup_name)
+        print ''
+        nsgroup_id = resp['id']
+    else:
+        print 'Problem in creating NS Group: {}'.format(nsgroup_name)
+        print 'Associated Error: {}'.format(resp)
+        exit(1)
+
+    return nsgroup_id
+
 def main():
 
     init()
@@ -1050,11 +1128,14 @@ def handle_nsxt_extras_config():
   # So create directly
   create_ha_switching_profile()
 
-  # # Set the route redistribution
+  # Set the route redistribution
   set_t0_route_redistribution()
 
-  # #print_t0_route_nat_rules()
+  # print_t0_route_nat_rules()
   add_t0_route_nat_rules()
+
+  # Add Network Security Groups
+  add_network_security_groups()
 
   # Add Loadbalancers, update if already existing
   add_loadbalancers()
