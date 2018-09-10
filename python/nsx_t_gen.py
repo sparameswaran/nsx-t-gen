@@ -856,6 +856,15 @@ def add_lbr_pool(virtual_server_defn):
         'type': 'LbSnatAutoMap'
     }, 'algorithm': 'LEAST_CONNECTION' }
 
+  monitor_name = virtual_server_defn.get('monitor')
+  if monitor_name:
+      active_monitor = check_for_existing_active_monitor(monitor_name)
+      if active_monitor is None:
+          print 'Warning!! Active Monitor specified {} for Server Pool {}ServerPool not found!!'.format(monitor_name, virtual_server_name)
+          print 'Going with default ActiveTcpMonitor!!\n'
+      else:
+          pool_payload['active_monitor_ids'] = [ active_monitor['id'] ]
+
   uses_port_range = False
   nsgroup_name = virtual_server_defn.get('nsgroup')
   if nsgroup_name:
@@ -1103,13 +1112,60 @@ def create_network_security_group(nsgroup_name, tag_map):
     if resp.get('error_code') is None:
         print 'Created NS Group: {}'.format(nsgroup_name)
         print ''
-        nsgroup_id = resp['id']
-    else:
-        print 'Problem in creating NS Group: {}'.format(nsgroup_name)
-        print 'Associated Error: {}'.format(resp)
-        exit(1)
+        return resp['id']
 
-    return nsgroup_id
+    print 'Problem in creating NS Group: {}'.format(nsgroup_name)
+    print 'Associated Error: {}'.format(resp)
+    exit(1)
+
+def add_active_monitors():
+    active_monitor_spec_defn = os.getenv('NSX_T_ACTIVE_MONITOR_SPEC', '').strip()
+    if active_monitor_spec_defn == '' or active_monitor_spec_defn == 'null':
+        print('No yaml payload set for the NSX_T_ACTIVE_MONITOR_SPEC, ignoring Active Monitors section!')
+        return
+
+    active_monitor_defn = yaml.load(active_monitor_spec_defn)['active_monitors']
+    if active_monitor_defn is None or len(active_monitor_defn) <= 0:
+        print('No valid yaml passed in the NSX_T_ACTIVE_MONITOR_SPEC, nothing to add/update for Active Monitors!!')
+        return
+
+    for active_monitor in active_monitor_defn:
+        if not check_for_existing_active_monitor(active_monitor['name']):
+            create_active_monitor(active_monitor)
+
+def check_for_existing_active_monitor(existing_monitor_name):
+  api_endpoint = LBR_MONITORS_ENDPOINT
+  resp = client.get(api_endpoint).json()
+  if resp is None or resp['result_count'] == 0:
+    return None
+
+  for active_monitor in resp['results']:
+    if active_monitor['display_name'] == existing_monitor_name:
+      return active_monitor
+
+  return None
+
+def create_active_monitor(active_monitor_entry):
+    api_endpoint = LBR_MONITORS_ENDPOINT
+    payload={
+        'resource_type' : active_monitor_entry['type'],
+        'display_name' : active_monitor_entry['name'],
+        'monitor_port' : active_monitor_entry['monitor_port']
+    }
+
+    if active_monitor_entry['type'] == 'LbHttpMonitor':
+        payload['request_url'] = active_monitor_entry['path']
+
+    resp = client.post(api_endpoint, payload ).json()
+
+    if resp.get('error_code') is None:
+        print 'Created Active monitor: {}'.format(active_monitor_entry['name'])
+        print ''
+        return resp['id']
+
+    print 'Problem in creating Active monitor: {}'.format(active_monitor_entry['name'])
+    print 'Associated Error: {}'.format(resp)
+    exit(1)
 
 def main():
 
@@ -1136,6 +1192,9 @@ def handle_nsxt_extras_config():
 
   # Add Network Security Groups
   add_network_security_groups()
+
+  # Add Active Monitors
+  add_active_monitors()
 
   # Add Loadbalancers, update if already existing
   add_loadbalancers()

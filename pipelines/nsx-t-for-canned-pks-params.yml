@@ -322,3 +322,5 @@ nsx_t_csr_request_spec: |
     algorithm: RSA               # Valid values: RSA or DSA
 
 nsx_t_lbr_spec:
+nsx_t_monitor_spec:
+nsx_t_nsgroup_spec:

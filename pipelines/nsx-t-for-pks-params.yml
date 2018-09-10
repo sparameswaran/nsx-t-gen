@@ -445,3 +445,5 @@ nsx_t_csr_request_spec: |
 # No need for any default Loadbalancers
 # Would be created on cluster creation automatically
 nsx_t_lbr_spec:
+nsx_t_monitor_spec:
+nsx_t_nsgroup_spec:
