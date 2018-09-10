@@ -527,6 +527,44 @@ nsx_t_csr_request_spec: |
 # large     |    4     |   1       | 1 # Recommended for running PAS + PKS
 # Bare metal - not handled here
 
+# Create Active monitors for LBR security group integration, cannot use passive or default monitors
+nsx_t_monitor_spec: |
+  active_monitors:
+  # Sample entry for creating Active Monitors for PAS ERT
+  - name: gorouter-monitor
+    type: LbHttpMonitor
+    monitor_port: 8080
+    path: /health        # Http monitor requires path
+  - name: diego-brain-monitor
+    type: LbTcpMonitor
+    monitor_port: 2222
+  - name: mysql-proxy-monitor
+    type: LbTcpMonitor
+    monitor_port: 1936
+
+# Create Security groups
+# These would be later linked with the PAS GoRouters or other groups as needed
+nsx_t_nsgroup_spec: |
+  nsgroups:
+  # Sample entry for creating LBR for PAS ERT
+  - name: PAS1-GoRouter-NSGroup
+    tags:
+      pas-foundation: PAS1        # Tag to associate with the NSGroup
+  - name: PAS1-TCPRouter-NSGroup
+    tags:
+      pas-foundation: PAS1        # Tag to associate with the NSGroup
+  - name: PAS1-SSHProxy2222-NSGroup
+    tags:
+      pas-foundation: PAS1        # Tag to associate with the NSGroup
+  - name: PAS1-MySQLProxy-NSGroup
+    tags:
+      pas-foundation: PAS1        # Tag to associate with the NSGroup
+  - name: PAS2-GoRouter-NSGroup
+    tags:
+      pas-foundation: PAS2        # Tag to associate with the NSGroup
+
+## Allow user to specify the NS Group association -> in that case, member details wont be used.
+## Also, if ns group is used, specify the active monitor name. Otherwise default to the default builtin tcp monitor
 nsx_t_lbr_spec: |
   loadbalancers:
   # Sample entry for creating LBR for PAS ERT
@@ -537,6 +575,10 @@ nsx_t_lbr_spec: |
     - name: goRouter443          # Unique name that signifies function being exposed
       vip: 10.13.12.150          # Exposed VIP for LBR to listen on
       port: 443
+      # If nsgroup is defined, then static members entry will be ignored
+      nsgroup: 'PAS1-GoRouter-NSGroup'
+      monitor: gorouter-monitor
+      # Ignored... as nsgroup is defined above
       members:
       - ip: 192.168.2.31        # Internal ip of GoRouter instance 1
         port: 443
@@ -545,6 +587,10 @@ nsx_t_lbr_spec: |
     - name: goRouter80
       vip: 10.13.12.150
       port: 80
+      # If nsgroup is defined, then static members will be ignored
+      nsgroup: 'PAS1-GoRouter-NSGroup'
+      monitor: gorouter-monitor
+      # Ignored... as nsgroup is defined above
       members:
       - ip: 192.168.2.31        # Internal ip of GoRouter instance 1
         port: 80
@@ -552,13 +598,28 @@ nsx_t_lbr_spec: |
         port: 80
     - name: sshProxy             # SSH Proxy exposed to outside
       vip: 10.13.12.151
-      port: 2222                 # Port 2222 for ssh proxy
+      port: 2222                 # Port 2222 for ssh
+      # If nsgroup is defined, then static members will be ignored
+      nsgroup: 'PAS1-SSHProxy2222-NSGroup'
+      monitor: diego-brain-monitor
+      # Ignored... as nsgroup is defined above
       members:
       - ip: 192.168.2.41        # Internal ip of Diego Brain where ssh proxy runs
         port: 2222
+    - name: mySQLProxy          # Mysql Proxy exposed to outside
+      vip: 10.13.12.153
+      port: 1936                 # Port 1936 for mysql proxy
+      # If nsgroup is defined, then static members will be ignored
+      nsgroup: 'PAS1-MySQLProxy-NSGroup'
+      monitor: mysql-proxy-monitor
+      # Ignored... as nsgroup is defined above
+      members:
+      - ip: 192.168.2.45        # Internal ip of Mysql proxy
+        port: 1936
     - name: sampleTcpRouter      # Sample for TCP Router that uses a port range
       vip: 10.13.12.152
       port: 10000-10500          # Uses a port range rather than a fixed port
+      # no nsgroup defined, so use static members and default tcp monitoring
       members:
       - ip: 192.168.2.42        # Internal ip of TcpRouter instance 1
         port: 10000-10500
