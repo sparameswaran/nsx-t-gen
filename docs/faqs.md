@@ -152,7 +152,7 @@ If the above curl command works but concourse is still not able to go out, then 
   * Modify the parameters to specify additional T1 routers or switches and rerun add-routers.
 * Adding additional T0 Routers
   * Only one T0 Router can be created during a run of the pipeline. But additional T0Routers can be added by  modifying the parameters and rerunning the add-routers and config-nsx-t-extras jobs.
-    * Create a new copy or edit the parameters to modify the T0Router definition.
+    * Create a new copy or edit the parameters to modify the T0Router definition (it should provide index reference to nsx-t edges thats not used actively or as backup by another T0 Router).
     * Edit T0Router references across T1 Routers as well as any tags that should be used to identify a specific T0Router.
     * Add or edit any additional ip blocks or pools, nats, lbrs
     * Register parameters with the pipeline

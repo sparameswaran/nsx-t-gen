@@ -21,6 +21,7 @@ Things handled by the pipeline:
 * Route redistribution for T0 Router
 * HA Spoofguard Switching Profile
 * Load Balancer (with virtual servers and server pool) creation
+* Security Group creation and association with the server pools to handle dynamic membership
 
 Not handled by pipeline:
 
