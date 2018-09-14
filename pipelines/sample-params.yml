@@ -565,6 +565,12 @@ nsx_t_nsgroup_spec: |
 
 ## Allow user to specify the NS Group association -> in that case, member details wont be used.
 ## Also, if ns group is used, specify the active monitor name. Otherwise default to the default builtin tcp monitor
+
+## Additionally, max pool member size (max_members) need to be specified when using NSG/Dynamic membership
+## The maximum size of pool members for SMALL load balancer service form factor is 30
+## So, ensure the total pool members does not go over the supported config for a given lbr size
+## Default max members per pool is 4, if not specified
+
 nsx_t_lbr_spec: |
   loadbalancers:
   # Sample entry for creating LBR for PAS ERT
@@ -578,6 +584,7 @@ nsx_t_lbr_spec: |
       # If nsgroup is defined, then static members entry will be ignored
       nsgroup: 'PAS1-GoRouter-NSGroup'
       monitor: gorouter-monitor
+      max_members: 5
       # Ignored... as nsgroup is defined above
       members:
       - ip: 192.168.2.31        # Internal ip of GoRouter instance 1
@@ -590,6 +597,7 @@ nsx_t_lbr_spec: |
       # If nsgroup is defined, then static members will be ignored
       nsgroup: 'PAS1-GoRouter-NSGroup'
       monitor: gorouter-monitor
+      max_members: 5
       # Ignored... as nsgroup is defined above
       members:
       - ip: 192.168.2.31        # Internal ip of GoRouter instance 1
@@ -602,6 +610,7 @@ nsx_t_lbr_spec: |
       # If nsgroup is defined, then static members will be ignored
       nsgroup: 'PAS1-SSHProxy2222-NSGroup'
       monitor: diego-brain-monitor
+      max_members: 2
       # Ignored... as nsgroup is defined above
       members:
       - ip: 192.168.2.41        # Internal ip of Diego Brain where ssh proxy runs
@@ -612,6 +621,7 @@ nsx_t_lbr_spec: |
       # If nsgroup is defined, then static members will be ignored
       nsgroup: 'PAS1-MySQLProxy-NSGroup'
       monitor: mysql-proxy-monitor
+      max_members: 2
       # Ignored... as nsgroup is defined above
       members:
       - ip: 192.168.2.45        # Internal ip of Mysql proxy

@@ -881,7 +881,8 @@ def add_lbr_pool(virtual_server_defn):
             'target_type' : 'NSGroup',
             'target_id' : nsgroup_id
           },
-          'ip_revision_filter' : 'IPV4'
+          'ip_revision_filter' : 'IPV4',
+          'max_ip_list_size' : virtual_server_defn.get('max_members', 4)
       }
       pool_payload['member_group'] = member_group
 
