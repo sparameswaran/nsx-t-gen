@@ -964,7 +964,8 @@ def add_lbr_virtual_server(virtual_server_defn):
             'pool_id': pool_id,
             'enabled': True,
             'ip_protocol': 'TCP',
-            'port': virtual_server_defn['port']
+            'port': virtual_server_defn['port'],
+            'default_pool_member_port': virtual_server_defn['port']
   }
 
   if existing_virtual_server is None:
