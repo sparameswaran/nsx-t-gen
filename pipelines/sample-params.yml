@@ -547,19 +547,19 @@ nsx_t_monitor_spec: |
 nsx_t_nsgroup_spec: |
   nsgroups:
   # Sample entry for creating LBR for PAS ERT
-  - name: PAS1-GoRouter-NSGroup
+  - name: PAS1-GoRouter-NSG
     tags:
       pas-foundation: PAS1        # Tag to associate with the NSGroup
-  - name: PAS1-TCPRouter-NSGroup
+  - name: PAS1-TCPRouter-NSG
     tags:
       pas-foundation: PAS1        # Tag to associate with the NSGroup
-  - name: PAS1-SSHProxy2222-NSGroup
+  - name: PAS1-SSHProxy-NSG
     tags:
       pas-foundation: PAS1        # Tag to associate with the NSGroup
-  - name: PAS1-MySQLProxy-NSGroup
+  - name: PAS1-MySQLProxy-NSG
     tags:
       pas-foundation: PAS1        # Tag to associate with the NSGroup
-  - name: PAS2-GoRouter-NSGroup
+  - name: PAS2-GoRouter-NSG
     tags:
       pas-foundation: PAS2        # Tag to associate with the NSGroup
 
@@ -582,7 +582,7 @@ nsx_t_lbr_spec: |
       vip: 10.13.12.150          # Exposed VIP for LBR to listen on
       port: 443
       # If nsgroup is defined, then static members entry will be ignored
-      nsgroup: 'PAS1-GoRouter-NSGroup'
+      nsgroup: 'PAS1-GoRouter-NSG'
       monitor: gorouter-monitor
       max_members: 5
       # Ignored... as nsgroup is defined above
@@ -595,7 +595,7 @@ nsx_t_lbr_spec: |
       vip: 10.13.12.150
       port: 80
       # If nsgroup is defined, then static members will be ignored
-      nsgroup: 'PAS1-GoRouter-NSGroup'
+      nsgroup: 'PAS1-GoRouter-NSG'
       monitor: gorouter-monitor
       max_members: 5
       # Ignored... as nsgroup is defined above
@@ -608,7 +608,7 @@ nsx_t_lbr_spec: |
       vip: 10.13.12.151
       port: 2222                 # Port 2222 for ssh
       # If nsgroup is defined, then static members will be ignored
-      nsgroup: 'PAS1-SSHProxy2222-NSGroup'
+      nsgroup: 'PAS1-SSHProxy-NSG'
       monitor: diego-brain-monitor
       max_members: 2
       # Ignored... as nsgroup is defined above
@@ -619,7 +619,7 @@ nsx_t_lbr_spec: |
       vip: 10.13.12.153
       port: 1936                 # Port 1936 for mysql proxy
       # If nsgroup is defined, then static members will be ignored
-      nsgroup: 'PAS1-MySQLProxy-NSGroup'
+      nsgroup: 'PAS1-MySQLProxy-NSG'
       monitor: mysql-proxy-monitor
       max_members: 2
       # Ignored... as nsgroup is defined above
