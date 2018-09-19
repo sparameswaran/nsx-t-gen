@@ -27,6 +27,11 @@ Not handled by pipeline:
 
 * BGP or Static Route setup (outside of NSX-T) for T0 Routers
 
+Pipeline
+<div><img src="docs/nsx-t-gen-jobs.png" width="500"/></div>
+
+Users can choose to run the full install or portions of the install (base install to bring up the Fabric and Mgmt, Config routers and extras separately )
+
 ## Note
 To install `NSX-T v2.2`, use the `nsxt-2.2` branch of pipeline templates of this repo. At some point, the `master` branch would transition over to v2.2
 
