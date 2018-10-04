@@ -479,8 +479,8 @@ def create_container_ip_blocks():
 
   ip_blocks = yaml.load(ip_blocks_defn)
   for ip_block in ip_blocks['container_ip_blocks']:
-    ip_block_name   = ip_block('name')
-    ip_block_cidr   = ip_block('cidr')
+    ip_block_name   = ip_block['name']
+    ip_block_cidr   = ip_block['cidr']
     container_ip_block_id = create_container_ip_block(ip_block_name, ip_block_cidr, ip_block['tags'])
     #update_tag(CONTAINER_IP_BLOCKS_ENDPOINT + '/' + container_ip_block_id, create_pas_tags())
 

@@ -73,6 +73,8 @@ if [ "$ENABLE_ANSIBLE_DEBUG" == "true" ]; then
   DEBUG="-vvv"
 fi
 
+check_ovas
+
 create_hosts
 create_ansible_cfg
 create_extra_yaml_args
