@@ -79,4 +79,5 @@ RUN pip install -U pyopenssl==17.5.0
 ENV GOPATH="/root/go" PATH="$PATH:/root/go/bin"
 RUN mkdir -p /root/go/src /root/go/bin /root/go/pkg \
        && go get -u github.com/vmware/govmomi/govc \
-       && cp /root/go/bin/* /usr/bin/
+       && cp /root/go/bin/* /usr/bin/ \
+			 && cp /root/go/bin/* /usr/local/bin/
