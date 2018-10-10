@@ -62,15 +62,15 @@ cp <*ova> <VMware-ovftool*.bundle> /var/www/html
 * SSH enabled on the Hosts
 
 ## Offline envs
-This is only applicable if the docker image `nsxedgegen/nsx-t-gen-worker:latest` is unavailable or env is restricted to offline.
+This is only applicable if the docker image `nsxedgegen/nsx-t-gen-worker:nsxt-2.3` is unavailable or env is restricted to offline.
 
-* Download and copy the VMware ovftool install bundle (linux 64-bit version) along with nsx-t python modules (including vapi_common, vapi_runtime, vapi_common_client libs) and copy that into the Dockerfile folder
+* Download and copy the VMware ovftool install bundle (linux 64-bit version) along with nsx-t python modules (including vapi_common, vapi_runtime, vapi_common_client libs for nsx-t 2.3) and copy that into the Dockerfile folder
 * Create and push the docker image using
 ```
  docker build -t nsx-t-gen-worker Dockerfile
  # To test image:  docker run --rm -it nsx-t-gen-worker bash
- docker tag  nsx-t-gen-worker nsxedgegen/nsx-t-gen-worker:v2.2
- docker push nsxedgegen/nsx-t-gen-worker:v2.2
+ docker tag  nsx-t-gen-worker nsxedgegen/nsx-t-gen-worker:v2.3
+ docker push nsxedgegen/nsx-t-gen-worker:v2.3
 ```
 
 
@@ -79,17 +79,17 @@ This is only applicable if the docker image `nsxedgegen/nsx-t-gen-worker:latest`
 Download and make the following bits available on a webserver so it can be used by pipeline to install the NSX-T 2.3 bits:
 
 ```
-# Download NSX-T 2.2 bits from
-# https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-220&productId=673
+# Download NSX-T 2.3 bits from
+# https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-230&productId=673
 
 #nsx-mgr-ova
-nsx-unified-appliance-2.2.0.0.0.8680778.ova  
+nsx-unified-appliance-2.3.0.0.0.10085405.ova
 
 #nsx-ctrl-ova
-nsx-controller-2.2.0.0.0.8680774.ova
+nsx-controller-2.3.0.0.0.10085396.ova
 
 #nsx-edge-ova
-nsx-edge-2.2.0.0.0.8680783.ova  
+nsx-edge-2.3.0.0.0.10085448.ova  
 
 # Download VMware ovftool from https://my.vmware.com/group/vmware/details?productId=614&downloadGroup=OVFTOOL420#
 VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle  

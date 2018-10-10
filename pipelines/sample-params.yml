@@ -360,10 +360,10 @@ nsx_t_container_ip_block_spec: |
       ncp/cluster: 'pas1' # Should match the top level ncp/cluster tag value
       testtag: 'testpas1'
   # - name: node-container-ip-block-pks-without-tag
-  #   cidr: 172.24.0.0/16
+  #   cidr: 172.24.0.0/14
   #   # No tags for this block
   # - name: pod-container-ip-block-pks-with-tag
-  #   cidr: 172.28.0.0/16
+  #   cidr: 172.28.0.0/14
   #   tags:
   #     ncp/shared_resource: 'true'
 
@@ -382,7 +382,7 @@ nsx_t_external_ip_pool_spec: |
   - name: snat-vip-pool-for-pas
     cidr: 10.100.0.0/24  # Should be a 0/24 or some valid cidr, matching the external exposed uplink
     gateway: 10.100.0.1
-    start: 10.100.0.21 # Should not include gateway; reserve some for Ops Mgr, LB Vips for GoRouter, SSH Proxy
+    start: 10.100.0.31 # Should not include gateway; reserve some for Ops Mgr, LB Vips for GoRouter, SSH Proxy
     end: 10.100.0.200  # Should not include gateway
     # Specify tags with PAS 2.0 and NSX Tile 2.1.0
     # Tags not needed for PAS 2.1 and NSX Tile 2.1.3
@@ -393,12 +393,12 @@ nsx_t_external_ip_pool_spec: |
   - name: snat-vip-pool-with-no-tags
     cidr: 10.200.0.0/24  # Should be a 0/24 or some valid cidr, matching the external exposed uplink
     gateway: 10.200.0.1
-    start: 10.200.0.20 # Should not include gateway
+    start: 10.200.0.31 # Should not include gateway
     end: 10.200.0.200  # Should not include gateway
   - name: snat-vip-pool-for-pks
     cidr: 10.300.0.0/24 # Should be a 0/24 or some valid cidr, matching the external exposed uplink
     gateway: 10.300.0.1
-    start: 10.300.0.20 # Should not include gateway; reserve some for PKS Controller, Harbor
+    start: 10.300.0.31 # Should not include gateway; reserve some for PKS Controller, Harbor
     end: 10.300.0.200  # Should not include gateway
     tags:
       ncp/external: 'true'        # Required for external facing ips
