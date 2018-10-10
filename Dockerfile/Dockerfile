@@ -1,4 +1,4 @@
-# Meant for support nsx-t v2.2
+# Meant for support nsx-t v2.3
 FROM ubuntu:17.10
 COPY ./ ./
 
@@ -63,7 +63,7 @@ RUN apt-get update \
   && apt-get install -y ansible
 
 # Add nsx-t python sdk and runtime libraries
-COPY ./nsx_python_sdk-2.2.0.0.0.8680797-py2.py3-none-any.whl .
+COPY ./nsx_python_sdk-2.3.0.0.0.10085514-py2.py3-none-any.whl .
 COPY ./vapi_runtime-2.9.0-py2.py3-none-any.whl .
 COPY ./vapi_common-2.9.0-py2.py3-none-any.whl .
 COPY ./vapi_common_client-2.9.0-py2.py3-none-any.whl .

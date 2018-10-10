@@ -4,7 +4,7 @@ platform: linux
 
 image_resource:
   type: docker-image
-  source: {repository: nsxedgegen/nsx-t-gen-worker, tag: v2.2 }
+  source: {repository: nsxedgegen/nsx-t-gen-worker, tag: v2.3 }
 
 params:
   NSX_T_INSTALLER:
@@ -25,7 +25,7 @@ params:
   NSX_T_LBR_SPEC:
   NSX_T_MONITOR_SPEC:
   NSX_T_NSGROUP_SPEC:
-    
+
 inputs:
   - name: nsx-t-gen-pipeline
 run:

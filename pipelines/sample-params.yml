@@ -1,6 +1,6 @@
 enable_ansible_debug: false # set value to true for verbose output from ansible
 nsx_t_installer: nsx-t-gen  # Set to name of installer or env or any value so resources can be identified
-nsx_t_version: 2.2
+nsx_t_version: 2.3
 
 # vCenter details to deploy the Mgmt OVAs (Mgr, Edge, Controller)
 vcenter_host: vcsa-01.corp.local.io       # EDIT - this is for deployment of the ovas for the mgmt plane
@@ -25,10 +25,10 @@ netmask: 255.255.255.0                    # EDIT
 nsx_image_webserver: http://10.85.24.5:9080
 
 # Download NSX-T 2.2 bits from
-# https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-220&productId=673
-nsx_mgr_ova: nsx-unified-appliance-2.2.0.0.0.8680778.ova
-nsx_controller_ova: nsx-controller-2.2.0.0.0.8680774.ova
-nsx_edge_ova: nsx-edge-2.2.0.0.0.8680783.ova
+# https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-230&productId=673
+nsx_mgr_ova: nsx-unified-appliance-2.3.0.0.0.10085405.ova
+nsx_controller_ova: nsx-controller-2.3.0.0.0.10085396.ova
+nsx_edge_ova: nsx-edge-2.3.0.0.0.10085448.ova
 # Ensure ovftool is minimally v4.2
 # https://my.vmware.com/group/vmware/details?productId=614&downloadGroup=OVFTOOL420#
 ovftool_image: VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle
