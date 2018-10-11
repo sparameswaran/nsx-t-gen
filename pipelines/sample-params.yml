@@ -432,6 +432,7 @@ nsx_t_nat_rules_spec: |
     source_network: 192.168.1.0/24      # PAS Infra network cidr
     translated_network: 10.13.12.3      # SNAT External Address for PAS networks
     rule_priority: 8000                  # Lower priority
+    #destination_network: 101.101.101.1  # Optional - allow specific network to reach out to
 
   # Sample entry for PAS ERT network SNAT - egress
   - t0_router: DefaultT0Router
@@ -439,6 +440,7 @@ nsx_t_nat_rules_spec: |
     source_network: 192.168.2.0/24      # PAS ERT network cidr
     translated_network: 10.13.12.3      # SNAT External Address for PAS networks
     rule_priority: 8000                  # Lower priority
+    #destination_network: 101.101.101.1  # Optional - allow specific network to reach out to
 
   # Sample entry for PAS Services network SNAT - egress
   - t0_router: DefaultT0Router
@@ -446,6 +448,7 @@ nsx_t_nat_rules_spec: |
     source_network: 192.168.3.0/24      # PAS Services network cidr
     translated_network: 10.13.12.3      # SNAT External Address for PAS networks
     rule_priority: 8001                  # Lower priority
+    #destination_network: 101.101.101.1  # Optional - allow specific network to reach out to
 
   # Sample entry for PAS Dynamic Services network SNAT - egress
   - t0_router: DefaultT0Router
@@ -453,6 +456,7 @@ nsx_t_nat_rules_spec: |
     source_network: 192.168.4.0/24      # PAS Dynamic Services network cidr
     translated_network: 10.13.12.3      # SNAT External Address for PAS networks
     rule_priority: 8001                  # Lower priority
+    #destination_network: 101.101.101.1  # Optional - allow specific network to reach out to
 
   # # Sample entry for PKS PKS-Infra network - egress
   # - t0_router: DefaultT0Router
@@ -460,6 +464,7 @@ nsx_t_nat_rules_spec: |
   #   source_network: 172.23.1.0/24        # PKS Infra network cidr
   #   translated_network: 10.13.12.6       # SNAT External Address for PKS networks
   #   rule_priority: 8001                  # Lower priority
+  #   #destination_network: 101.101.101.1  # Optional - allow specific network to reach out to
   #
   # # Sample entry for PKS PKS-Clusters network - egress
   # - t0_router: DefaultT0Router
@@ -467,6 +472,7 @@ nsx_t_nat_rules_spec: |
   #   source_network: 172.23.2.0/24        # PKS Services network cidr
   #   translated_network: 10.13.12.6       # SNAT External Address for PKS networks
   #   rule_priority: 8001                  # Lower priority
+  #   #destination_network: 101.101.101.1  # Optional - allow specific network to reach out to
   #
   # # Sample entry for allowing inbound to PKS Ops manager
   # - t0_router: DefaultT0Router
@@ -488,6 +494,7 @@ nsx_t_nat_rules_spec: |
   #   destination_network: 10.13.12.7      # External IP address for PKS controller
   #   translated_network: 172.23.2.4       # Internal IP of PKS Ops Controller
   #   rule_priority: 1024                  # Higher priority
+  #   #destination_network: 101.101.101.1  # Optional - allow specific network to reach out to
   # # Sample entry for allowing outbound from PKS Controller to external
   # - t0_router: DefaultT0Router
   #   nat_type: snat
