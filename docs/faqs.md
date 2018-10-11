@@ -161,40 +161,40 @@ If the above curl command works but concourse is still not able to go out, then 
 * Static Routing for NSX-T T0 Router
   Please refer to the [Static Routing Setup](./static-routing-setup.md) for details on the static routing.
 
-  * Errors with NAT rule application
-    Sample error1: `[Routing] Service IPs are overlapping with logical router ports`
-    Sample error2: `[Routing] NAT service IP(s) overlap with HA VIP subnet`
-    If the external assigned ip used as a SNAT translated ip falls in the Router uplink port range (like T0 router is using /27 and the specified translated ip falls within the /27 range), then the above errors might get thrown. Restrict or limit the cidr range using something like /29 (configured in the T0 spec) that limits it to just 6 ips and use an external ip thats outside of this uplink router ip range as translated ip.
+* Errors with NAT rule application
+  Sample error1: `[Routing] Service IPs are overlapping with logical router ports`
+  Sample error2: `[Routing] NAT service IP(s) overlap with HA VIP subnet`
+  If the external assigned ip used as a SNAT translated ip falls in the Router uplink port range (like T0 router is using /27 and the specified translated ip falls within the /27 range), then the above errors might get thrown. Restrict or limit the cidr range using something like /29 (configured in the T0 spec) that limits it to just 6 ips and use an external ip thats outside of this uplink router ip range as translated ip.
 
-    Sample:
-    ```
-    nsx_t_t0router_spec: |
-    t0_router:
-      name: DefaultT0Router
-      ...
-      vip: 10.13.12.103/29  # T0 router vip - make sure this range does not intrude with the external vip ranges
-      ip1: 10.13.12.101/29  # T0 router uplink ports - make sure this range does not intrude with the external vip ranges
-      ip2: 10.13.12.102/29  # T0 router uplink ports - make sure this range does not intrude with the external vip ranges
-     ```
-    And external ip:
-    ```
-    nsx_t_external_ip_pool_spec: |
-    external_ip_pools:
-    - name: snat-vip-pool-for-pas
-      cidr: 10.100.0.0/24  # Should be a 0/24 or some valid cidr, matching the external exposed uplink
-      gateway: 10.100.0.1
-      start: 10.100.0.31 # Should not include gateway, not overlap with the T0 router uplink ips; reserve some for Ops Mgr, LB Vips for GoRouter, SSH Proxy
-      end: 10.100.0.200  # Should not include gateway, not overlap with the T0 router uplink ips
-      # Specify tags with PAS 2.0 and NSX Tile 2.1.0
-    ```
-    And nat rule:
-    ```
-    nsx_t_nat_rules_spec: |
-    nat_rules:
-    # Sample entry for PAS Infra network SNAT - egress
-    - t0_router: DefaultT0Router
-      nat_type: snat
-      source_network: 192.168.1.0/24      # PAS Infra network cidr
-      translated_network: 10.100.0.12      # SNAT External Address for PAS networks, outside of the T0 uplink ip range
-      rule_priority: 8000   
-    ```
+  Sample:
+  ```
+  nsx_t_t0router_spec: |
+  t0_router:
+    name: DefaultT0Router
+    ...
+    vip: 10.13.12.103/29  # T0 router vip - make sure this range does not intrude with the external vip ranges
+    ip1: 10.13.12.101/29  # T0 router uplink ports - make sure this range does not intrude with the external vip ranges
+    ip2: 10.13.12.102/29  # T0 router uplink ports - make sure this range does not intrude with the external vip ranges
+   ```
+  And external ip:
+  ```
+  nsx_t_external_ip_pool_spec: |
+  external_ip_pools:
+  - name: snat-vip-pool-for-pas
+    cidr: 10.100.0.0/24  # Should be a 0/24 or some valid cidr, matching the external exposed uplink
+    gateway: 10.100.0.1
+    start: 10.100.0.31 # Should not include gateway, not overlap with the T0 router uplink ips; reserve some for Ops Mgr, LB Vips for GoRouter, SSH Proxy
+    end: 10.100.0.200  # Should not include gateway, not overlap with the T0 router uplink ips
+    # Specify tags with PAS 2.0 and NSX Tile 2.1.0
+  ```
+  And nat rule:
+  ```
+  nsx_t_nat_rules_spec: |
+  nat_rules:
+  # Sample entry for PAS Infra network SNAT - egress
+  - t0_router: DefaultT0Router
+    nat_type: snat
+    source_network: 192.168.1.0/24      # PAS Infra network cidr
+    translated_network: 10.100.0.12      # SNAT External Address for PAS networks, outside of the T0 uplink ip range
+    rule_priority: 8000   
+  ```

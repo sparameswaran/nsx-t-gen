@@ -1,5 +1,5 @@
 # nsx-t-gen
-Concourse pipeline to install NSX-T v2.1
+Concourse pipeline to install NSX-T v2.x
 
 The concourse pipeline uses [ansible scripts](https://github.com/yasensim/nsxt-ansible) created by Yasen Simeonov and [forked](https://github.com/sparameswaran/nsxt-ansible) by the author of this pipeline.
 
@@ -32,11 +32,14 @@ Pipeline
 
 Users can choose to run the full install or portions of the install (base install to bring up the Fabric and Mgmt, Config routers and extras separately )
 
+## Canned-pks
+For users looking at installing NSX-T in fully isolated or offline environments, please check the [canned-pks](https://github.com/pivotalservices/canned-pks) on how to use an offline version of this pipeline that would use cached/offlined copies of various dependencies (docker images, pipeline sources, ova or other install bits along with the offline version of the pipeline itself). The canned-pks install takes a very opinionated view of install (only single compute cluster supported vs any number of compute clusters in nsx-t-gen, pre-determined set of parameters for things that are not specific to env etc.)
+
 ## Note
-To install `NSX-T v2.2`, use the `nsxt-2.2` branch of pipeline templates of this repo. At some point, the `master` branch would transition over to v2.2
+To install `NSX-T v2.2`, use the `nsxt-2.2` branch of pipeline templates of this repo. Similarly, use `nsxt-2.3` for installing `NSX-T v2.3`.
 
 ## Warning
-This is purely a trial work-in-progress and not officially supported by anyone. Use caution while using it at your own Risk!!.
+This is purely a work-in-progress and not officially supported by anyone. Use caution while using it at your own Risk!!.
 
 Also, NSX-T cannot co-reside on the same ESXi Host & Cluster as one already running NSX-V. So, ensure you are either using a different set of vCenter, Clusters and hosts or atleast the cluster that does not have NSX-V. Also, the ESXi hosts should be atleast 6.5. Please refer to NSX-T Documentation for detailed set of requirements for NSX-T.
 
@@ -60,14 +63,13 @@ sudo apt-get nginx
 cp <*ova> <VMware-ovftool*.bundle> /var/www/html
 # Edit nginx config and start
 ```
- S3 can also be used to host the bits. Change the reference to s3 so concourse can pull down the bits as needed.
 * vCenter Access
 * SSH enabled on the Hosts
 
 ## Offline envs
-This is only applicable if the docker image `nsxedgegen/nsx-t-gen-worker:latest` is unavailable or env is restricted to offline.
+This is only applicable if the docker image `nsxedgegen/nsx-t-gen-worker:<version>` is unavailable or env is restricted to offline.
 
-* Download and copy the VMware ovftool install bundle (linux 64-bit version) along with nsx-t python modules (including vapi_common, vapi_runtime, vapi_common_client libs) and copy that into the Dockerfile folder
+* Download and copy the VMware ovftool install bundle (linux 64-bit version) along with nsx-t python modules (including vapi_common, vapi_runtime, vapi_common_client libs based on version of nsx-t) and copy that into the Dockerfile folder
 * Create and push the docker image using
 ```
  docker build -t nsx-t-gen-worker Dockerfile
@@ -77,9 +79,9 @@ This is only applicable if the docker image `nsxedgegen/nsx-t-gen-worker:latest`
 ```
 
 
-## VMware NSX-T 2.1.* bits
+## VMware NSX-T 2.* bits
 
-Download and make the following bits available on a webserver so it can be used by pipeline to install the NSX-T 2.1 bits:
+Download and make the following bits available on a webserver so it can be used by pipeline to install the NSX-T 2.x bits:
 
 ```
 # Download NSX-T 2.1 bits from
