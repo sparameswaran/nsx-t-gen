@@ -7,8 +7,8 @@
   * Recommend planning ahead of time and creating the edges all in the beginning rather than adding them later.
   * If its really required, recommend manually installing any additional edges using direct deployment of OVAs while ensuring the names are following previously installed edge instance name convention (like nsx-t-edge-0?), then update the parameters to specify the additional edge ips (assuming they use the same edge naming convention) and let the controller (as part of the base-install or just full-install) to do a rejoin of the edges followed by other jobs/tasks. Only recommended for advanced users who are ready to drill down/debug.
 * Downloading the bits
-  * Download NSX-T 2.1 bits from
-    https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-210&productId=673
+  * Download NSX-T 2.22 bits from
+    https://my.vmware.com/group/vmware/details?downloadGroup=NSX-T-220&productId=673
     Check https://my.vmware.com for link to new installs
   * Download [VMware-ovftool-4.2.0-5965791-lin.x86_64.bundle v4.2](https://my.vmware.com/group/vmware/details?productId=614&downloadGroup=OVFTOOL420#)
 
@@ -29,7 +29,7 @@
 
   Check with docker documentation on specifying proxies: https://docs.docker.com/network/proxy/
 
-  Ensure the ``/etc/systemd/system/docker.service.d/http-proxy.conf` specifies the HTTP_PROXY and HTTPS_PROXY env variables so docker can go out via the proxy.
+  Ensure the `/etc/systemd/system/docker.service.d/http-proxy.conf` specifies the HTTP_PROXY and HTTPS_PROXY env variables so docker can go out via the proxy.
   ```
   [Service]
   Environment="HTTP_PROXY=http://proxy.corp.local"   # EDIT the proxy
@@ -61,7 +61,7 @@
 
 * If running out of disk space with docker compose, use `docker volume prune` command to clean up unused volumes.
 
-* If things are still not reachable to outside (like reaching the github repos or webserver), try to add an additional docker image to run alongside concourse like a ubuntu image for debug purpose and then try to do a curl to outside after updating apt-get and installing curl.
+* If things are still not reachable to outside (like reaching the github repos or webserver), try to add an additional docker image to run alongside concourse like an vanilla ubuntu image for debug purpose and shell into it, then try to run a curl to outside after updating apt-get and installing curl.
 
 Sample entry for adding ubuntu docker container image to docker-compose.yml.
 ```
@@ -152,8 +152,49 @@ If the above curl command works but concourse is still not able to go out, then 
   * Modify the parameters to specify additional T1 routers or switches and rerun add-routers.
 * Adding additional T0 Routers
   * Only one T0 Router can be created during a run of the pipeline. But additional T0Routers can be added by  modifying the parameters and rerunning the add-routers and config-nsx-t-extras jobs.
-    * Create a new copy or edit the parameters to modify the T0Router definition.
+    * Create a new copy or edit the parameters to modify the T0Router definition (it should provide index reference to nsx-t edges thats not used actively or as backup by another T0 Router).
     * Edit T0Router references across T1 Routers as well as any tags that should be used to identify a specific T0Router.
     * Add or edit any additional ip blocks or pools, nats, lbrs
     * Register parameters with the pipeline
     * Rerun add-routers followed by config-nsx-t-extras job group
+
+* Static Routing for NSX-T T0 Router
+  Please refer to the [Static Routing Setup](./static-routing-setup.md) for details on the static routing.
+
+* Errors with NAT rule application
+  Sample error1: `[Routing] Service IPs are overlapping with logical router ports`
+  Sample error2: `[Routing] NAT service IP(s) overlap with HA VIP subnet`
+  If the external assigned ip used as a SNAT translated ip falls in the Router uplink port range (like T0 router is using /27 and the specified translated ip falls within the /27 range), then the above errors might get thrown. Restrict or limit the cidr range using something like /29 (configured in the T0 spec) that limits it to just 6 ips and use an external ip thats outside of this uplink router ip range as translated ip.
+
+  Sample:
+  ```
+  nsx_t_t0router_spec: |
+  t0_router:
+    name: DefaultT0Router
+    ...
+    vip: 10.13.12.103/29  # T0 router vip - make sure this range does not intrude with the external vip ranges
+    ip1: 10.13.12.101/29  # T0 router uplink ports - make sure this range does not intrude with the external vip ranges
+    ip2: 10.13.12.102/29  # T0 router uplink ports - make sure this range does not intrude with the external vip ranges
+   ```
+  And external ip:
+  ```
+  nsx_t_external_ip_pool_spec: |
+  external_ip_pools:
+  - name: snat-vip-pool-for-pas
+    cidr: 10.100.0.0/24  # Should be a 0/24 or some valid cidr, matching the external exposed uplink
+    gateway: 10.100.0.1
+    start: 10.100.0.31 # Should not include gateway, not overlap with the T0 router uplink ips; reserve some for Ops Mgr, LB Vips for GoRouter, SSH Proxy
+    end: 10.100.0.200  # Should not include gateway, not overlap with the T0 router uplink ips
+    # Specify tags with PAS 2.0 and NSX Tile 2.1.0
+  ```
+  And nat rule:
+  ```
+  nsx_t_nat_rules_spec: |
+  nat_rules:
+  # Sample entry for PAS Infra network SNAT - egress
+  - t0_router: DefaultT0Router
+    nat_type: snat
+    source_network: 192.168.1.0/24      # PAS Infra network cidr
+    translated_network: 10.100.0.12      # SNAT External Address for PAS networks, outside of the T0 uplink ip range
+    rule_priority: 8000   
+  ```
