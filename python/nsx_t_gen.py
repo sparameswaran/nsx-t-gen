@@ -743,6 +743,8 @@ def add_t0_route_nat_rules():
     else:
       rule_payload['action'] = 'SNAT'
       rule_payload['match_source_network'] = nat_rule['source_network']
+      if nat_rule.get('destination_network'):
+          rule_payload['match_destination_network'] = nat_rule['destination_network']
 
     existing_nat_rule = check_for_existing_rule(existing_nat_rules, rule_payload )
 
