@@ -26,7 +26,7 @@ cp $FUNCTIONS_DIR/uninstall-nsx-vibs.yml $ROOT_DIR/
 #   cp $FUNCTIONS_DIR/uninstall-nsx-t-v2.1-vibs.sh $ROOT_DIR/uninstall-nsx-t-vibs.sh
 # fi
 
-cp $FUNCTIONS_DIR/uninstall-nsx-t-v2.2-vibs.sh $ROOT_DIR/uninstall-nsx-t-vibs.sh
+cp $FUNCTIONS_DIR/uninstall-nsx-t-v2.3-vibs.sh $ROOT_DIR/uninstall-nsx-t-vibs.sh
 
 cat > $ROOT_DIR/ansible.cfg << EOF
 [defaults]
