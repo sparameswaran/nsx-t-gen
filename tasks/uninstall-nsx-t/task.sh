@@ -55,6 +55,7 @@ else
   echo "NSX Manager VM not responding!!"
   echo "Cannot delete any related resources within the NSX Management plane"
   echo ""
+  exit -1
 fi
 
 echo "Going to delete the NSX vms in 60 seconds!!!!"
