@@ -1,7 +1,7 @@
 # nsx-t-gen
 Concourse pipeline to install NSX-T v2.1
 
-# DISCLAIMER
+# DEPRECATED
 
 This pipeline is not supported or maintained going forward as of Oct 17th, 2018. This was a best-effort, unofficial, unsupported work at best. All development work has now stopped.
 
