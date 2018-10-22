@@ -7,6 +7,7 @@ This pipeline is not supported or maintained going forward as of Oct 17th, 2018.
 
 Kindly use the [VMware's nsx-t-datacenter-pipelines](https://github.com/vmware/nsx-t-datacenter-ci-pipelines) which contains fork of this repository code (a bit older) that would be supported and maintained by VMware.
 
+
 # Details
 
 The concourse pipeline uses [ansible scripts](https://github.com/yasensim/nsxt-ansible) created by Yasen Simeonov and [forked](https://github.com/sparameswaran/nsxt-ansible) by the author of this pipeline.
